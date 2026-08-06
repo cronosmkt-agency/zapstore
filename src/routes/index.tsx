@@ -99,7 +99,7 @@ const products: { name: string; price: number; cat: string; badge: string; img: 
   { name: "iPhone 11 (seminovo)", price: 1999, cat: "Seminovos", badge: "Seminovo", img: iphone12 },
 ];
 
-const filters = ["Todos", "iPhones", "Seminovos"];
+const filters = ["Todos", "Novos", "Seminovos"];
 
 const services = [
   { icon: Smartphone, title: "Troca de Tela", desc: "Original e com garantia. A partir de R$ 299" },
