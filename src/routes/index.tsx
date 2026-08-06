@@ -156,6 +156,14 @@ function DeltaLogo({ height = 40, showText = true }: { height?: number; showText
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [afterHours, setAfterHours] = useState(false);
+
+  useEffect(() => {
+    const now = new Date();
+    const minutes = now.getHours() * 60 + now.getMinutes();
+    // Same logic as DeliveryPopup: after 18:30 (18 * 60 + 30)
+    setAfterHours(minutes >= 18 * 60 + 30);
+  }, []);
   useEffect(() => {
     let raf = 0;
     const on = () => {
@@ -195,7 +203,9 @@ function Navbar() {
             ))}
           </div>
           <div className="flex items-center gap-6 justify-end">
-            <div className="badge-aberto">Aberto até 18:00</div>
+            <div className="badge-aberto">
+              {afterHours ? "Fechado — Abre amanhã às 10:00" : "Aberto até 18:00"}
+            </div>
             <span className="h-6 border-l" style={{ borderColor: "rgba(var(--blue-rgb),0.18)" }} />
             <a href={WHATSAPP} className="btn-pedir-agora">Pedir Agora</a>
           </div>
@@ -1093,7 +1103,7 @@ function Footer() {
             <div className="font-bold mb-4" style={{ color: T.text }}>Contato</div>
             <div className="text-sm space-y-2" style={{ color: T.sub }}>
               <div className="flex items-center gap-2"><Phone className="w-4 h-4" /> {PHONE_DISPLAY}</div>
-              <a href="https://instagram.com/acasadamaça_teresopolis" className="flex items-center gap-2"><Instagram className="w-4 h-4" /> @acasadamaça_teresopolis</a>
+              <a href="https://instagram.com/casadamac_" className="flex items-center gap-2"><Instagram className="w-4 h-4" /> @casadamac_</a>
               <a href="https://facebook.com/acasadamaça" className="flex items-center gap-2"><Facebook className="w-4 h-4" /> acasadamaça</a>
             </div>
           </div>
