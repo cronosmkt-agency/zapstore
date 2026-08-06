@@ -834,9 +834,9 @@ function Services() {
 function DeliverySection() {
   const benefits = [
     "Entrega no mesmo dia em Teresópolis",
-    "Técnico especializado na sua casa",
+    "Atendimento personalizado via WhatsApp",
     "Pagamento seguro na entrega",
-    "Rastreio via WhatsApp em tempo real",
+    "Produtos com garantia e procedência",
   ];
   return (
     <section id="delivery" className="py-10 sm:py-24 px-4 sm:px-6">
@@ -869,9 +869,6 @@ function DeliverySection() {
             <a href={WHATSAPP} className="btn-primary-glow wa-float mt-8 inline-flex items-center gap-2">
               <MessageCircle className="w-5 h-5" /> Chamar no WhatsApp
             </a>
-            <div className="mt-4 flex items-center gap-2 text-sm" style={{ color: T.muted }}>
-              <Phone className="w-4 h-4" /> {PHONE_DISPLAY}
-            </div>
           </div>
           <div className="flex justify-center">
             <div className="glass w-56 h-56 rounded-full flex items-center justify-center float-slow">
