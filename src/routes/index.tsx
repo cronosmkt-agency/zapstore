@@ -143,10 +143,12 @@ function DeltaLogo({ height = 40, showText = true }: { height?: number; showText
         width={height * 1.5}
         height={height}
         style={{ height, width: "auto" }}
-        className="object-contain"
+        className="object-contain shrink-0"
       />
       {showText && (
-        <span className="font-bold text-lg" style={{ color: T.text }}>A Casa da Maçã</span>
+        <span className="font-bold text-base sm:text-lg whitespace-nowrap" style={{ color: T.text }}>
+          A Casa da <span style={{ color: T.primary }}>Maçã</span>
+        </span>
       )}
     </div>
   );
