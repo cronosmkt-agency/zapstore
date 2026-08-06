@@ -1046,8 +1046,8 @@ function About() {
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 mt-0.5" style={{ color: T.primary }} />
                 <div className="text-sm" style={{ color: T.sub }}>
-                  Prédio da ACIAT, Av. José Joaquim de Araújo Regadas, nº 142 — Sala 06<br />
-                  Várzea, Teresópolis - RJ
+                  Av. José Joaquim de Araújo Regadas, 146 — Várzea<br />
+                  Teresópolis - RJ, 25953-040
                 </div>
               </div>
               <div className="flex items-center gap-3">
