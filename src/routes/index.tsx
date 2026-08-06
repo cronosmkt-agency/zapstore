@@ -65,8 +65,8 @@ export const Route = createFileRoute("/")({
   component: DeltaStore,
 });
 
-const WHATSAPP = "https://wa.me/552120080400";
-const PHONE_DISPLAY = "(21) 2008-0400";
+const WHATSAPP = "https://wa.me/5521993446336";
+const PHONE_DISPLAY = "(21) 99344-6336";
 
 /* ---------- Tokens util ---------- */
 const T = {
