@@ -187,7 +187,7 @@ function Navbar() {
 
         <div className="navbar-desk-inner">
           <a href="#inicio" className="shrink-0 logo-desk">
-            <DeltaLogo height={scrolled ? 44 : 52} />
+            <DeltaLogo height={scrolled ? 44 : 52} showText={true} />
           </a>
           <div className="flex items-center justify-center nav-links-desk">
             {links.map(([l, h]) => (
@@ -215,7 +215,7 @@ function Navbar() {
           </button>
 
           <a href="#inicio" className="absolute left-1/2 -translate-x-1/2 flex items-center">
-            <DeltaLogo height={36} />
+            <DeltaLogo height={36} showText={true} />
           </a>
         </div>
 
