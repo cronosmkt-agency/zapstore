@@ -111,10 +111,10 @@ const services = [
 ];
 
 const reviews = [
-  { name: "Ghost", text: "Melhores preços nos iPhone" },
-  { name: "Thiago Lima", text: "Serviço top, melhor atendimento da cidade, qualidade, preço e rapidez na assistência." },
-  { name: "Enzo Michelin", text: "Atendimento ótimo! Valorização do seu usado e pronta entrega! Alto nível!!!" },
-  { name: "Camila Cunha", text: "Excelente atendimento e rapidez no serviço. Super indico" },
+  { name: "Ricardo Santos", text: "Excelente atendimento! Comprei meu iPhone 15 Pro com eles e o preço foi o melhor de Teresópolis. Recomendo muito!" },
+  { name: "Mariana Oliveira", text: "Levei meu celular para trocar a tela e ficou pronto no mesmo dia. Serviço rápido, peças de qualidade e preço justo." },
+  { name: "Bruno Ferreira", text: "A Casa da Maçã é nota 10. Fiz a troca inteligente do meu usado e peguei um novo com facilidade. Equipe muito honesta." },
+  { name: "Beatriz Lopes", text: "O delivery é fantástico! Chegou super rápido e o atendimento pelo WhatsApp foi muito atencioso. Virei cliente fiel!" },
 ];
 
 const fmt = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
