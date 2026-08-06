@@ -133,17 +133,22 @@ function BackgroundOrbs() {
   );
 }
 
-function DeltaLogo({ height = 40 }: { height?: number }) {
+function DeltaLogo({ height = 40, showText = true }: { height?: number; showText?: boolean }) {
   return (
-    <img
-      src={sejaDeltaLogo}
-      alt="A Casa da Maçã"
-      decoding="async"
-      width={height * 3}
-      height={height}
-      style={{ height, width: "auto" }}
-      className="object-contain"
-    />
+    <div className="flex items-center gap-2">
+      <img
+        src={sejaDeltaLogo}
+        alt="A Casa da Maçã"
+        decoding="async"
+        width={height * 1.5}
+        height={height}
+        style={{ height, width: "auto" }}
+        className="object-contain"
+      />
+      {showText && (
+        <span className="font-bold text-lg" style={{ color: T.text }}>A Casa da Maçã</span>
+      )}
+    </div>
   );
 }
 
@@ -182,7 +187,7 @@ function Navbar() {
 
         <div className="navbar-desk-inner">
           <a href="#inicio" className="shrink-0 logo-desk">
-            <DeltaLogo height={scrolled ? 44 : 52} />
+            <DeltaLogo height={scrolled ? 44 : 52} showText={true} />
           </a>
           <div className="flex items-center justify-center nav-links-desk">
             {links.map(([l, h]) => (
@@ -210,7 +215,7 @@ function Navbar() {
           </button>
 
           <a href="#inicio" className="absolute left-1/2 -translate-x-1/2 flex items-center">
-            <DeltaLogo height={36} />
+            <DeltaLogo height={36} showText={true} />
           </a>
         </div>
 
@@ -1071,7 +1076,7 @@ function Footer() {
       <div className="max-w-7xl mx-auto">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <DeltaLogo />
+            <DeltaLogo showText={true} />
             <p className="text-sm mt-4" style={{ color: T.sub }}>
               A experiência premium em smartphones que Teresópolis merece.
             </p>
