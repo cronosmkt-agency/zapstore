@@ -686,7 +686,7 @@ function VSL() {
           <span className="hidden sm:inline" style={{ color: "rgba(var(--blue-rgb), 0.25)" }}>|</span>
           <div className="flex items-center justify-center gap-2">
             <span style={{ color: "var(--blue-primary)" }}>✓</span>
-            <span>46 avaliações reais</span>
+            <span>Avaliações reais</span>
           </div>
           <span className="hidden sm:inline" style={{ color: "rgba(var(--blue-rgb), 0.25)" }}>|</span>
           <div className="flex items-center justify-center gap-2">
