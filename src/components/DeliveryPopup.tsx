@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-const sejaDeltaLogo = "https://ik.imagekit.io/cronosmkt/A%20Casa%20da%20Ma%C3%A7a.png";
+const sejaDeltaLogo = "https://ik.imagekit.io/cronosmkt/A%20Casa%20da%20Ma%C3%A7a.png?updatedAt=1785982094106";
 
 
 export function DeliveryPopup() {
