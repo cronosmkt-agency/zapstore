@@ -517,7 +517,7 @@ function VimeoPlayer() {
           aria-label="Reproduzir vídeo da A Casa da Maçã"
         >
           <img
-            src="https://vumbnail.com/1214863083.jpg"
+            src="https://ik.imagekit.io/cronosmkt/Casa%20da%20Ma%C3%A7%C3%A3%20Background.jpg"
             alt="Thumbnail do vídeo A Casa da Maçã"
             className="absolute inset-0 w-full h-full object-cover"
             style={{ opacity: 0.45, borderRadius: "18px" }}
