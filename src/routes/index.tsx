@@ -1048,9 +1048,9 @@ function About() {
       <div className="max-w-6xl mx-auto glass p-8 sm:p-12">
         <div className="grid lg:grid-cols-2 gap-10">
           <div>
-            <SectionTitle eyebrow="Quem somos" title="Delta — a Apple experience de Teresópolis" />
+            <SectionTitle eyebrow="Quem somos" title="A Casa da Maçã — a Apple experience de Teresópolis" />
             <p className="mt-6 leading-relaxed" style={{ color: T.sub }}>
-              A <span className="text-gradient-blue font-bold">Delta</span> nasceu para
+              A <span className="text-gradient-blue font-bold">A Casa da Maçã</span> nasceu para
               transformar a relação dos teresopolitanos com seus smartphones:
               produtos originais, assistência técnica de confiança e um atendimento
               que trata cada cliente como único.
