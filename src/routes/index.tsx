@@ -834,9 +834,9 @@ function Services() {
 function DeliverySection() {
   const benefits = [
     "Entrega no mesmo dia em Teresópolis",
-    "Técnico especializado na sua casa",
+    "Atendimento personalizado via WhatsApp",
     "Pagamento seguro na entrega",
-    "Rastreio via WhatsApp em tempo real",
+    "Produtos com garantia e procedência",
   ];
   return (
     <section id="delivery" className="py-10 sm:py-24 px-4 sm:px-6">
