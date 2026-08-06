@@ -4,7 +4,7 @@ import {
   Truck, Wrench, DollarSign, Recycle, Star, MapPin, ShoppingCart,
   MessageCircle, Menu, X, Smartphone, Battery, Droplets, Unlock,
   ShieldCheck, Home, Check, Instagram, Facebook, Phone, Clock,
-  ChevronDown, Zap, Camera,
+  ChevronDown, Zap, Camera, LayoutGrid, LayoutList
 } from "lucide-react";
 import iphone15Pro from "@/assets/iphone-15-pro.webp";
 import heroIphone from "@/assets/hero-iphone.webp";
