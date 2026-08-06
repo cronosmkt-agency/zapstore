@@ -133,25 +133,17 @@ function BackgroundOrbs() {
   );
 }
 
-function DeltaLogo({ height = 40, textSize = "text-xl" }: { height?: number; textSize?: string }) {
+function DeltaLogo({ height = 40 }: { height?: number }) {
   return (
-    <span className="flex items-center gap-2">
-      <img
-        src={sejaDeltaLogo}
-        alt="A Casa da Maçã"
-        decoding="async"
-        width={height}
-        height={height}
-        style={{ height, width: "auto" }}
-        className="object-contain"
-      />
-      <span
-        className={`${textSize} font-bold tracking-tight whitespace-nowrap`}
-        style={{ color: "var(--text-primary)" }}
-      >
-        A Casa da<span style={{ color: "var(--blue-primary)" }}> Maçã</span>
-      </span>
-    </span>
+    <img
+      src={sejaDeltaLogo}
+      alt="A Casa da Maçã"
+      decoding="async"
+      width={height * 3}
+      height={height}
+      style={{ height, width: "auto" }}
+      className="object-contain"
+    />
   );
 }
 
