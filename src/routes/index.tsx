@@ -35,26 +35,21 @@ export const Route = createFileRoute("/")({
           name: "A Casa da Maçã",
           description:
             "Loja de iPhones, acessórios e assistência técnica com delivery em Teresópolis - RJ.",
-          telephone: "+552120080400",
+          telephone: "+5521993446336",
           address: {
             "@type": "PostalAddress",
-            streetAddress: "Av. José Joaquim de Araújo Regadas, 142",
+            streetAddress: "Av. José Joaquim de Araújo Regadas, 146",
             addressLocality: "Teresópolis",
             addressRegion: "RJ",
             addressCountry: "BR",
+            postalCode: "25953-040",
           },
           openingHoursSpecification: [
             {
               "@type": "OpeningHoursSpecification",
-              dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-              opens: "09:00",
-              closes: "18:30",
-            },
-            {
-              "@type": "OpeningHoursSpecification",
-              dayOfWeek: "Saturday",
-              opens: "09:00",
-              closes: "13:00",
+              dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+              opens: "10:00",
+              closes: "18:00",
             },
           ],
           aggregateRating: {
@@ -70,8 +65,8 @@ export const Route = createFileRoute("/")({
   component: DeltaStore,
 });
 
-const WHATSAPP = "https://wa.me/552120080400";
-const PHONE_DISPLAY = "(21) 2008-0400";
+const WHATSAPP = "https://wa.me/5521993446336";
+const PHONE_DISPLAY = "(21) 99344-6336";
 
 /* ---------- Tokens util ---------- */
 const T = {
@@ -102,14 +97,6 @@ const products: { name: string; price: number; cat: string; badge: string; img: 
   { name: "iPhone 14 Pro", price: 5299, cat: "iPhones", badge: "Pronta Entrega", img: iphone14 },
   { name: "iPhone 13 mini", price: 2899, cat: "iPhones", badge: "Delivery", img: iphone13 },
   { name: "iPhone 11 (seminovo)", price: 1999, cat: "Seminovos", badge: "Seminovo", img: iphone12 },
-  { name: "iPhone 16 Pro", price: 8499, cat: "iPhones", badge: "Lançamento", img: iphone15Pro },
-  { name: "iPhone 16", price: 6299, cat: "iPhones", badge: "Pronta Entrega", img: iphone14 },
-  { name: "iPhone 15", price: 5499, cat: "iPhones", badge: "Pronta Entrega", img: iphone15Pro },
-  { name: "iPhone 14 Plus", price: 4799, cat: "iPhones", badge: "Delivery", img: iphone14 },
-  { name: "iPhone 13 Pro", price: 3899, cat: "iPhones", badge: "Pronta Entrega", img: iphone13 },
-  { name: "iPhone 13 (seminovo)", price: 2699, cat: "Seminovos", badge: "Seminovo", img: iphone13 },
-  { name: "iPhone 12 Pro", price: 2999, cat: "iPhones", badge: "Delivery", img: iphone12 },
-  { name: "iPhone XR (seminovo)", price: 1499, cat: "Seminovos", badge: "Seminovo", img: iphone12 },
 ];
 
 const filters = ["Todos", "iPhones", "Seminovos"];
@@ -211,7 +198,7 @@ function Navbar() {
             ))}
           </div>
           <div className="flex items-center gap-6 justify-end">
-            <div className="badge-aberto">Aberto até 18:30</div>
+            <div className="badge-aberto">Aberto até 18:00</div>
             <span className="h-6 border-l" style={{ borderColor: "rgba(var(--blue-rgb),0.18)" }} />
             <a href={WHATSAPP} className="btn-pedir-agora">Pedir Agora</a>
           </div>
@@ -962,7 +949,7 @@ function SellUsed() {
       `*(Tenho as fotos do aparelho prontas para enviar por aqui)*`;
 
     toast.success("Redirecionando para o WhatsApp...");
-    window.open("https://wa.me/552120080400?text=" + encodeURIComponent(mensagem), "_blank");
+    window.open("https://wa.me/5521993446336?text=" + encodeURIComponent(mensagem), "_blank");
   };
 
   const cls = "glass px-4 py-3 outline-none placeholder:opacity-60 w-full";
@@ -1059,13 +1046,13 @@ function About() {
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 mt-0.5" style={{ color: T.primary }} />
                 <div className="text-sm" style={{ color: T.sub }}>
-                  Prédio da ACIAT, Av. José Joaquim de Araújo Regadas, nº 142 — Sala 06<br />
-                  Várzea, Teresópolis - RJ
+                  Av. José Joaquim de Araújo Regadas, 146 — Várzea<br />
+                  Teresópolis - RJ, 25953-040
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Clock className="w-5 h-5" style={{ color: T.primary }} />
-                <div className="text-sm" style={{ color: T.sub }}>Segunda a Sábado — até 18:30</div>
+                <div className="text-sm" style={{ color: T.sub }}>Segunda a Sábado — 10:00 às 18:00</div>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="w-5 h-5" style={{ color: T.primary }} />
@@ -1077,7 +1064,7 @@ function About() {
                style={{ border: "1px solid rgba(var(--blue-rgb),.2)", boxShadow: "0 20px 60px rgba(var(--blue-rgb),.15)" }}>
             <iframe
               title="A Casa da Maçã — Localização"
-              src="https://www.google.com/maps?q=Av.+Jos%C3%A9+Joaquim+de+Ara%C3%BAjo+Regadas,+142+-+V%C3%A1rzea,+Teres%C3%B3polis+-+RJ&output=embed"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3685.8344589947883!2d-42.97341072469956!3d-22.416416979603593!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x99b9a62254f15d%3A0xcf823f6685514b8a!2sAv.%20Jos%C3%A9%20Joaquim%20de%20Ara%C3%BAjo%20Regadas%2C%20146%20-%20V%C3%A1rzea%2C%20Teres%C3%B3polis%20-%20RJ%2C%2025953-040!5e0!3m2!1spt-BR!2sbr!4v1710000000000!5m2!1spt-BR!2sbr"
               className="w-full h-full min-h-[340px]"
               loading="lazy"
             />
