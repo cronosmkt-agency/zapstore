@@ -1064,7 +1064,7 @@ function About() {
                style={{ border: "1px solid rgba(var(--blue-rgb),.2)", boxShadow: "0 20px 60px rgba(var(--blue-rgb),.15)" }}>
             <iframe
               title="A Casa da Maçã — Localização"
-              src="https://www.google.com/maps?q=Av.+Jos%C3%A9+Joaquim+de+Ara%C3%BAjo+Regadas,+142+-+V%C3%A1rzea,+Teres%C3%B3polis+-+RJ&output=embed"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3685.8344589947883!2d-42.97341072469956!3d-22.416416979603593!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x99b9a62254f15d%3A0xcf823f6685514b8a!2sAv.%20Jos%C3%A9%20Joaquim%20de%20Ara%C3%BAjo%20Regadas%2C%20146%20-%20V%C3%A1rzea%2C%20Teres%C3%B3polis%20-%20RJ%2C%2025953-040!5e0!3m2!1spt-BR!2sbr!4v1710000000000!5m2!1spt-BR!2sbr"
               className="w-full h-full min-h-[340px]"
               loading="lazy"
             />
