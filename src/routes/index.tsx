@@ -1076,7 +1076,7 @@ function Footer() {
       <div className="max-w-7xl mx-auto">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <DeltaLogo />
+            <DeltaLogo showText={true} />
             <p className="text-sm mt-4" style={{ color: T.sub }}>
               A experiência premium em smartphones que Teresópolis merece.
             </p>
