@@ -1104,7 +1104,7 @@ function Footer() {
             <div className="text-sm space-y-2" style={{ color: T.sub }}>
               <div className="flex items-center gap-2"><Phone className="w-4 h-4" /> {PHONE_DISPLAY}</div>
               <a href="https://instagram.com/casadamac_" className="flex items-center gap-2"><Instagram className="w-4 h-4" /> @casadamac_</a>
-              <a href="https://facebook.com/acasadamaça" className="flex items-center gap-2"><Facebook className="w-4 h-4" /> acasadamaça</a>
+              <a href="https://facebook.com/casadamac_" className="flex items-center gap-2"><Facebook className="w-4 h-4" /> casadamac_</a>
             </div>
           </div>
         </div>
