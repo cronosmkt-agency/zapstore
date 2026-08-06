@@ -32,7 +32,7 @@ export function DeliveryPopup() {
       {/* Mobile: card compacto, alinhado ao botão de chat */}
       <div className="md:hidden relative flex h-14 items-center gap-2 rounded-2xl border border-white/40 bg-white/85 px-3 py-2 pr-7 shadow-lg backdrop-blur-md">
         <div className="shrink-0 grid h-8 w-8 place-items-center rounded-lg bg-primary/10">
-          <img src={sejaDeltaLogo} alt="Delta" width={22} height={22} className="h-[22px] w-[22px] object-contain" />
+          <img src={sejaDeltaLogo} alt="A Casa da Maçã" width={22} height={22} className="h-[22px] w-[22px] object-contain" />
         </div>
         <div className="min-w-0">
           <p className="flex items-center gap-1 text-[11px] font-semibold leading-tight text-gray-900">
@@ -55,7 +55,7 @@ export function DeliveryPopup() {
       {/* Desktop: card completo */}
       <div className="hidden md:flex relative items-start gap-3 rounded-2xl border border-white/40 bg-white/80 p-4 pr-8 shadow-lg backdrop-blur-md">
         <div className="shrink-0 grid h-10 w-10 place-items-center rounded-xl bg-primary/10">
-          <img src={sejaDeltaLogo} alt="Delta" width={28} height={28} className="h-7 w-7 object-contain" />
+          <img src={sejaDeltaLogo} alt="A Casa da Maçã" width={28} height={28} className="h-7 w-7 object-contain" />
         </div>
 
         <div className="min-w-0">
