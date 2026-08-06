@@ -949,7 +949,7 @@ function SellUsed() {
       `*(Tenho as fotos do aparelho prontas para enviar por aqui)*`;
 
     toast.success("Redirecionando para o WhatsApp...");
-    window.open("https://wa.me/552120080400?text=" + encodeURIComponent(mensagem), "_blank");
+    window.open("https://wa.me/5521993446336?text=" + encodeURIComponent(mensagem), "_blank");
   };
 
   const cls = "glass px-4 py-3 outline-none placeholder:opacity-60 w-full";
