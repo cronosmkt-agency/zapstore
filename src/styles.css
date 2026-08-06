@@ -9,9 +9,9 @@
   --color-background: var(--bg-primary);
   --color-foreground: var(--text-primary);
   --color-surface: var(--bg-secondary);
-  --color-delta-primary: var(--blue-primary);
-  --color-delta-vivid: var(--blue-vivid);
-  --color-delta-soft: var(--blue-light);
+  --color-brand-primary: var(--blue-primary);
+  --color-brand-vivid: var(--blue-vivid);
+  --color-brand-soft: var(--blue-light);
   --color-border: var(--glass-border);
   --color-muted-foreground: var(--text-secondary);
   --color-primary: var(--blue-primary);
@@ -65,7 +65,7 @@ html, body {
 
 
 /* ============ Background orbs (light) ============ */
-.delta-bg {
+.brand-bg {
   position: fixed;
   inset: 0;
   z-index: -1;
@@ -73,31 +73,31 @@ html, body {
   pointer-events: none;
   background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 45%, var(--bg-tertiary) 100%);
 }
-.delta-orb {
+.brand-orb {
   position: absolute;
   border-radius: 9999px;
-  animation: deltaFloat 14s ease-in-out infinite;
+  animation: brandFloat 14s ease-in-out infinite;
   transform: translateZ(0);
   contain: strict;
 }
-.delta-orb-1 {
+.brand-orb-1 {
   width: 680px; height: 680px;
   top: -200px; right: -160px;
   background: radial-gradient(circle, rgba(var(--blue-rgb), 0.08) 0%, rgba(var(--blue-rgb), 0) 70%);
 }
-.delta-orb-2 {
+.brand-orb-2 {
   width: 600px; height: 600px;
   bottom: -180px; left: -140px;
   background: radial-gradient(circle, rgba(var(--blue-vivid-rgb), 0.06) 0%, rgba(var(--blue-vivid-rgb), 0) 70%);
   animation-delay: -3s;
 }
-.delta-orb-3 {
+.brand-orb-3 {
   width: 760px; height: 760px;
   top: 35%; left: 28%;
   background: radial-gradient(circle, rgba(var(--blue-rgb), 0.05) 0%, rgba(var(--blue-rgb), 0) 70%);
   animation-delay: -5s;
 }
-@keyframes deltaFloat {
+@keyframes brandFloat {
   0%, 100% { transform: translate(0, 0) scale(1); }
   50% { transform: translate(40px, -30px) scale(1.06); }
 }
@@ -533,8 +533,8 @@ div[style*="Edit with Lovable"],
 
 /* ============ Performance ============ */
 @media (max-width: 1023px) {
-  .delta-orb, .deco-shape, .particle { animation: none; }
-  .delta-orb-3 { display: none; }
+  .brand-orb, .deco-shape, .particle { animation: none; }
+  .brand-orb-3 { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
