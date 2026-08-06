@@ -176,7 +176,7 @@ function Navbar() {
     };
   }, []);
   const links = [
-    ["Início", "#inicio"], ["Produtos", "#produtos"], ["Serviços", "#servicos"],
+    ["Início", "#inicio"], ["Produtos", "#produtos"],
     ["Delivery", "#delivery"], ["Contato", "#contato"],
   ];
   return (
