@@ -80,11 +80,11 @@ const T = {
 
 /* ---------- Data ---------- */
 const differentials = [
-  { icon: Truck, title: "Delivery Express", desc: "Serviços e produtos na sua porta em Teresópolis" },
-  { icon: Wrench, title: "Assistência Rápida", desc: "Diagnóstico gratuito e conserto no mesmo dia" },
+  { icon: Truck, title: "Delivery Express", desc: "Seu iPhone novo na sua porta em Teresópolis" },
+  { icon: Wrench, title: "Qualidade Garantida", desc: "Aparelhos revisados e com garantia total" },
   { icon: DollarSign, title: "Menor Preço", desc: "Melhores preços em iPhones da região" },
   { icon: Recycle, title: "Valorização do Usado", desc: "Traga seu aparelho e ganhe o melhor valor" },
-  { icon: Star, title: "4,9 no Google", desc: "46 avaliações 5 estrelas de clientes reais" },
+  { icon: Star, title: "4,9 no Google", desc: "Avaliações 5 estrelas de clientes reais" },
   { icon: MapPin, title: "Loja + Delivery", desc: "Atendimento presencial ou onde você estiver" },
 ];
 
