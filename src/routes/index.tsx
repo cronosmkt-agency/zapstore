@@ -80,11 +80,11 @@ const T = {
 
 /* ---------- Data ---------- */
 const differentials = [
-  { icon: Truck, title: "Delivery Express", desc: "Serviços e produtos na sua porta em Teresópolis" },
-  { icon: Wrench, title: "Assistência Rápida", desc: "Diagnóstico gratuito e conserto no mesmo dia" },
+  { icon: Truck, title: "Delivery Express", desc: "Seu iPhone novo na sua porta em Teresópolis" },
+  { icon: Wrench, title: "Qualidade Garantida", desc: "Aparelhos revisados e com garantia total" },
   { icon: DollarSign, title: "Menor Preço", desc: "Melhores preços em iPhones da região" },
   { icon: Recycle, title: "Valorização do Usado", desc: "Traga seu aparelho e ganhe o melhor valor" },
-  { icon: Star, title: "4,9 no Google", desc: "46 avaliações 5 estrelas de clientes reais" },
+  { icon: Star, title: "4,9 no Google", desc: "Avaliações 5 estrelas de clientes reais" },
   { icon: MapPin, title: "Loja + Delivery", desc: "Atendimento presencial ou onde você estiver" },
 ];
 
@@ -176,7 +176,7 @@ function Navbar() {
     };
   }, []);
   const links = [
-    ["Início", "#inicio"], ["Produtos", "#produtos"], ["Serviços", "#servicos"],
+    ["Início", "#inicio"], ["Produtos", "#produtos"],
     ["Delivery", "#delivery"], ["Contato", "#contato"],
   ];
   return (
@@ -686,7 +686,7 @@ function VSL() {
           <span className="hidden sm:inline" style={{ color: "rgba(var(--blue-rgb), 0.25)" }}>|</span>
           <div className="flex items-center justify-center gap-2">
             <span style={{ color: "var(--blue-primary)" }}>✓</span>
-            <span>46 avaliações reais</span>
+            <span>Avaliações reais</span>
           </div>
           <span className="hidden sm:inline" style={{ color: "rgba(var(--blue-rgb), 0.25)" }}>|</span>
           <div className="flex items-center justify-center gap-2">
@@ -1091,9 +1091,9 @@ function Footer() {
             ["iPhones", "#produtos"], ["Acessórios", "#produtos"],
             ["Seminovos", "#produtos"], ["Peças", "#produtos"],
           ]} />
-          <FooterCol title="Serviços" links={[
-            ["Troca de Tela", "#servicos"], ["Bateria", "#servicos"],
-            ["Diagnóstico", "#servicos"], ["Visita Domiciliar", "#delivery"],
+          <FooterCol title="Institucional" links={[
+            ["Sobre Nós", "#sobre"], ["Localização", "#sobre"],
+            ["Contato", "#contato"], ["WhatsApp", WHATSAPP],
           ]} />
           <div>
             <div className="font-bold mb-4" style={{ color: T.text }}>Contato</div>
@@ -1154,7 +1154,6 @@ function DeltaStore() {
         <VSL />
         <Differentials />
         <Products />
-        <Services />
         <DeliverySection />
         <Reviews />
         <SellUsed />
