@@ -97,14 +97,6 @@ const products: { name: string; price: number; cat: string; badge: string; img: 
   { name: "iPhone 14 Pro", price: 5299, cat: "iPhones", badge: "Pronta Entrega", img: iphone14 },
   { name: "iPhone 13 mini", price: 2899, cat: "iPhones", badge: "Delivery", img: iphone13 },
   { name: "iPhone 11 (seminovo)", price: 1999, cat: "Seminovos", badge: "Seminovo", img: iphone12 },
-  { name: "iPhone 16 Pro", price: 8499, cat: "iPhones", badge: "Lançamento", img: iphone15Pro },
-  { name: "iPhone 16", price: 6299, cat: "iPhones", badge: "Pronta Entrega", img: iphone14 },
-  { name: "iPhone 15", price: 5499, cat: "iPhones", badge: "Pronta Entrega", img: iphone15Pro },
-  { name: "iPhone 14 Plus", price: 4799, cat: "iPhones", badge: "Delivery", img: iphone14 },
-  { name: "iPhone 13 Pro", price: 3899, cat: "iPhones", badge: "Pronta Entrega", img: iphone13 },
-  { name: "iPhone 13 (seminovo)", price: 2699, cat: "Seminovos", badge: "Seminovo", img: iphone13 },
-  { name: "iPhone 12 Pro", price: 2999, cat: "iPhones", badge: "Delivery", img: iphone12 },
-  { name: "iPhone XR (seminovo)", price: 1499, cat: "Seminovos", badge: "Seminovo", img: iphone12 },
 ];
 
 const filters = ["Todos", "iPhones", "Seminovos"];
