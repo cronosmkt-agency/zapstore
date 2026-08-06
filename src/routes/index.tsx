@@ -17,9 +17,9 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Delta — iPhones, Assistência e Delivery em Teresópolis" },
-      { name: "description", content: "Compre iPhones, acessórios e conserte seu smartphone com delivery em Teresópolis - RJ. Loja Delta: 4,9★ no Google, melhores preços da região." },
-      { property: "og:title", content: "Delta — iPhones, Assistência e Delivery em Teresópolis" },
+      { title: "A Casa da Maçã — iPhones, Assistência e Delivery em Teresópolis" },
+      { name: "description", content: "Compre iPhones, acessórios e conserte seu smartphone com delivery em Teresópolis - RJ. Loja A Casa da Maçã: 4,9★ no Google, melhores preços da região." },
+      { property: "og:title", content: "A Casa da Maçã — iPhones, Assistência e Delivery em Teresópolis" },
       { property: "og:description", content: "Compre, repare e revenda com quem mais entende de smartphone em Teresópolis. Delivery até você." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/" },
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "LocalBusiness",
-          name: "Delta",
+          name: "A Casa da Maçã",
           description:
             "Loja de iPhones, acessórios e assistência técnica com delivery em Teresópolis - RJ.",
           telephone: "+552120080400",
@@ -151,7 +151,7 @@ function DeltaLogo({ height = 40, textSize = "text-xl" }: { height?: number; tex
     <span className="flex items-center gap-2">
       <img
         src={sejaDeltaLogo}
-        alt="Seja Delta"
+        alt="A Casa da Maçã"
         decoding="async"
         width={height}
         height={height}
@@ -162,7 +162,7 @@ function DeltaLogo({ height = 40, textSize = "text-xl" }: { height?: number; tex
         className={`${textSize} font-bold tracking-tight whitespace-nowrap`}
         style={{ color: "var(--text-primary)" }}
       >
-        Seja<span style={{ color: "var(--blue-primary)" }}>Delta</span>
+        A Casa da<span style={{ color: "var(--blue-primary)" }}> Maçã</span>
       </span>
     </span>
   );
@@ -355,7 +355,7 @@ function TiltPhone() {
       />
       <img
         src={heroIphone}
-        alt="iPhone Delta em destaque"
+        alt="iPhone A Casa da Maçã em destaque"
         fetchPriority="high"
         decoding="async"
         width={520}
@@ -515,11 +515,11 @@ function VimeoPlayer() {
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setLoaded(true); }}
-          aria-label="Reproduzir vídeo da Delta"
+          aria-label="Reproduzir vídeo da A Casa da Maçã"
         >
           <img
             src="https://vumbnail.com/1214863083.jpg"
-            alt="Thumbnail do vídeo Delta"
+            alt="Thumbnail do vídeo A Casa da Maçã"
             className="absolute inset-0 w-full h-full object-cover"
             style={{ opacity: 0.45, borderRadius: "18px" }}
             loading="lazy"
@@ -565,7 +565,7 @@ function VimeoPlayer() {
             className="absolute inset-0 w-full h-full"
             allow="autoplay; fullscreen; picture-in-picture"
             allowFullScreen
-            title="Conheça a Delta"
+            title="Conheça a A Casa da Maçã"
             style={{ border: "none", borderRadius: "18px" }}
           />
 
@@ -653,13 +653,13 @@ function VSL() {
       <div className="max-w-4xl mx-auto relative">
         <div className="text-center mb-10">
           <div className="text-xs uppercase tracking-[0.3em] font-bold text-gradient-blue mb-3">
-            Conheça a Delta
+            Conheça a A Casa da Maçã
           </div>
           <h2 className="text-3xl sm:text-4xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
             Veja por que somos <span className="text-gradient-blue">a referência</span> em Teresópolis
           </h2>
           <p className="mt-3 text-base max-w-xl mx-auto" style={{ color: "var(--text-secondary)" }}>
-            Qualidade, preço e atendimento que só a Delta oferece. Assista e descubra.
+            Qualidade, preço e atendimento que só a A Casa da Maçã oferece. Assista e descubra.
           </p>
         </div>
 
@@ -675,7 +675,7 @@ function VSL() {
                 aria-hidden="true" style={{ color: "var(--blue-primary)" }}>
                 <polygon points="6 3 20 12 6 21 6 3" />
               </svg>
-              <span className="text-xs font-medium">Delta — Teresópolis, RJ</span>
+              <span className="text-xs font-medium">A Casa da Maçã — Teresópolis, RJ</span>
             </div>
             <a
               href="https://wa.me/552120080400"
@@ -686,7 +686,7 @@ function VSL() {
                 strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" />
               </svg>
-              Falar com a Delta
+              Falar com a A Casa da Maçã
             </a>
           </div>
         </div>
@@ -741,7 +741,7 @@ function Differentials() {
   return (
     <section id="diferenciais" className="py-10 sm:py-24 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
-        <SectionTitle eyebrow="Por que Delta" title="Diferenciais que só quem entende oferece" />
+        <SectionTitle eyebrow="Por que A Casa da Maçã" title="Diferenciais que só quem entende oferece" />
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mt-8 sm:mt-14">
           {differentials.map((d) => (
             <div key={d.title} className="glass-card p-4 sm:p-7 group">
@@ -763,7 +763,7 @@ function Products() {
   return (
     <section id="produtos" className="py-10 sm:py-24 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
-        <SectionTitle eyebrow="Loja Delta" title="Nossos Produtos" />
+        <SectionTitle eyebrow="Loja A Casa da Maçã" title="Nossos Produtos" />
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           {filters.map(fl => (
             <button
@@ -827,7 +827,7 @@ function Services() {
   return (
     <section id="servicos" className="py-10 sm:py-24 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
-        <SectionTitle eyebrow="Assistência Técnica" title="Serviços Delta" badge="#sejadelta" />
+        <SectionTitle eyebrow="Assistência Técnica" title="Serviços A Casa da Maçã" badge="#acasadamaça" />
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mt-8 sm:mt-14">
           {services.map(s => (
             <div key={s.title} className="glass-card p-4 sm:p-7 flex flex-col">
@@ -860,7 +860,7 @@ function DeliverySection() {
           <div>
             <div className="inline-flex items-center gap-2 glass px-3 py-1.5 text-xs font-semibold mb-5"
                  style={{ borderRadius: 999, color: T.sub }}>
-              <Truck className="w-3.5 h-3.5" style={{ color: T.primary }} /> Delivery Delta
+              <Truck className="w-3.5 h-3.5" style={{ color: T.primary }} /> Delivery A Casa da Maçã
             </div>
             <h2 className="text-4xl sm:text-5xl font-black leading-tight" style={{ color: T.text }}>
               Na sua porta, <span className="text-gradient-blue">no seu tempo.</span>
@@ -952,7 +952,7 @@ function SellUsed() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const mensagem =
-      `Olá, equipe Delta! Vim pelo site e tenho interesse na Troca Inteligente. Aqui estão os dados do meu aparelho para pré-avaliação:\n\n` +
+      `Olá, equipe A Casa da Maçã! Vim pelo site e tenho interesse na Troca Inteligente. Aqui estão os dados do meu aparelho para pré-avaliação:\n\n` +
       `📱 *Meu aparelho:* ${aparelhoAtual}\n\n` +
       `💾 *Armazenamento:* ${armazenamento}\n\n` +
       `🔋 *Saúde da Bateria:* ${bateria}%\n\n` +
@@ -1048,9 +1048,9 @@ function About() {
       <div className="max-w-6xl mx-auto glass p-8 sm:p-12">
         <div className="grid lg:grid-cols-2 gap-10">
           <div>
-            <SectionTitle eyebrow="Quem somos" title="Delta — a Apple experience de Teresópolis" />
+            <SectionTitle eyebrow="Quem somos" title="A Casa da Maçã — a Apple experience de Teresópolis" />
             <p className="mt-6 leading-relaxed" style={{ color: T.sub }}>
-              A <span className="text-gradient-blue font-bold">Delta</span> nasceu para
+              A <span className="text-gradient-blue font-bold">A Casa da Maçã</span> nasceu para
               transformar a relação dos teresopolitanos com seus smartphones:
               produtos originais, assistência técnica de confiança e um atendimento
               que trata cada cliente como único.
@@ -1076,7 +1076,7 @@ function About() {
           <div className="rounded-2xl overflow-hidden relative"
                style={{ border: "1px solid rgba(var(--blue-rgb),.2)", boxShadow: "0 20px 60px rgba(var(--blue-rgb),.15)" }}>
             <iframe
-              title="Delta — Localização"
+              title="A Casa da Maçã — Localização"
               src="https://www.google.com/maps?q=Av.+Jos%C3%A9+Joaquim+de+Ara%C3%BAjo+Regadas,+142+-+V%C3%A1rzea,+Teres%C3%B3polis+-+RJ&output=embed"
               className="w-full h-full min-h-[340px]"
               loading="lazy"
@@ -1122,7 +1122,7 @@ function Footer() {
         </div>
         <div className="mt-10 h-px" style={{ background: "linear-gradient(90deg, transparent, var(--blue-primary), var(--blue-vivid), transparent)" }} />
         <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs" style={{ color: T.muted }}>
-          <div>© {new Date().getFullYear()} Delta — Teresópolis, RJ. Todos os direitos reservados.</div>
+          <div>© {new Date().getFullYear()} A Casa da Maçã — Teresópolis, RJ. Todos os direitos reservados.</div>
           <div>Feito com 💙 em Teresópolis</div>
         </div>
       </div>

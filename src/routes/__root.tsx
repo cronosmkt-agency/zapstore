@@ -80,10 +80,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Delta — iPhones, Assistência e Delivery em Teresópolis" },
-      { name: "description", content: "Delta: loja de iPhones, acessórios e assistência técnica com delivery em Teresópolis - RJ. Melhores preços, valorização do usado e 4,9★ no Google." },
-      { name: "author", content: "Delta" },
-      { property: "og:title", content: "Delta — iPhones, Assistência e Delivery em Teresópolis" },
+      { title: "A Casa da Maçã — iPhones, Assistência e Delivery em Teresópolis" },
+      { name: "description", content: "A Casa da Maçã: loja de iPhones, acessórios e assistência técnica com delivery em Teresópolis - RJ. Melhores preços, valorização do usado e 4,9★ no Google." },
+      { name: "author", content: "A Casa da Maçã" },
+      { property: "og:title", content: "A Casa da Maçã — iPhones, Assistência e Delivery em Teresópolis" },
       { property: "og:description", content: "Compre, repare e revenda com quem mais entende de smartphone em Teresópolis. Delivery até você." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -103,14 +103,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@graph": [
             {
               "@type": "Organization",
-              name: "Delta",
-              alternateName: "SejaDelta",
+              name: "A Casa da Maçã",
+              alternateName: "A Casa da Maçã",
               telephone: "+552120080400",
               areaServed: "Teresópolis, RJ",
             },
             {
               "@type": "WebSite",
-              name: "Delta — SejaDelta",
+              name: "A Casa da Maçã",
               inLanguage: "pt-BR",
             },
           ],
