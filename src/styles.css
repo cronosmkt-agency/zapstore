@@ -270,7 +270,7 @@ html, body {
 .marquee {
   display: flex;
   gap: 1.5rem;
-  animation: marquee 40s linear infinite;
+  animation: marquee 60s linear infinite;
   width: max-content;
 }
 @keyframes marquee {
