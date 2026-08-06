@@ -1091,9 +1091,9 @@ function Footer() {
             ["iPhones", "#produtos"], ["Acessórios", "#produtos"],
             ["Seminovos", "#produtos"], ["Peças", "#produtos"],
           ]} />
-          <FooterCol title="Serviços" links={[
-            ["Troca de Tela", "#servicos"], ["Bateria", "#servicos"],
-            ["Diagnóstico", "#servicos"], ["Visita Domiciliar", "#delivery"],
+          <FooterCol title="Institucional" links={[
+            ["Sobre Nós", "#sobre"], ["Localização", "#sobre"],
+            ["Contato", "#contato"], ["WhatsApp", WHATSAPP],
           ]} />
           <div>
             <div className="font-bold mb-4" style={{ color: T.text }}>Contato</div>
