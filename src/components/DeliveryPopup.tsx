@@ -19,10 +19,10 @@ export function DeliveryPopup() {
 
   if (!visible || closed) return null;
 
-  const title = afterHours ? "🌙 Agende sua Entrega" : "Delivery Expresso";
+  const title = afterHours ? "🌙 Agende seu iPhone" : "🚀 Delivery Expresso";
   const subtitle = afterHours
-    ? "Garanta hoje e receba amanhã cedo!"
-    : "Receba seu iPhone hoje até as 18:30h.";
+    ? "Agende agora e receba amanhã!"
+    : "Receba hoje até as 18:00h.";
 
   return (
     <div
