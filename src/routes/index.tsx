@@ -17,9 +17,9 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Delta — iPhones, Assistência e Delivery em Teresópolis" },
-      { name: "description", content: "Compre iPhones, acessórios e conserte seu smartphone com delivery em Teresópolis - RJ. Loja Delta: 4,9★ no Google, melhores preços da região." },
-      { property: "og:title", content: "Delta — iPhones, Assistência e Delivery em Teresópolis" },
+      { title: "A Casa da Maçã — iPhones, Assistência e Delivery em Teresópolis" },
+      { name: "description", content: "Compre iPhones, acessórios e conserte seu smartphone com delivery em Teresópolis - RJ. Loja A Casa da Maçã: 4,9★ no Google, melhores preços da região." },
+      { property: "og:title", content: "A Casa da Maçã — iPhones, Assistência e Delivery em Teresópolis" },
       { property: "og:description", content: "Compre, repare e revenda com quem mais entende de smartphone em Teresópolis. Delivery até você." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/" },
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "LocalBusiness",
-          name: "Delta",
+          name: "A Casa da Maçã",
           description:
             "Loja de iPhones, acessórios e assistência técnica com delivery em Teresópolis - RJ.",
           telephone: "+552120080400",
@@ -151,7 +151,7 @@ function DeltaLogo({ height = 40, textSize = "text-xl" }: { height?: number; tex
     <span className="flex items-center gap-2">
       <img
         src={sejaDeltaLogo}
-        alt="Seja Delta"
+        alt="A Casa da Maçã"
         decoding="async"
         width={height}
         height={height}
@@ -162,7 +162,7 @@ function DeltaLogo({ height = 40, textSize = "text-xl" }: { height?: number; tex
         className={`${textSize} font-bold tracking-tight whitespace-nowrap`}
         style={{ color: "var(--text-primary)" }}
       >
-        Seja<span style={{ color: "var(--blue-primary)" }}>Delta</span>
+        A Casa da<span style={{ color: "var(--blue-primary)" }}> Maçã</span>
       </span>
     </span>
   );
