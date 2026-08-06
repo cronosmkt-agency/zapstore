@@ -166,8 +166,8 @@ function Navbar() {
   useEffect(() => {
     const now = new Date();
     const minutes = now.getHours() * 60 + now.getMinutes();
-    // Same logic as DeliveryPopup: after 18:30 (18 * 60 + 30)
-    setAfterHours(minutes >= 18 * 60 + 30);
+    // Same logic as DeliveryPopup: after 18:00 (18 * 60)
+    setAfterHours(minutes >= 18 * 60);
   }, []);
   useEffect(() => {
     let raf = 0;
