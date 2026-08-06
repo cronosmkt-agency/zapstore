@@ -1096,13 +1096,13 @@ function Footer() {
             <div className="font-bold mb-4" style={{ color: T.text }}>Contato</div>
             <div className="text-sm space-y-2" style={{ color: T.sub }}>
               <div className="flex items-center gap-2"><Phone className="w-4 h-4" /> {PHONE_DISPLAY}</div>
-              <a href="https://instagram.com/sejadelta" className="flex items-center gap-2"><Instagram className="w-4 h-4" /> @sejadelta</a>
-              <a href="https://facebook.com/sejadelta" className="flex items-center gap-2"><Facebook className="w-4 h-4" /> sejadelta</a>
+              <a href="https://instagram.com/acasadamaça_teresopolis" className="flex items-center gap-2"><Instagram className="w-4 h-4" /> @acasadamaça_teresopolis</a>
+              <a href="https://facebook.com/acasadamaça" className="flex items-center gap-2"><Facebook className="w-4 h-4" /> acasadamaça</a>
             </div>
           </div>
         </div>
         <div className="mt-12 text-center">
-          <div className="text-4xl font-black text-gradient-blue">#sejadelta</div>
+          <div className="text-4xl font-black text-gradient-blue">#acasadamaça</div>
         </div>
         <div className="mt-10 h-px" style={{ background: "linear-gradient(90deg, transparent, var(--blue-primary), var(--blue-vivid), transparent)" }} />
         <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs" style={{ color: T.muted }}>

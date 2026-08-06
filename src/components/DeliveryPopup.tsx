@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import sejaDeltaLogo from "@/assets/sejadelta-logo.webp";
+const sejaDeltaLogo = "https://ik.imagekit.io/cronosmkt/A%20Casa%20da%20Ma%C3%A7a.png";
 
 
 export function DeliveryPopup() {
