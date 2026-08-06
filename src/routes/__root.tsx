@@ -105,7 +105,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
               "@type": "Organization",
               name: "A Casa da Maçã",
               alternateName: "A Casa da Maçã",
-              telephone: "+552120080400",
+              telephone: "+5521993446336",
               areaServed: "Teresópolis, RJ",
             },
             {
