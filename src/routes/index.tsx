@@ -11,7 +11,7 @@ const heroIphone = "https://ik.imagekit.io/cronosmkt/Smart-A%20Casa%20da%20Ma%C3
 import iphone14 from "@/assets/iphone-14.webp";
 import iphone13 from "@/assets/iphone-13.webp";
 import iphone12 from "@/assets/iphone-12.webp";
-const sejaDeltaLogo = "https://ik.imagekit.io/cronosmkt/A%20Casa%20da%20Ma%C3%A7a.png?updatedAt=1785982094106";
+const brandLogoUrl = "https://ik.imagekit.io/cronosmkt/A%20Casa%20da%20Ma%C3%A7a.png?updatedAt=1785982094106";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
@@ -62,7 +62,7 @@ export const Route = createFileRoute("/")({
     ],
   }),
 
-  component: DeltaStore,
+  component: BrandStore,
 });
 
 const WHATSAPP = "https://wa.me/5521993446336";
@@ -200,7 +200,7 @@ function Navbar() {
 
         <div className="navbar-desk-inner">
           <a href="#inicio" className="shrink-0 logo-desk">
-            <DeltaLogo height={scrolled ? 44 : 52} showText={true} />
+            <BrandLogo height={scrolled ? 44 : 52} showText={true} />
           </a>
           <div className="flex items-center justify-center nav-links-desk">
             {links.map(([l, h]) => (
@@ -230,7 +230,7 @@ function Navbar() {
           </button>
 
           <a href="#inicio" className="absolute left-1/2 -translate-x-1/2 flex items-center">
-            <DeltaLogo height={36} showText={true} />
+            <BrandLogo height={36} showText={true} />
           </a>
         </div>
 
@@ -1139,7 +1139,7 @@ function Footer() {
       <div className="max-w-7xl mx-auto">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <DeltaLogo showText={true} />
+            <BrandLogo showText={true} />
             <p className="text-sm mt-4" style={{ color: T.sub }}>
               A experiência premium em smartphones que Teresópolis merece.
             </p>
