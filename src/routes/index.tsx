@@ -11,7 +11,7 @@ import heroIphone from "@/assets/hero-iphone.webp";
 import iphone14 from "@/assets/iphone-14.webp";
 import iphone13 from "@/assets/iphone-13.webp";
 import iphone12 from "@/assets/iphone-12.webp";
-import sejaDeltaLogo from "@/assets/sejadelta-logo.webp";
+const sejaDeltaLogo = "https://ik.imagekit.io/cronosmkt/A%20Casa%20da%20Ma%C3%A7a.png";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
