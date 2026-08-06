@@ -821,7 +821,7 @@ function Services() {
   return (
     <section id="servicos" className="py-10 sm:py-24 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
-        <SectionTitle eyebrow="Assistência Técnica" title="Serviços A Casa da Maçã" badge="#acasadamaça" />
+        <SectionTitle eyebrow="Assistência Técnica" title="Serviços A Casa da Maçã" badge="#casadamac_" />
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mt-8 sm:mt-14">
           {services.map(s => (
             <div key={s.title} className="glass-card p-4 sm:p-7 flex flex-col">
