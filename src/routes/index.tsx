@@ -359,7 +359,7 @@ function TiltPhone() {
         decoding="async"
         width={520}
         height={520}
-        className="relative z-10 w-[320px] sm:w-[420px] h-auto float-slow"
+        className="relative z-10 w-[320px] sm:w-[420px] lg:w-[480px] h-auto float-slow"
         style={{
           filter: "drop-shadow(0 40px 60px rgba(13,27,62,0.22))",
           transformStyle: "preserve-3d",
