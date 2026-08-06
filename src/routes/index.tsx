@@ -1154,7 +1154,6 @@ function DeltaStore() {
         <VSL />
         <Differentials />
         <Products />
-        <Services />
         <DeliverySection />
         <Reviews />
         <SellUsed />
