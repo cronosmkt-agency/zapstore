@@ -7,7 +7,7 @@ import {
   ChevronDown, Zap, Camera, LayoutGrid, LayoutList
 } from "lucide-react";
 import iphone15Pro from "@/assets/iphone-15-pro.webp";
-import heroIphone from "@/assets/hero-iphone.webp";
+const heroIphone = "https://ik.imagekit.io/cronosmkt/Smart-A%20Casa%20da%20Ma%C3%A7a.png?updatedAt=1785982404561";
 import iphone14 from "@/assets/iphone-14.webp";
 import iphone13 from "@/assets/iphone-13.webp";
 import iphone12 from "@/assets/iphone-12.webp";
