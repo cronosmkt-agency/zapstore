@@ -35,26 +35,21 @@ export const Route = createFileRoute("/")({
           name: "A Casa da Maçã",
           description:
             "Loja de iPhones, acessórios e assistência técnica com delivery em Teresópolis - RJ.",
-          telephone: "+552120080400",
+          telephone: "+5521993446336",
           address: {
             "@type": "PostalAddress",
-            streetAddress: "Av. José Joaquim de Araújo Regadas, 142",
+            streetAddress: "Av. José Joaquim de Araújo Regadas, 146",
             addressLocality: "Teresópolis",
             addressRegion: "RJ",
             addressCountry: "BR",
+            postalCode: "25953-040",
           },
           openingHoursSpecification: [
             {
               "@type": "OpeningHoursSpecification",
-              dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-              opens: "09:00",
-              closes: "18:30",
-            },
-            {
-              "@type": "OpeningHoursSpecification",
-              dayOfWeek: "Saturday",
-              opens: "09:00",
-              closes: "13:00",
+              dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+              opens: "10:00",
+              closes: "18:00",
             },
           ],
           aggregateRating: {
