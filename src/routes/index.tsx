@@ -198,7 +198,7 @@ function Navbar() {
             ))}
           </div>
           <div className="flex items-center gap-6 justify-end">
-            <div className="badge-aberto">Aberto até 18:30</div>
+            <div className="badge-aberto">Aberto até 18:00</div>
             <span className="h-6 border-l" style={{ borderColor: "rgba(var(--blue-rgb),0.18)" }} />
             <a href={WHATSAPP} className="btn-pedir-agora">Pedir Agora</a>
           </div>
