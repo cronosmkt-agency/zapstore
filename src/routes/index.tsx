@@ -753,34 +753,68 @@ function Differentials() {
 
 function Products() {
   const [f, setF] = useState("Todos");
-  const list = f === "Todos" ? products : products.filter(p => p.cat === f);
+  const [viewMode, setViewMode] = useState<"grid-1" | "grid-2">("grid-2");
+  const [showAll, setShowAll] = useState(false);
+
+  const filteredList = f === "Todos" ? products : products.filter(p => p.cat === f);
+  const displayList = showAll ? filteredList : filteredList.slice(0, 4);
+
   return (
     <section id="produtos" className="py-10 sm:py-24 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
         <SectionTitle eyebrow="Loja A Casa da Maçã" title="Nossos Produtos" />
-        <div className="mt-10 flex flex-wrap justify-center gap-3">
-          {filters.map(fl => (
+        
+        <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="flex flex-wrap justify-center gap-3">
+            {filters.map(fl => (
+              <button
+                key={fl}
+                onClick={() => {
+                  setF(fl);
+                  setShowAll(false);
+                }}
+                className="px-5 py-2 text-sm font-semibold rounded-full transition-all"
+                style={
+                  f === fl
+                    ? { background: T.grad, color: "#fff", boxShadow: "0 6px 20px rgba(var(--blue-rgb),.3)" }
+                    : { background: "rgba(255,255,255,.7)", border: "1px solid rgba(var(--blue-rgb),.2)", color: T.sub, backdropFilter: "blur(20px)" }
+                }
+              >
+                {fl}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2 p-1 glass rounded-xl">
             <button
-              key={fl}
-              onClick={() => setF(fl)}
-              className="px-5 py-2 text-sm font-semibold rounded-full transition-all"
-              style={
-                f === fl
-                  ? { background: T.grad, color: "#fff", boxShadow: "0 6px 20px rgba(var(--blue-rgb),.3)" }
-                  : { background: "rgba(255,255,255,.7)", border: "1px solid rgba(var(--blue-rgb),.2)", color: T.sub, backdropFilter: "blur(20px)" }
-              }
+              onClick={() => setViewMode("grid-1")}
+              className={`p-2 rounded-lg transition-all ${viewMode === "grid-1" ? "bg-white shadow-sm" : "opacity-50"}`}
+              style={{ color: viewMode === "grid-1" ? T.primary : T.sub }}
+              title="1 por linha"
             >
-              {fl}
+              <LayoutList className="w-5 h-5" />
             </button>
-          ))}
+            <button
+              onClick={() => setViewMode("grid-2")}
+              className={`p-2 rounded-lg transition-all ${viewMode === "grid-2" ? "bg-white shadow-sm" : "opacity-50"}`}
+              style={{ color: viewMode === "grid-2" ? T.primary : T.sub }}
+              title="2 por linha"
+            >
+              <LayoutGrid className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
-          {list.map(p => (
-            <div key={p.name} className="glass-card p-5 flex flex-col">
-
-
-              <div className="relative h-44 rounded-2xl mb-4 overflow-hidden flex items-center justify-center"
+        <div className={`mt-12 grid gap-4 sm:gap-6 ${
+          viewMode === "grid-1" 
+            ? "grid-cols-1 max-w-2xl mx-auto" 
+            : "grid-cols-2 lg:grid-cols-4"
+        }`}>
+          {displayList.map(p => (
+            <div key={p.name} className={`glass-card p-4 sm:p-5 flex flex-col ${viewMode === "grid-1" ? "sm:flex-row sm:items-center sm:gap-8" : ""}`}>
+              <div className={`relative rounded-2xl mb-4 overflow-hidden flex items-center justify-center shrink-0 ${
+                viewMode === "grid-1" ? "h-48 sm:h-56 sm:w-56" : "h-40 sm:h-44"
+              }`}
                    style={{ background: "radial-gradient(circle at center, rgba(var(--blue-rgb),.10), rgba(255,255,255,0) 70%)" }}>
                 <img
                   src={p.img}
@@ -788,30 +822,44 @@ function Products() {
                   loading="lazy"
                   width={400}
                   height={400}
-                  className="h-full w-auto object-contain"
+                  className="h-full w-auto object-contain p-2"
                   style={{ filter: "drop-shadow(0 14px 22px rgba(13,27,62,0.18))" }}
                 />
-                <span className="absolute top-3 left-3 text-[10px] uppercase tracking-wider font-bold px-2.5 py-1 rounded-full"
+                <span className="absolute top-2 left-2 text-[9px] sm:text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 sm:py-1 rounded-full"
                       style={{ background: "var(--blue-light)", color: T.primary, border: "1px solid rgba(var(--blue-rgb),.25)" }}>
                   {p.badge}
                 </span>
               </div>
-              <h3 className="font-bold text-lg" style={{ color: T.text }}>{p.name}</h3>
-              <div className="mt-2">
-                <div className="text-2xl font-black" style={{ color: T.primary }}>{fmt(p.price)}</div>
-                <div className="text-xs mt-1" style={{ color: T.muted }}>12x de {fmt(p.price / 12)}</div>
-              </div>
-              <div className="mt-5 flex gap-2 pt-4 border-t" style={{ borderColor: "rgba(var(--blue-rgb),.12)" }}>
-                <a href={WHATSAPP} className="btn-primary-glow flex-1 text-xs text-center py-2 flex items-center justify-center gap-1">
-                  <ShoppingCart className="w-3.5 h-3.5" /> Comprar
-                </a>
-                <a href={WHATSAPP} className="btn-glass flex-1 text-xs text-center py-2 flex items-center justify-center gap-1">
-                  <MessageCircle className="w-3.5 h-3.5" />
-                </a>
+              
+              <div className="flex-1 flex flex-col">
+                <h3 className="font-bold text-base sm:text-lg" style={{ color: T.text }}>{p.name}</h3>
+                <div className="mt-1 sm:mt-2">
+                  <div className="text-xl sm:text-2xl font-black" style={{ color: T.primary }}>{fmt(p.price)}</div>
+                  <div className="text-[10px] sm:text-xs mt-0.5 sm:mt-1" style={{ color: T.muted }}>12x de {fmt(p.price / 12)}</div>
+                </div>
+                <div className={`mt-4 sm:mt-5 flex gap-2 pt-4 border-t ${viewMode === "grid-1" ? "sm:mt-auto" : ""}`} style={{ borderColor: "rgba(var(--blue-rgb),.12)" }}>
+                  <a href={WHATSAPP} className="btn-primary-glow flex-1 text-[10px] sm:text-xs text-center py-2 flex items-center justify-center gap-1">
+                    <ShoppingCart className="w-3.5 h-3.5" /> Comprar
+                  </a>
+                  <a href={WHATSAPP} className="btn-glass flex-none px-3 text-xs text-center py-2 flex items-center justify-center">
+                    <MessageCircle className="w-3.5 h-3.5" />
+                  </a>
+                </div>
               </div>
             </div>
           ))}
         </div>
+
+        {!showAll && filteredList.length > 4 && (
+          <div className="mt-12 text-center">
+            <button
+              onClick={() => setShowAll(true)}
+              className="btn-glass px-8 py-3 text-sm font-bold inline-flex items-center gap-2"
+            >
+              Ver mais <ChevronDown className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
