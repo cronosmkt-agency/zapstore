@@ -869,9 +869,6 @@ function DeliverySection() {
             <a href={WHATSAPP} className="btn-primary-glow wa-float mt-8 inline-flex items-center gap-2">
               <MessageCircle className="w-5 h-5" /> Chamar no WhatsApp
             </a>
-            <div className="mt-4 flex items-center gap-2 text-sm" style={{ color: T.muted }}>
-              <Phone className="w-4 h-4" /> {PHONE_DISPLAY}
-            </div>
           </div>
           <div className="flex justify-center">
             <div className="glass w-56 h-56 rounded-full flex items-center justify-center float-slow">
