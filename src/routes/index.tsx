@@ -1052,7 +1052,7 @@ function About() {
               </div>
               <div className="flex items-center gap-3">
                 <Clock className="w-5 h-5" style={{ color: T.primary }} />
-                <div className="text-sm" style={{ color: T.sub }}>Segunda a Sábado — até 18:30</div>
+                <div className="text-sm" style={{ color: T.sub }}>Segunda a Sábado — 10:00 às 18:00</div>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="w-5 h-5" style={{ color: T.primary }} />
