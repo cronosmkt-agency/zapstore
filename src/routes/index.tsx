@@ -125,10 +125,10 @@ const fmt = (n: number) => n.toLocaleString("pt-BR", { style: "currency", curren
 /* ---------- Components ---------- */
 function BackgroundOrbs() {
   return (
-    <div className="delta-bg" aria-hidden>
-      <div className="delta-orb delta-orb-1" />
-      <div className="delta-orb delta-orb-2" />
-      <div className="delta-orb delta-orb-3" />
+    <div className="brand-bg" aria-hidden>
+      <div className="brand-orb brand-orb-1" />
+      <div className="brand-orb brand-orb-2" />
+      <div className="brand-orb brand-orb-3" />
       <div className="deco-shape rounded-3xl" style={{ width: 120, height: 120, top: "18%", left: "6%", transform: "rotate(18deg)" }} />
       <div className="deco-shape rounded-full" style={{ width: 80, height: 80, top: "62%", right: "9%", animationDelay: "-3s" }} />
       <div className="deco-shape rounded-2xl" style={{ width: 60, height: 60, top: "40%", right: "22%", animationDelay: "-5s" }} />
@@ -136,11 +136,11 @@ function BackgroundOrbs() {
   );
 }
 
-function DeltaLogo({ height = 40, showText = true }: { height?: number; showText?: boolean }) {
+function BrandLogo({ height = 40, showText = true }: { height?: number; showText?: boolean }) {
   return (
     <div className="flex items-center gap-2">
       <img
-        src={sejaDeltaLogo}
+        src={brandLogoUrl}
         alt="A Casa da Maçã"
         decoding="async"
         width={height * 1.5}
@@ -1201,7 +1201,7 @@ function WhatsFloat() {
 }
 
 /* ---------- Page ---------- */
-function DeltaStore() {
+function BrandStore() {
   return (
     <div className="relative min-h-screen overflow-x-hidden" style={{ color: T.text }}>
       <BackgroundOrbs />
