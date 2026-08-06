@@ -1109,7 +1109,7 @@ function Footer() {
           </div>
         </div>
         <div className="mt-12 text-center">
-          <div className="text-4xl font-black text-gradient-blue">#casadamac_</div>
+          <div className="text-4xl font-black text-gradient-blue">@casadamac_</div>
         </div>
         <div className="mt-10 h-px" style={{ background: "linear-gradient(90deg, transparent, var(--blue-primary), var(--blue-vivid), transparent)" }} />
         <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs" style={{ color: T.muted }}>
