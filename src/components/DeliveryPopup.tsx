@@ -11,7 +11,8 @@ export function DeliveryPopup() {
   useEffect(() => {
     const now = new Date();
     const minutes = now.getHours() * 60 + now.getMinutes();
-    setAfterHours(minutes >= 18 * 60 + 30);
+    // Adjusted to 18:00 (18 * 60)
+    setAfterHours(minutes >= 18 * 60);
 
     const t = setTimeout(() => setVisible(true), 3000);
     return () => clearTimeout(t);
