@@ -11,7 +11,7 @@ import heroIphone from "@/assets/hero-iphone.webp";
 import iphone14 from "@/assets/iphone-14.webp";
 import iphone13 from "@/assets/iphone-13.webp";
 import iphone12 from "@/assets/iphone-12.webp";
-import sejaDeltaLogo from "@/assets/sejadelta-logo.webp";
+const sejaDeltaLogo = "https://ik.imagekit.io/cronosmkt/A%20Casa%20da%20Ma%C3%A7a.png";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
@@ -133,25 +133,17 @@ function BackgroundOrbs() {
   );
 }
 
-function DeltaLogo({ height = 40, textSize = "text-xl" }: { height?: number; textSize?: string }) {
+function DeltaLogo({ height = 40 }: { height?: number }) {
   return (
-    <span className="flex items-center gap-2">
-      <img
-        src={sejaDeltaLogo}
-        alt="A Casa da Maçã"
-        decoding="async"
-        width={height}
-        height={height}
-        style={{ height, width: "auto" }}
-        className="object-contain"
-      />
-      <span
-        className={`${textSize} font-bold tracking-tight whitespace-nowrap`}
-        style={{ color: "var(--text-primary)" }}
-      >
-        A Casa da<span style={{ color: "var(--blue-primary)" }}> Maçã</span>
-      </span>
-    </span>
+    <img
+      src={sejaDeltaLogo}
+      alt="A Casa da Maçã"
+      decoding="async"
+      width={height * 3}
+      height={height}
+      style={{ height, width: "auto" }}
+      className="object-contain"
+    />
   );
 }
 
@@ -190,7 +182,7 @@ function Navbar() {
 
         <div className="navbar-desk-inner">
           <a href="#inicio" className="shrink-0 logo-desk">
-            <DeltaLogo height={scrolled ? 44 : 52} textSize="text-2xl" />
+            <DeltaLogo height={scrolled ? 44 : 52} />
           </a>
           <div className="flex items-center justify-center nav-links-desk">
             {links.map(([l, h]) => (
@@ -218,7 +210,7 @@ function Navbar() {
           </button>
 
           <a href="#inicio" className="absolute left-1/2 -translate-x-1/2 flex items-center">
-            <DeltaLogo height={36} textSize="text-lg" />
+            <DeltaLogo height={36} />
           </a>
         </div>
 
@@ -1096,13 +1088,13 @@ function Footer() {
             <div className="font-bold mb-4" style={{ color: T.text }}>Contato</div>
             <div className="text-sm space-y-2" style={{ color: T.sub }}>
               <div className="flex items-center gap-2"><Phone className="w-4 h-4" /> {PHONE_DISPLAY}</div>
-              <a href="https://instagram.com/sejadelta" className="flex items-center gap-2"><Instagram className="w-4 h-4" /> @sejadelta</a>
-              <a href="https://facebook.com/sejadelta" className="flex items-center gap-2"><Facebook className="w-4 h-4" /> sejadelta</a>
+              <a href="https://instagram.com/acasadamaça_teresopolis" className="flex items-center gap-2"><Instagram className="w-4 h-4" /> @acasadamaça_teresopolis</a>
+              <a href="https://facebook.com/acasadamaça" className="flex items-center gap-2"><Facebook className="w-4 h-4" /> acasadamaça</a>
             </div>
           </div>
         </div>
         <div className="mt-12 text-center">
-          <div className="text-4xl font-black text-gradient-blue">#sejadelta</div>
+          <div className="text-4xl font-black text-gradient-blue">#acasadamaça</div>
         </div>
         <div className="mt-10 h-px" style={{ background: "linear-gradient(90deg, transparent, var(--blue-primary), var(--blue-vivid), transparent)" }} />
         <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs" style={{ color: T.muted }}>
