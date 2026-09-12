@@ -10,7 +10,7 @@ import {
 import { BrandLogo } from "@/components/BrandLogo";
 import { ThemeSelectorModal, type ThemeMode } from "@/components/ThemeSelectorModal";
 import iphone15Pro from "@/assets/iphone-15-pro.webp";
-const heroIphone = "https://ik.imagekit.io/cronosmkt/Smart-A%20Casa%20da%20Ma%C3%A7a.png?updatedAt=1785982404561";
+const heroIphone = "https://ik.imagekit.io/zinma/Terephones-iphone.png";
 import iphone14 from "@/assets/iphone-14.webp";
 import iphone13 from "@/assets/iphone-13.webp";
 import iphone12 from "@/assets/iphone-12.webp";
@@ -555,7 +555,7 @@ function VimeoPlayer() {
           aria-label="Reproduzir vídeo da Terephones"
         >
           <img
-            src="https://ik.imagekit.io/cronosmkt/Casa%20da%20Ma%C3%A7%C3%A3%20Background.jpg"
+            src="https://ik.imagekit.io/zinma/Terephones-capa.png"
             alt="Thumbnail do vídeo Terephones"
             className="absolute inset-0 w-full h-full object-cover"
             style={{ opacity: 0.45, borderRadius: "18px" }}
