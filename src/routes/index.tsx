@@ -351,7 +351,7 @@ const products: ProductItem[] = [
   },
 ];
 
-const filters = ["Todos", "Novos", "Seminovos"];
+const filters = ["Todos", "Seminovos", "Novos"];
 
 const comboUpsell = {
   title: "Kit Essencial Proteção Total",
@@ -1112,10 +1112,11 @@ function Products() {
           badge="Teresópolis / RJ"
         />
 
-        {/* Filtros e Alternador de Visualização (Apenas no Mobile) */}
-        <div className="mt-8 sm:mt-10 flex flex-col md:flex-row items-center justify-between gap-4">
-          {/* Filtros de Categoria */}
-          <div className="flex flex-wrap items-center justify-center gap-2">
+        {/* Filtros e Alternador de Visualização */}
+        {/* Mobile: Barra de Filtros Segmentada & Controles */}
+        <div className="sm:hidden mt-6 flex flex-col gap-3">
+          {/* Segmented Control de 3 Colunas Perfeitas (0 quebras, 100% simétrico) */}
+          <div className="grid grid-cols-3 p-1 rounded-2xl bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 shadow-inner backdrop-blur-md">
             {filters.map(fl => {
               const count = fl === "Todos" ? productList.length : productList.filter(p => p.cat === fl).length;
               const isActive = f === fl;
@@ -1126,7 +1127,83 @@ function Products() {
                     setF(fl);
                     setShowAll(false);
                   }}
-                  className={`px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-extrabold rounded-full transition-all flex items-center gap-2 cursor-pointer ${
+                  className={`flex items-center justify-center gap-1.5 py-2 px-1 text-xs rounded-xl transition-all cursor-pointer ${
+                    isActive
+                      ? "btn-primary-glow text-white shadow-md font-black scale-[1.02]"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-bold"
+                  }`}
+                >
+                  <span className="truncate">{fl}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded-full font-black shrink-0 ${
+                      isActive
+                        ? "bg-white/25 text-white"
+                        : "bg-slate-200/90 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Sub-barra: Estoque disponível na esquerda + Alternador de Visualização na direita */}
+          <div className="flex items-center justify-between px-1">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <span>
+                {filtered.length} {filtered.length === 1 ? "iPhone disponível" : "iPhones disponíveis"}
+              </span>
+            </div>
+
+            {/* Alternador de Visualização Mobile (Grade 2x vs Vitrine 1x) */}
+            <div className="flex items-center p-0.5 bg-slate-100/90 dark:bg-slate-900/90 rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs">
+              <button
+                onClick={() => setViewMode("compact")}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  viewMode === "compact"
+                    ? "btn-primary-glow text-white shadow-xs"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
+                }`}
+                title="Grade 2 por linha no celular"
+                aria-label="Grade 2x"
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                <span className="text-[11px]">Grade 2x</span>
+              </button>
+
+              <button
+                onClick={() => setViewMode("showcase")}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  viewMode === "showcase"
+                    ? "btn-primary-glow text-white shadow-xs"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
+                }`}
+                title="Vitrine 1 card por linha no celular"
+                aria-label="Vitrine 1x"
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+                <span className="text-[11px]">Vitrine 1x</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop: Filtros de Categoria em Barra Ampla */}
+        <div className="hidden sm:flex mt-8 sm:mt-10 items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            {filters.map(fl => {
+              const count = fl === "Todos" ? productList.length : productList.filter(p => p.cat === fl).length;
+              const isActive = f === fl;
+              return (
+                <button
+                  key={fl}
+                  onClick={() => {
+                    setF(fl);
+                    setShowAll(false);
+                  }}
+                  className={`px-5 py-2.5 text-sm font-extrabold rounded-full transition-all flex items-center gap-2 cursor-pointer ${
                     isActive
                       ? "btn-primary-glow text-white shadow-lg scale-105"
                       : "section-pill hover:scale-105"
@@ -1134,7 +1211,7 @@ function Products() {
                 >
                   <span>{fl}</span>
                   <span
-                    className={`text-[11px] px-2 py-0.5 rounded-full font-black ${
+                    className={`text-xs px-2 py-0.5 rounded-full font-black ${
                       isActive
                         ? "bg-white/25 text-white"
                         : "bg-blue-100 text-blue-800 dark:bg-sky-400/25 dark:text-sky-200 border border-blue-200/50 dark:border-sky-400/30"
@@ -1147,35 +1224,9 @@ function Products() {
             })}
           </div>
 
-          {/* Alternador de Visualização: Exclusivo no Mobile (Grade 2x vs Vitrine 1x) */}
-          <div className="sm:hidden flex items-center p-1 glass rounded-2xl border border-blue-500/20 shadow-sm shrink-0">
-            <button
-              onClick={() => setViewMode("compact")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
-                viewMode === "compact"
-                  ? "btn-primary-glow text-white shadow-md scale-105"
-                  : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
-              }`}
-              title="Grade 2 por linha no celular"
-              aria-label="Grade 2x"
-            >
-              <LayoutGrid className="w-4 h-4" />
-              <span className="text-[11px]">Grade 2x</span>
-            </button>
-
-            <button
-              onClick={() => setViewMode("showcase")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
-                viewMode === "showcase"
-                  ? "btn-primary-glow text-white shadow-md scale-105"
-                  : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
-              }`}
-              title="Vitrine 1 card por linha no celular"
-              aria-label="Vitrine 1x"
-            >
-              <Smartphone className="w-4 h-4" />
-              <span className="text-[11px]">Vitrine 1x</span>
-            </button>
+          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>{filtered.length} aparelhos prontos para entrega hoje em Teresópolis</span>
           </div>
         </div>
 
@@ -1757,7 +1808,7 @@ function About() {
 function Footer({ currentTheme }: { currentTheme?: ThemeMode }) {
   const isDark = currentTheme === "black-piano";
   return (
-    <footer id="contato" className="pt-20 pb-10 px-4 sm:px-6"
+    <footer id="contato" className="pt-20 pb-28 sm:pb-10 px-4 sm:px-6"
             style={{ background: "var(--glass-bg)", backdropFilter: "var(--glass-blur)", borderTop: "1px solid var(--glass-border)" }}>
       <div className="max-w-7xl mx-auto">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -1840,28 +1891,111 @@ function WhatsFloat() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Falar no WhatsApp oficial da Terephones"
-      className="fixed bottom-6 right-6 z-40 group flex items-center gap-2 p-2 sm:p-2.5 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
+      className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] right-3.5 sm:bottom-6 sm:right-6 z-40 group flex items-center gap-2 p-1.5 sm:p-2 rounded-full shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
       style={{
         background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
-        boxShadow: "0 10px 30px rgba(34, 197, 94, 0.45)",
+        boxShadow: "0 6px 22px rgba(34, 197, 94, 0.4)",
       }}
       title="Falar com a Terephones no WhatsApp: (21) 96463-9999"
     >
-      <div className="relative flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12">
-        <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white fill-white" />
+      <div className="relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10">
+        <MessageCircle className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-white fill-white" />
         {/* Pulse online badge */}
-        <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+        <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-          <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-300 border-2 border-emerald-600" />
+          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-300 border border-emerald-600" />
         </span>
       </div>
 
       {/* Text label on desktop */}
-      <div className="hidden sm:flex flex-col pr-3 pl-1 text-left leading-tight text-white">
-        <span className="text-[10px] uppercase font-bold tracking-wider opacity-90">Online agora</span>
-        <span className="text-xs font-black tracking-tight">(21) 96463-9999</span>
+      <div className="hidden sm:flex flex-col pr-2.5 pl-0.5 text-left leading-tight text-white">
+        <span className="text-[9px] uppercase font-bold tracking-wider opacity-90">Online agora</span>
+        <span className="text-[11px] font-black tracking-tight">(21) 96463-9999</span>
       </div>
     </a>
+  );
+}
+
+/**
+ * Mobile Bottom Navigation Bar (Footer de Navegação Rápida)
+ * Abas: Início, Loja, Chat
+ */
+function MobileBottomNav() {
+  const [activeTab, setActiveTab] = useState<"inicio" | "loja" | "chat">("inicio");
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const produtosEl = document.getElementById("produtos");
+      const produtosTop = produtosEl ? produtosEl.offsetTop - 220 : 500;
+
+      if (scrollY >= produtosTop) {
+        setActiveTab("loja");
+      } else {
+        setActiveTab("inicio");
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleNav = (tab: "inicio" | "loja" | "chat") => {
+    setActiveTab(tab);
+    if (tab === "inicio") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else if (tab === "loja") {
+      document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" });
+    } else if (tab === "chat") {
+      window.open(WHATSAPP, "_blank");
+    }
+  };
+
+  return (
+    <nav
+      aria-label="Navegação rápida mobile"
+      className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/92 dark:bg-slate-950/92 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800/80 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.5)] px-4 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
+    >
+      <div className="grid grid-cols-3 max-w-xs mx-auto items-center">
+        {/* Início */}
+        <button
+          onClick={() => handleNav("inicio")}
+          className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition-all cursor-pointer ${
+            activeTab === "inicio"
+              ? "text-blue-600 dark:text-sky-400 font-black"
+              : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-semibold"
+          }`}
+        >
+          <Home className={`w-5 h-5 transition-transform ${activeTab === "inicio" ? "scale-110 stroke-[2.5]" : "stroke-[1.8]"}`} />
+          <span className="text-[11px] leading-none">Início</span>
+        </button>
+
+        {/* Loja */}
+        <button
+          onClick={() => handleNav("loja")}
+          className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition-all cursor-pointer ${
+            activeTab === "loja"
+              ? "text-blue-600 dark:text-sky-400 font-black"
+              : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-semibold"
+          }`}
+        >
+          <Smartphone className={`w-5 h-5 transition-transform ${activeTab === "loja" ? "scale-110 stroke-[2.5]" : "stroke-[1.8]"}`} />
+          <span className="text-[11px] leading-none">Loja</span>
+        </button>
+
+        {/* Chat */}
+        <button
+          onClick={() => handleNav("chat")}
+          className="flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition-all cursor-pointer text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 font-black group"
+        >
+          <div className="relative">
+            <MessageCircle className="w-5 h-5 transition-transform group-hover:scale-110 stroke-[2.2]" />
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-950 animate-pulse" />
+          </div>
+          <span className="text-[11px] leading-none">Chat</span>
+        </button>
+      </div>
+    </nav>
   );
 }
 
@@ -1925,6 +2059,7 @@ function BrandStore() {
       </main>
       <Footer currentTheme={currentTheme} />
       <WhatsFloat />
+      <MobileBottomNav />
     </div>
   );
 }
