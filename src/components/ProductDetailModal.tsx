@@ -96,38 +96,30 @@ export function ProductDetailModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="product-modal-title"
-      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-6 overflow-y-auto"
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/75 backdrop-blur-md transition-opacity animate-fade-in"
+        className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity animate-fade-in"
         onClick={onClose}
       />
 
       {/* Modal Container */}
       <div
-        className="relative w-full max-w-3xl my-auto glass-card overflow-hidden shadow-2xl z-10 border border-white/20 dark:border-white/10 max-h-[92vh] flex flex-col"
-        style={{
-          borderRadius: "24px",
-          background: "var(--bg-secondary)",
-          color: "var(--text-primary)",
-        }}
+        className="relative w-[94vw] max-w-2xl my-auto product-modal-container overflow-hidden shadow-2xl z-10 max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header bar com botão fechar */}
-        <div className="flex items-center justify-between px-5 sm:px-7 py-4 border-b border-slate-200/40 dark:border-slate-800/80 shrink-0">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between px-5 sm:px-7 py-3.5 border-b border-slate-200/50 dark:border-white/10 shrink-0">
+          <div className="flex items-center gap-2.5">
             <span
-              className="text-[10px] sm:text-xs uppercase tracking-wider font-bold px-2.5 py-1 rounded-full"
-              style={{
-                background: isNovo ? "rgba(37, 211, 102, 0.15)" : "rgba(56, 189, 248, 0.15)",
-                color: isNovo ? "#15803d" : "var(--blue-primary)",
-                border: isNovo ? "1px solid rgba(37, 211, 102, 0.3)" : "1px solid rgba(56, 189, 248, 0.3)",
-              }}
+              className={`text-[10px] sm:text-xs uppercase tracking-wider font-extrabold px-3 py-1 rounded-full shadow-sm ${
+                isNovo ? "product-badge-novo" : "product-badge-seminovo"
+              }`}
             >
               {product.badge}
             </span>
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-300">
               {product.cat}
             </span>
           </div>
@@ -135,28 +127,28 @@ export function ProductDetailModal({
           <button
             onClick={onClose}
             aria-label="Fechar detalhes"
-            className="p-1.5 rounded-full text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-800/80 transition-colors cursor-pointer"
+            className="p-2 rounded-full text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-slate-800/80 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto px-5 sm:px-7 py-5 space-y-6">
+        <div className="overflow-y-auto px-4 sm:px-7 py-5 space-y-6">
           {/* Top Section: Imagem + Título + Preço */}
-          <div className="grid sm:grid-cols-2 gap-6 items-center">
+          <div className="grid sm:grid-cols-2 gap-5 items-center">
             <div
-              className="relative rounded-2xl p-6 flex items-center justify-center overflow-hidden border border-slate-200/50 dark:border-slate-800/60"
+              className="relative rounded-2xl p-5 flex items-center justify-center overflow-hidden border border-slate-200/60 dark:border-white/10"
               style={{
-                background: "radial-gradient(circle at center, rgba(var(--blue-rgb), 0.15), rgba(0,0,0,0) 70%)",
-                minHeight: "220px",
+                background: "radial-gradient(circle at center, rgba(56, 189, 248, 0.18), rgba(0,0,0,0) 75%)",
+                minHeight: "200px",
               }}
             >
               <img
                 src={product.img}
                 alt={product.name}
-                className="max-h-56 w-auto object-contain transition-transform hover:scale-105 duration-300"
-                style={{ filter: "drop-shadow(0 16px 28px rgba(0,0,0,0.22))" }}
+                className="max-h-52 w-auto object-contain transition-transform hover:scale-105 duration-300"
+                style={{ filter: "drop-shadow(0 16px 28px rgba(0,0,0,0.35))" }}
               />
             </div>
 
@@ -169,96 +161,96 @@ export function ProductDetailModal({
                 {product.name}
               </h2>
 
-              <p className="text-xs sm:text-sm font-medium mt-1 text-slate-500 dark:text-slate-400">
+              <p className="text-xs sm:text-sm font-semibold mt-1 text-slate-600 dark:text-slate-300">
                 {product.specs || "Disponível para pronta-entrega em Teresópolis / RJ"}
               </p>
 
               {/* Preço */}
-              <div className="mt-4 p-4 rounded-xl border border-slate-200/50 dark:border-slate-800/70 bg-slate-50/50 dark:bg-slate-900/40">
-                <div className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">
+              <div className="mt-3.5 product-modal-price-box p-4">
+                <div className="text-[11px] uppercase font-extrabold tracking-wider text-slate-500 dark:text-sky-300">
                   Valor à vista no PIX
                 </div>
                 <div className="text-3xl font-black text-gradient-blue mt-0.5">
                   {fmt(product.price)}
                 </div>
-                <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300 font-medium">
-                  <CreditCard className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                  <span>ou em até 12x de {fmt(product.price / 12)} no cartão (até 18x disponível)</span>
+                <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-700 dark:text-slate-200 font-medium">
+                  <CreditCard className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                  <span>ou até 12x de {fmt(product.price / 12)} (até 18x no cartão)</span>
                 </div>
               </div>
 
               {/* Trade-in notice */}
-              <div className="mt-3 flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
+              <div className="mt-2.5 flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 font-bold">
                 <Zap className="w-3.5 h-3.5 shrink-0" />
-                <span>Aceitamos seu iPhone usado na troca (Troca Inteligente)</span>
+                <span>Aceitamos seu iPhone usado na troca (Trade-In)</span>
               </div>
             </div>
           </div>
 
           {/* Ficha Técnica / Especificações em Grid */}
           <div>
-            <h3 className="text-sm uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
-              <Smartphone className="w-4 h-4 text-blue-500" />
+            <h3 className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-1.5">
+              <Smartphone className="w-4 h-4 text-sky-400" />
               Especificações Técnicas do Modelo
             </h3>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-              <div className="p-3 rounded-xl border border-slate-200/60 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/30">
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                  <Smartphone className="w-3.5 h-3.5 text-blue-500" />
+              <div className="product-modal-box p-3">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
+                  <Smartphone className="w-3.5 h-3.5 text-sky-400" />
                   Armazenamento
                 </div>
-                <div className="text-xs sm:text-sm font-bold mt-1 text-slate-800 dark:text-slate-200">
+                <div className="text-xs sm:text-sm font-extrabold mt-1 text-slate-900 dark:text-white">
                   {product.storage || "128 GB"}
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl border border-slate-200/60 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/30">
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                  <Battery className="w-3.5 h-3.5 text-emerald-500" />
+              <div className="product-modal-box p-3">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
+                  <Battery className="w-3.5 h-3.5 text-emerald-400" />
                   Saúde da Bateria
                 </div>
-                <div className="text-xs sm:text-sm font-bold mt-1 text-emerald-600 dark:text-emerald-400">
+                <div className="text-xs sm:text-sm font-extrabold mt-1 text-emerald-600 dark:text-emerald-400">
                   {product.battery || (isNovo ? "100% (Lacrado Apple)" : "88% a 100% (Alta Performance)")}
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl border border-slate-200/60 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/30">
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                  <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
+              <div className="product-modal-box p-3">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
+                  <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />
                   Garantia
                 </div>
-                <div className="text-xs sm:text-sm font-bold mt-1 text-slate-800 dark:text-slate-200">
+                <div className="text-xs sm:text-sm font-extrabold mt-1 text-blue-600 dark:text-sky-300">
                   {product.warranty || (isNovo ? "1 Ano Mundial Apple" : "90 Dias Garantia Terephones")}
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl border border-slate-200/60 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/30">
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                  <Smartphone className="w-3.5 h-3.5 text-blue-500" />
+              <div className="product-modal-box p-3">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
+                  <Smartphone className="w-3.5 h-3.5 text-sky-400" />
                   Tela
                 </div>
-                <div className="text-xs sm:text-sm font-bold mt-1 text-slate-800 dark:text-slate-200 truncate">
+                <div className="text-xs sm:text-sm font-extrabold mt-1 text-slate-900 dark:text-white truncate">
                   {product.screen || "Super Retina XDR OLED"}
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl border border-slate-200/60 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/30">
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                  <Camera className="w-3.5 h-3.5 text-blue-500" />
+              <div className="product-modal-box p-3">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
+                  <Camera className="w-3.5 h-3.5 text-sky-400" />
                   Câmeras
                 </div>
-                <div className="text-xs sm:text-sm font-bold mt-1 text-slate-800 dark:text-slate-200 truncate">
+                <div className="text-xs sm:text-sm font-extrabold mt-1 text-slate-900 dark:text-white truncate">
                   {product.camera || "Sistema Apple c/ Modo Cinema"}
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl border border-slate-200/60 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/30">
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                  <Cpu className="w-3.5 h-3.5 text-blue-500" />
+              <div className="product-modal-box p-3">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
+                  <Cpu className="w-3.5 h-3.5 text-sky-400" />
                   Processador
                 </div>
-                <div className="text-xs sm:text-sm font-bold mt-1 text-slate-800 dark:text-slate-200 truncate">
+                <div className="text-xs sm:text-sm font-extrabold mt-1 text-slate-900 dark:text-white truncate">
                   {product.chip || "Apple Bionic Alta Velocidade"}
                 </div>
               </div>
@@ -266,14 +258,14 @@ export function ProductDetailModal({
           </div>
 
           {/* O que vem na embalagem / Pedido */}
-          <div className="p-4 rounded-2xl border border-slate-200/60 dark:border-slate-800/80 bg-slate-50/60 dark:bg-slate-900/40">
-            <h3 className="text-xs sm:text-sm uppercase tracking-wider font-bold text-slate-700 dark:text-slate-300 mb-2.5 flex items-center gap-2">
-              <Gift className="w-4 h-4 text-emerald-500" />
+          <div className="product-modal-box p-4 sm:p-5">
+            <h3 className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-slate-800 dark:text-white mb-2.5 flex items-center gap-2">
+              <Gift className="w-4 h-4 text-emerald-400" />
               O que você recebe no seu pedido:
             </h3>
-            <ul className="space-y-1.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+            <ul className="space-y-2 text-xs sm:text-sm text-slate-700 dark:text-slate-100 font-medium">
               {boxList.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-2">
+                <li key={idx} className="flex items-start gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
                   <span>{item}</span>
                 </li>
@@ -282,46 +274,46 @@ export function ProductDetailModal({
           </div>
 
           {/* Compromissos de Segurança */}
-          <div className="grid sm:grid-cols-3 gap-3 text-xs text-slate-600 dark:text-slate-400">
-            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/30 dark:border-blue-900/30">
-              <Truck className="w-4 h-4 text-blue-500 shrink-0" />
+          <div className="grid sm:grid-cols-3 gap-2.5 text-xs text-slate-700 dark:text-slate-200 font-semibold">
+            <div className="product-modal-box p-3 flex items-center gap-2">
+              <Truck className="w-4 h-4 text-sky-400 shrink-0" />
               <span>Entrega Express em até 2h em Teresópolis</span>
             </div>
-            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/30 dark:border-emerald-900/30">
-              <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
+            <div className="product-modal-box p-3 flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>Pague somente na entrega após testar</span>
             </div>
-            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/30 dark:border-indigo-900/30">
-              <Building2 className="w-4 h-4 text-indigo-500 shrink-0" />
+            <div className="product-modal-box p-3 flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-indigo-400 shrink-0" />
               <span>Retirada presencial na loja SejaDelta</span>
             </div>
           </div>
         </div>
 
-        {/* Footer Actions */}
-        <div className="px-5 sm:px-7 py-4 border-t border-slate-200/40 dark:border-slate-800/80 bg-slate-50/80 dark:bg-slate-900/80 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+        {/* Footer Actions (Responsivo e sem cortar) */}
+        <div className="product-modal-footer px-4 sm:px-7 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
           <div className="text-center sm:text-left">
-            <div className="text-[11px] text-slate-500 dark:text-slate-400">
+            <div className="text-[11px] text-slate-500 dark:text-slate-300">
               Dúvidas ou quer negociar? Fale direto no WhatsApp:
             </div>
-            <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
-              (21) 96463-9999 • Atendimento Rápido
+            <div className="text-xs font-extrabold text-slate-900 dark:text-sky-300">
+              (21) 96463-9999 • Atendimento Imediato
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 w-full sm:w-auto">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             <button
               onClick={onClose}
-              className="px-4 py-2.5 rounded-full text-xs font-semibold border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer w-full sm:w-auto"
+              className="px-4 py-2.5 rounded-full text-xs font-bold border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer text-center"
             >
               Fechar
             </button>
             <button
               onClick={handleWhatsApp}
-              className="btn-whatsapp px-6 py-2.5 text-xs sm:text-sm flex items-center justify-center gap-2 font-bold cursor-pointer w-full sm:w-auto shrink-0 shadow-lg"
+              className="btn-whatsapp w-full sm:w-auto px-5 py-3 sm:py-2.5 text-xs sm:text-sm flex items-center justify-center gap-2 font-bold cursor-pointer shadow-lg shrink-0"
             >
-              <MessageCircle className="w-4 h-4 fill-white" />
-              Comprar pelo WhatsApp
+              <MessageCircle className="w-4 h-4 fill-white shrink-0" />
+              <span className="whitespace-nowrap">Comprar pelo WhatsApp</span>
             </button>
           </div>
         </div>

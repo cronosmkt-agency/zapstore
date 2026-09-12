@@ -229,7 +229,7 @@ const comboUpsell = {
 const reviews = [
   { name: "Fernanda Lima", neighborhood: "Agriões", text: "Fiquei impressionada com a rapidez. Comprei pelo WhatsApp da Terephones e em menos de 1h30 o aparelho estava aqui no meu prédio. Paguei no cartão na entrega. Nota 10!" },
   { name: "Ricardo Santos", neighborhood: "Alto", text: "Fui retirar na loja parceira SejaDelta. Ambiente super seguro, equipe atenciosa, conferi tudo na hora e já saí com a película aplicada." },
-  { name: "Bruno Ferreira", neighborhood: "Várzea", text: "A Terephones é nota 10. Fiz a troca inteligente do meu iPhone 11 pelo 14 Pro com facilidade. Zinma e equipe muito honestos e transparentes." },
+  { name: "Bruno Ferreira", neighborhood: "Várzea", text: "A Terephones é nota 10. Fiz a troca inteligente do meu iPhone 11 pelo 14 Pro com facilidade. Ismael e equipe muito honestos e transparentes." },
   { name: "Beatriz Lopes", neighborhood: "Comary", text: "Estava receosa de pedir pela internet e ficar esperando os Correios subirem a serra. A Terephones entregou na minha porta no mesmo dia. Atendimento impecável!" },
   { name: "Lucas Mendes", neighborhood: "Barra do Imbuí", text: "Aparelho 100% lacrado com 1 ano de garantia oficial Apple verificado na hora. Melhor preço e atendimento de Teresópolis." },
   { name: "Juliana Costa", neighborhood: "Taumaturgo", text: "Vendi meu iPhone antigo por um valor muito justo no Trade-in e peguei o 15. Processo limpo, rápido e sem burocracia." },
@@ -399,7 +399,7 @@ function Navbar({
               style={{ color: T.text, borderColor: "rgba(var(--blue-rgb),.10)" }}
             >
               <span>Escolher Atmosfera Visual</span>
-              <span className="text-xs px-2.5 py-1 rounded-full glass border font-bold flex items-center gap-1.5">
+              <span className="section-pill text-xs py-1 px-3">
                 {isDark ? "⚫ Black Piano" : "⚪ Branco Titânio"}
               </span>
             </button>
@@ -556,9 +556,9 @@ function Hero() {
       </div>
       <div className="max-w-7xl mx-auto w-full my-auto lg:my-0 lg:pt-24 lg:pb-24 grid lg:grid-cols-2 gap-6 lg:gap-12 items-center relative z-20">
         <div className="fade-up relative z-20">
-          <div className="glass inline-flex items-center gap-2 px-3 py-1.5 text-xs mb-4 lg:mb-6" style={{ borderRadius: 999 }}>
-            <Zap className="w-3.5 h-3.5" style={{ color: T.primary }} />
-            <span className="font-medium" style={{ color: T.sub }}>iPhones Novos & Seminovos em Teresópolis</span>
+          <div className="section-pill mb-4 lg:mb-6">
+            <Zap className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--blue-primary)" }} />
+            <span>iPhones Novos & Seminovos em Teresópolis</span>
           </div>
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.05] tracking-tight" style={{ color: T.text }}>
             O seu novo <span className="text-gradient-blue">iPhone</span>,<br />
@@ -867,13 +867,13 @@ function SectionTitle({ eyebrow, title, badge }: { eyebrow?: string; title: stri
   return (
     <div className="text-center">
       {eyebrow && (
-        <div className="text-xs uppercase tracking-[0.3em] font-bold text-gradient-blue mb-3">{eyebrow}</div>
+        <div className="text-xs uppercase tracking-[0.3em] font-extrabold text-gradient-blue mb-3">{eyebrow}</div>
       )}
       <div className="flex items-center justify-center gap-3 flex-wrap">
-        <h2 className="text-4xl sm:text-5xl font-black tracking-tight" style={{ color: T.text }}>{title}</h2>
-        {badge && <span className="glass px-3 py-1.5 text-sm text-gradient-blue font-bold">{badge}</span>}
+        <h2 className="text-3xl sm:text-5xl font-black tracking-tight" style={{ color: T.text }}>{title}</h2>
+        {badge && <span className="section-pill text-xs sm:text-sm font-extrabold">{badge}</span>}
       </div>
-      <div className="mx-auto mt-5 w-24 h-[3px] rounded-full" style={{ background: T.grad }} />
+      <div className="mx-auto mt-4 sm:mt-5 w-24 h-[3px] rounded-full" style={{ background: T.grad }} />
     </div>
   );
 }
@@ -943,26 +943,18 @@ function Products() {
                     setF(fl);
                     setShowAll(false);
                   }}
-                  className="px-5 py-2.5 text-xs sm:text-sm font-bold rounded-full transition-all flex items-center gap-2 cursor-pointer"
-                  style={
+                  className={`px-5 py-2.5 text-xs sm:text-sm font-extrabold rounded-full transition-all flex items-center gap-2 cursor-pointer ${
                     isActive
-                      ? {
-                          background: T.grad,
-                          color: "#fff",
-                          boxShadow: "0 6px 20px rgba(var(--blue-rgb),.35)",
-                        }
-                      : {
-                          background: "var(--glass-bg)",
-                          border: "1px solid var(--glass-border)",
-                          color: T.sub,
-                          backdropFilter: "var(--glass-blur)",
-                        }
-                  }
+                      ? "btn-primary-glow text-white shadow-lg scale-105"
+                      : "section-pill hover:scale-105"
+                  }`}
                 >
                   <span>{fl}</span>
                   <span
-                    className={`text-[11px] px-2 py-0.5 rounded-full font-semibold ${
-                      isActive ? "bg-white/20 text-white" : "bg-slate-200/50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300"
+                    className={`text-[11px] px-2 py-0.5 rounded-full font-black ${
+                      isActive
+                        ? "bg-white/25 text-white"
+                        : "bg-blue-100 text-blue-800 dark:bg-sky-400/25 dark:text-sky-200 border border-blue-200/50 dark:border-sky-400/30"
                     }`}
                   >
                     {count}
@@ -1033,13 +1025,9 @@ function Products() {
 
                 {/* Badge de Status / Condição */}
                 <span
-                  className="absolute top-2.5 left-2.5 text-[9px] sm:text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-1 rounded-full shadow-sm"
-                  style={{
-                    background: p.cat === "Novos" ? "rgba(34, 197, 94, 0.16)" : "var(--blue-light)",
-                    color: p.cat === "Novos" ? "#16a34a" : T.primary,
-                    border: p.cat === "Novos" ? "1px solid rgba(34, 197, 94, 0.3)" : "1px solid rgba(var(--blue-rgb),.25)",
-                    backdropFilter: "blur(8px)",
-                  }}
+                  className={`absolute top-2.5 left-2.5 text-[9px] sm:text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-1 rounded-full shadow-sm backdrop-blur-md ${
+                    p.cat === "Novos" ? "product-badge-novo" : "product-badge-seminovo"
+                  }`}
                 >
                   {p.badge}
                 </span>
@@ -1158,7 +1146,7 @@ function HybridSejaDelta() {
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 text-white" style={{ background: T.grad }}>
                 <Truck className="w-6 h-6" />
               </div>
-              <div className="inline-block text-xs font-bold uppercase tracking-wider text-gradient-blue mb-2">
+              <div className="section-pill text-xs font-extrabold uppercase tracking-wider mb-2.5">
                 Opção 1 • Máxima Comodidade
               </div>
               <h3 className="text-2xl font-black" style={{ color: T.text }}>
@@ -1196,7 +1184,7 @@ function HybridSejaDelta() {
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 text-white" style={{ background: T.grad }}>
                 <Building2 className="w-6 h-6" />
               </div>
-              <div className="inline-block text-xs font-bold uppercase tracking-wider text-gradient-blue mb-2">
+              <div className="section-pill text-xs font-extrabold uppercase tracking-wider mb-2.5">
                 Opção 2 • Ver & Testar Pessoalmente
               </div>
               <h3 className="text-2xl font-black" style={{ color: T.text }}>
@@ -1233,7 +1221,7 @@ function HybridSejaDelta() {
         <div className="mt-8 glass-card p-6 sm:p-8 relative overflow-hidden border border-emerald-500/30">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
             <div>
-              <span className="bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+              <span className="section-pill text-xs font-extrabold uppercase tracking-wider border-emerald-500/40 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
                 Oferta Especial de Lançamento
               </span>
               <h4 className="text-2xl font-black mt-2" style={{ color: T.text }}>
@@ -1246,7 +1234,7 @@ function HybridSejaDelta() {
             <div className="flex items-center gap-4 shrink-0">
               <div className="text-right">
                 <span className="text-xs line-through text-gray-400 block">{fmt(comboUpsell.originalPrice)}</span>
-                <span className="text-3xl font-black text-emerald-600">{fmt(comboUpsell.promoPrice)}</span>
+                <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400">{fmt(comboUpsell.promoPrice)}</span>
               </div>
               <button
                 onClick={comboWhatsApp}
@@ -1277,9 +1265,9 @@ function DeliverySection() {
              style={{ background: "radial-gradient(circle, rgba(var(--blue-rgb),.16), transparent 70%)", filter: "blur(50px)" }} />
         <div className="grid lg:grid-cols-2 gap-10 items-center relative">
           <div>
-            <div className="inline-flex items-center gap-2 glass px-3 py-1.5 text-xs font-semibold mb-5"
-                 style={{ borderRadius: 999, color: T.sub }}>
-              <Truck className="w-3.5 h-3.5" style={{ color: T.primary }} /> Logística Terephones
+            <div className="section-pill mb-5">
+              <Truck className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--blue-primary)" }} />
+              <span>Logística Terephones</span>
             </div>
             <h2 className="text-4xl sm:text-5xl font-black leading-tight" style={{ color: T.text }}>
               Na sua porta em até 2h, <span className="text-gradient-blue">sem frete lento.</span>
