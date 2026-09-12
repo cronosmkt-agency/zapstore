@@ -4,7 +4,7 @@ import {
   Truck, Wrench, DollarSign, Recycle, Star, MapPin, ShoppingCart,
   MessageCircle, Menu, X, Smartphone, Battery, Droplets, Unlock,
   ShieldCheck, Home, Check, Instagram, Facebook, Phone, Clock,
-  ChevronDown, Zap, Camera, LayoutGrid, LayoutList, Building2, ShieldAlert,
+  ChevronDown, Zap, Camera, LayoutGrid, Building2, ShieldAlert,
   Sun, Moon, Info
 } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -1075,7 +1075,7 @@ function Differentials() {
 
 function Products() {
   const [f, setF] = useState("Todos");
-  const [viewMode, setViewMode] = useState<"compact" | "showcase" | "list">("compact");
+  const [viewMode, setViewMode] = useState<"compact" | "showcase">("compact");
   const [showAll, setShowAll] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(null);
 
@@ -1117,7 +1117,7 @@ function Products() {
           badge="Teresópolis / RJ"
         />
 
-        {/* Filtros e Alternador de Visualização */}
+        {/* Filtros e Alternador de Visualização (Apenas no Mobile) */}
         <div className="mt-8 sm:mt-10 flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Filtros de Categoria */}
           <div className="flex flex-wrap items-center justify-center gap-2">
@@ -1152,8 +1152,8 @@ function Products() {
             })}
           </div>
 
-          {/* Alternador de Visualização em 3 Modos */}
-          <div className="flex items-center p-1 glass rounded-2xl border border-blue-500/20 shadow-sm shrink-0">
+          {/* Alternador de Visualização: Exclusivo no Mobile (Grade 2x vs Vitrine 1x) */}
+          <div className="sm:hidden flex items-center p-1 glass rounded-2xl border border-blue-500/20 shadow-sm shrink-0">
             <button
               onClick={() => setViewMode("compact")}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
@@ -1161,12 +1161,11 @@ function Products() {
                   ? "btn-primary-glow text-white shadow-md scale-105"
                   : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
               }`}
-              title="Grade Compacta (2 por linha no celular, 4 no computador)"
-              aria-label="Grade Compacta"
+              title="Grade 2 por linha no celular"
+              aria-label="Grade 2x"
             >
               <LayoutGrid className="w-4 h-4" />
-              <span className="hidden sm:inline">Grade 4x</span>
-              <span className="sm:hidden text-[11px]">Grade 2x</span>
+              <span className="text-[11px]">Grade 2x</span>
             </button>
 
             <button
@@ -1176,125 +1175,111 @@ function Products() {
                   ? "btn-primary-glow text-white shadow-md scale-105"
                   : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
               }`}
-              title="Vitrine Destaque (1 card amplo no celular, 3/4 no computador)"
-              aria-label="Vitrine Destaque"
+              title="Vitrine 1 card por linha no celular"
+              aria-label="Vitrine 1x"
             >
               <Smartphone className="w-4 h-4" />
-              <span className="hidden sm:inline">Vitrine</span>
-              <span className="sm:hidden text-[11px]">Vitrine 1x</span>
-            </button>
-
-            <button
-              onClick={() => setViewMode("list")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
-                viewMode === "list"
-                  ? "btn-primary-glow text-white shadow-md scale-105"
-                  : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
-              }`}
-              title="Lista Detalhada (Cards horizontais com especificações completas)"
-              aria-label="Lista Detalhada"
-            >
-              <LayoutList className="w-4 h-4" />
-              <span>Lista</span>
+              <span className="text-[11px]">Vitrine 1x</span>
             </button>
           </div>
         </div>
 
-        {/* Grade Compacta (2 no celular, 3 no tablet, 4 no desktop) */}
-        {viewMode === "compact" && (
-          <div className="mt-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-5">
-            {displayList.map(p => (
+        {/* Grade de Produtos (Sempre ativa no Computador/Web; no Mobile ativa em modo Grade 2x) */}
+        <div
+          className={`mt-8 ${
+            viewMode === "showcase" ? "hidden sm:grid" : "grid"
+          } grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-5`}
+        >
+          {displayList.map(p => (
+            <div
+              key={p.name}
+              className="product-card p-2.5 sm:p-4 rounded-2xl flex flex-col justify-between transition-all duration-300 hover:-translate-y-1"
+            >
               <div
-                key={p.name}
-                className="product-card p-2.5 sm:p-4 rounded-2xl flex flex-col justify-between transition-all duration-300 hover:-translate-y-1"
+                className="product-image-box h-32 sm:h-44 mb-2 sm:mb-3 shrink-0 cursor-pointer relative flex items-center justify-center rounded-xl"
+                onClick={() => setSelectedProduct(p)}
+                title="Clique para ver detalhes"
               >
-                <div
-                  className="product-image-box h-32 sm:h-44 mb-2 sm:mb-3 shrink-0 cursor-pointer relative flex items-center justify-center rounded-xl"
-                  onClick={() => setSelectedProduct(p)}
-                  title="Clique para ver detalhes"
+                <img
+                  src={p.img}
+                  alt={p.name}
+                  loading="lazy"
+                  width={300}
+                  height={300}
+                  className="h-full w-auto object-contain p-1.5 transition-transform duration-300 hover:scale-105"
+                  style={{ filter: "drop-shadow(0 10px 18px rgba(13,27,62,0.18))" }}
+                />
+                <span
+                  className={`absolute top-2 left-2 text-[8px] sm:text-[9px] uppercase tracking-wider font-black px-2 py-0.5 rounded-full shadow-sm backdrop-blur-md ${
+                    p.cat === "Novos" ? "product-badge-novo" : "product-badge-seminovo"
+                  }`}
                 >
-                  <img
-                    src={p.img}
-                    alt={p.name}
-                    loading="lazy"
-                    width={300}
-                    height={300}
-                    className="h-full w-auto object-contain p-1.5 transition-transform duration-300 hover:scale-105"
-                    style={{ filter: "drop-shadow(0 10px 18px rgba(13,27,62,0.18))" }}
-                  />
-                  <span
-                    className={`absolute top-2 left-2 text-[8px] sm:text-[9px] uppercase tracking-wider font-black px-2 py-0.5 rounded-full shadow-sm backdrop-blur-md ${
-                      p.cat === "Novos" ? "product-badge-novo" : "product-badge-seminovo"
-                    }`}
-                  >
-                    {p.badge}
-                  </span>
-                </div>
+                  {p.badge}
+                </span>
+              </div>
 
-                <div className="flex-1 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between gap-1">
-                      <h3 className="font-extrabold text-xs sm:text-base tracking-tight truncate" style={{ color: T.text }} title={p.name}>
-                        {p.name}
-                      </h3>
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
-                        {p.storage || "128GB"}
+              <div className="flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between gap-1">
+                    <h3 className="font-extrabold text-xs sm:text-base tracking-tight truncate" style={{ color: T.text }} title={p.name}>
+                      {p.name}
+                    </h3>
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
+                      {p.storage || "128GB"}
+                    </span>
+                  </div>
+
+                  <p className="text-[10px] sm:text-xs font-medium mt-1 leading-snug line-clamp-1" style={{ color: T.sub }}>
+                    {p.specs}
+                  </p>
+
+                  <div className="mt-2 pt-2 border-t border-slate-200/50 dark:border-white/10">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-base sm:text-xl font-black text-gradient-blue">
+                        {fmt(p.price)}
+                      </span>
+                      <span className="text-[8px] sm:text-[9px] uppercase font-bold text-emerald-600 dark:text-emerald-400">
+                        PIX
                       </span>
                     </div>
-
-                    <p className="text-[10px] sm:text-xs font-medium mt-1 leading-snug line-clamp-1" style={{ color: T.sub }}>
-                      {p.specs}
-                    </p>
-
-                    <div className="mt-2 pt-2 border-t border-slate-200/50 dark:border-white/10">
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-base sm:text-xl font-black text-gradient-blue">
-                          {fmt(p.price)}
-                        </span>
-                        <span className="text-[9px] uppercase font-bold text-emerald-600 dark:text-emerald-400">
-                          PIX
-                        </span>
-                      </div>
-                      <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400 truncate">
-                        12x de {fmt(p.price / 12)}
-                      </div>
+                    <div className="text-[9px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">
+                      ou 12x de {fmt(p.price / 12)}
                     </div>
                   </div>
+                </div>
 
-                  <div className="mt-3 pt-2.5 border-t border-slate-200/50 dark:border-white/10 flex flex-col sm:flex-row gap-1.5">
-                    <button
-                      onClick={() => handleProductWhatsApp(p)}
-                      className="btn-whatsapp flex-1 py-2 px-2 text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer shadow-md rounded-xl"
-                      title="Pedir no WhatsApp"
-                    >
-                      <MessageCircle className="w-3.5 h-3.5 fill-white shrink-0" />
-                      <span className="truncate">Pedir</span>
-                    </button>
-                    <button
-                      onClick={() => setSelectedProduct(p)}
-                      className="btn-outline-glass flex-1 py-2 px-2 text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer rounded-xl"
-                      title="Ver Informações"
-                    >
-                      <Info className="w-3.5 h-3.5 text-sky-400 shrink-0" />
-                      <span className="truncate">Info</span>
-                    </button>
-                  </div>
+                <div className="mt-3 pt-2.5 border-t border-slate-200/50 dark:border-white/10 flex items-center gap-1.5">
+                  <button
+                    onClick={() => handleProductWhatsApp(p)}
+                    className="btn-whatsapp flex-1 py-2 px-1.5 sm:px-2 text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1 cursor-pointer shadow-md rounded-xl"
+                  >
+                    <MessageCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-white shrink-0" />
+                    <span>Pedir</span>
+                  </button>
+                  <button
+                    onClick={() => setSelectedProduct(p)}
+                    className="btn-outline-glass py-2 px-2 text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1 cursor-pointer rounded-xl shrink-0"
+                    title="Ver Informações"
+                  >
+                    <Info className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                    <span className="truncate">Info</span>
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
 
-        {/* Vitrine Conforto (1 no celular, 2 no tablet, 3-4 no desktop) */}
+        {/* Vitrine Mobile: Exclusiva no celular (1 card por linha com visual amplo) */}
         {viewMode === "showcase" && (
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+          <div className="sm:hidden mt-8 grid grid-cols-1 gap-4">
             {displayList.map(p => (
               <div
                 key={p.name}
-                className="product-card p-4 sm:p-6 rounded-2xl flex flex-col justify-between transition-all duration-300 hover:-translate-y-1"
+                className="product-card p-4 rounded-2xl flex flex-col justify-between transition-all duration-300 hover:-translate-y-1"
               >
                 <div
-                  className="product-image-box h-48 sm:h-56 mb-4 shrink-0 cursor-pointer relative flex items-center justify-center rounded-2xl"
+                  className="product-image-box h-48 mb-3 shrink-0 cursor-pointer relative flex items-center justify-center rounded-2xl"
                   onClick={() => setSelectedProduct(p)}
                   title="Clique para ver detalhes"
                 >
@@ -1308,7 +1293,7 @@ function Products() {
                     style={{ filter: "drop-shadow(0 14px 24px rgba(13,27,62,0.2))" }}
                   />
                   <span
-                    className={`absolute top-2.5 left-2.5 text-[9px] sm:text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-1 rounded-full shadow-sm backdrop-blur-md ${
+                    className={`absolute top-2.5 left-2.5 text-[9px] uppercase tracking-wider font-extrabold px-2.5 py-1 rounded-full shadow-sm backdrop-blur-md ${
                       p.cat === "Novos" ? "product-badge-novo" : "product-badge-seminovo"
                     }`}
                   >
@@ -1319,7 +1304,7 @@ function Products() {
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between gap-2">
-                      <h3 className="font-extrabold text-base sm:text-xl tracking-tight" style={{ color: T.text }}>
+                      <h3 className="font-extrabold text-base tracking-tight" style={{ color: T.text }}>
                         {p.name}
                       </h3>
                       <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 shrink-0">
@@ -1331,9 +1316,9 @@ function Products() {
                       {p.specs}
                     </p>
 
-                    <div className="mt-4 pt-3 border-t border-slate-200/50 dark:border-white/10">
+                    <div className="mt-3 pt-3 border-t border-slate-200/50 dark:border-white/10">
                       <div className="flex items-baseline gap-1.5">
-                        <span className="text-2xl sm:text-3xl font-black text-gradient-blue">
+                        <span className="text-2xl font-black text-gradient-blue">
                           {fmt(p.price)}
                         </span>
                         <span className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400">
@@ -1346,118 +1331,17 @@ function Products() {
                     </div>
                   </div>
 
-                  <div className="mt-5 pt-4 border-t border-slate-200/50 dark:border-white/10 flex flex-col gap-2.5">
+                  <div className="mt-4 pt-3 border-t border-slate-200/50 dark:border-white/10 flex flex-col gap-2">
                     <button
                       onClick={() => handleProductWhatsApp(p)}
-                      className="btn-whatsapp w-full py-3 px-4 text-xs sm:text-sm flex items-center justify-center gap-2 font-bold cursor-pointer transition-all shadow-md rounded-xl"
+                      className="btn-whatsapp w-full py-3 px-4 text-xs flex items-center justify-center gap-2 font-bold cursor-pointer transition-all shadow-md rounded-xl"
                     >
                       <MessageCircle className="w-4 h-4 fill-white shrink-0" />
                       <span>Pedir no WhatsApp</span>
                     </button>
                     <button
                       onClick={() => setSelectedProduct(p)}
-                      className="btn-outline-glass w-full py-2.5 px-4 text-xs sm:text-sm flex items-center justify-center gap-2 font-bold cursor-pointer transition-all rounded-xl"
-                    >
-                      <Info className="w-4 h-4 text-sky-400 shrink-0" />
-                      <span>Ver Informações</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Lista Detalhada (Layout horizontal e-commerce premium) */}
-        {viewMode === "list" && (
-          <div className="mt-8 flex flex-col gap-4 max-w-5xl mx-auto">
-            {displayList.map(p => (
-              <div
-                key={p.name}
-                className="product-card p-3.5 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6 transition-all duration-300 hover:-translate-y-1"
-              >
-                <div
-                  className="product-image-box h-40 sm:h-44 sm:w-48 shrink-0 cursor-pointer relative flex items-center justify-center rounded-xl"
-                  onClick={() => setSelectedProduct(p)}
-                  title="Clique para ver detalhes"
-                >
-                  <img
-                    src={p.img}
-                    alt={p.name}
-                    loading="lazy"
-                    width={350}
-                    height={350}
-                    className="h-full w-auto object-contain p-2 transition-transform duration-300 hover:scale-105"
-                    style={{ filter: "drop-shadow(0 12px 20px rgba(13,27,62,0.18))" }}
-                  />
-                  <span
-                    className={`absolute top-2 left-2 text-[9px] sm:text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-1 rounded-full shadow-sm backdrop-blur-md ${
-                      p.cat === "Novos" ? "product-badge-novo" : "product-badge-seminovo"
-                    }`}
-                  >
-                    {p.badge}
-                  </span>
-                </div>
-
-                <div className="flex-1 min-w-0 flex flex-col justify-center">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="font-extrabold text-base sm:text-xl tracking-tight" style={{ color: T.text }}>
-                      {p.name}
-                    </h3>
-                    <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
-                      {p.storage || "128GB"}
-                    </span>
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-md border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300">
-                      {p.cat}
-                    </span>
-                  </div>
-
-                  <p className="text-xs sm:text-sm font-medium mt-1.5 leading-relaxed" style={{ color: T.sub }}>
-                    {p.specs}
-                  </p>
-
-                  <div className="mt-2.5 flex flex-wrap items-center gap-3 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
-                    <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-                      <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
-                      {p.cat === "Novos" ? "1 Ano Garantia Apple" : "90 Dias Garantia"}
-                    </span>
-                    <span className="flex items-center gap-1 text-sky-500 dark:text-sky-400">
-                      <Truck className="w-3.5 h-3.5 shrink-0" />
-                      Entrega em até 2h
-                    </span>
-                    <span className="flex items-center gap-1 text-indigo-500 dark:text-indigo-400">
-                      <Zap className="w-3.5 h-3.5 shrink-0" />
-                      Aceita Trade-In
-                    </span>
-                  </div>
-                </div>
-
-                <div className="sm:w-60 shrink-0 flex flex-col justify-center sm:border-l sm:pl-6 border-slate-200/50 dark:border-white/10 pt-3 sm:pt-0 border-t sm:border-t-0">
-                  <div>
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-2xl sm:text-2xl font-black text-gradient-blue">
-                        {fmt(p.price)}
-                      </span>
-                      <span className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400">
-                        PIX
-                      </span>
-                    </div>
-                    <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                      ou até 12x de {fmt(p.price / 12)}
-                    </div>
-                  </div>
-
-                  <div className="mt-3.5 flex flex-col gap-2">
-                    <button
-                      onClick={() => handleProductWhatsApp(p)}
-                      className="btn-whatsapp w-full py-2.5 px-3 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md rounded-xl"
-                    >
-                      <MessageCircle className="w-3.5 h-3.5 fill-white shrink-0" />
-                      <span>Pedir no WhatsApp</span>
-                    </button>
-                    <button
-                      onClick={() => setSelectedProduct(p)}
-                      className="btn-outline-glass w-full py-2 px-3 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer rounded-xl"
+                      className="btn-outline-glass w-full py-2.5 px-4 text-xs flex items-center justify-center gap-2 font-bold cursor-pointer transition-all rounded-xl"
                     >
                       <Info className="w-4 h-4 text-sky-400 shrink-0" />
                       <span>Ver Informações</span>
