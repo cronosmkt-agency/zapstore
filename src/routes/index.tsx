@@ -4,9 +4,11 @@ import {
   Truck, Wrench, DollarSign, Recycle, Star, MapPin, ShoppingCart,
   MessageCircle, Menu, X, Smartphone, Battery, Droplets, Unlock,
   ShieldCheck, Home, Check, Instagram, Facebook, Phone, Clock,
-  ChevronDown, Zap, Camera, LayoutGrid, LayoutList, Building2, ShieldAlert
+  ChevronDown, Zap, Camera, LayoutGrid, LayoutList, Building2, ShieldAlert,
+  Sun, Moon
 } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
+import { ThemeSelectorModal, type ThemeMode } from "@/components/ThemeSelectorModal";
 import iphone15Pro from "@/assets/iphone-15-pro.webp";
 const heroIphone = "https://ik.imagekit.io/cronosmkt/Smart-A%20Casa%20da%20Ma%C3%A7a.png?updatedAt=1785982404561";
 import iphone14 from "@/assets/iphone-14.webp";
@@ -138,10 +140,17 @@ function BackgroundOrbs() {
 }
 
 
-function Navbar() {
+function Navbar({
+  currentTheme,
+  toggleTheme,
+}: {
+  currentTheme: ThemeMode;
+  toggleTheme: () => void;
+}) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [afterHours, setAfterHours] = useState(false);
+  const isDark = currentTheme === "black-piano";
 
   useEffect(() => {
     const now = new Date();
@@ -169,6 +178,11 @@ function Navbar() {
     ["Início", "#inicio"], ["Produtos", "#produtos"],
     ["Delivery", "#delivery"], ["Contato", "#contato"],
   ];
+
+  const openThemeModal = () => {
+    window.dispatchEvent(new CustomEvent("open-theme-modal"));
+  };
+
   return (
     <>
       {/* Desktop navbar */}
@@ -180,14 +194,33 @@ function Navbar() {
 
         <div className="navbar-desk-inner">
           <a href="#inicio" className="shrink-0 logo-desk">
-            <BrandLogo height={scrolled ? 44 : 52} showText={true} />
+            <BrandLogo height={scrolled ? 44 : 52} showText={true} dark={isDark} />
           </a>
           <div className="flex items-center justify-center nav-links-desk">
             {links.map(([l, h]) => (
               <a key={h} href={h} className="nav-link nav-link-desk">{l}</a>
             ))}
           </div>
-          <div className="flex items-center gap-6 justify-end">
+          <div className="flex items-center gap-4 justify-end">
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold glass transition-all hover:scale-105 cursor-pointer border shadow-sm"
+              title={isDark ? "Mudar para Branco Titânio" : "Mudar para Black Piano"}
+            >
+              {isDark ? (
+                <>
+                  <span className="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]" />
+                  <span className="text-slate-200">Black Piano</span>
+                </>
+              ) : (
+                <>
+                  <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shadow-[0_0_8px_rgba(26,111,232,0.4)]" />
+                  <span className="text-slate-700">Branco</span>
+                </>
+              )}
+            </button>
+
             <div className="badge-aberto">
               {afterHours ? "Fechado — Abre amanhã às 10:00" : "Aberto até 18:00"}
             </div>
@@ -199,26 +232,36 @@ function Navbar() {
 
       {/* Mobile pill navbar */}
       <nav className={`lg:hidden nav-pill ${scrolled ? "scrolled" : ""}`}>
-        <div className="relative flex items-center justify-start h-14 px-5">
+        <div className="relative flex items-center justify-between h-14 px-4">
           <button
             onClick={() => setOpen(!open)}
             aria-label="Menu"
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-white text-[#1A6FE8] shadow-[0_4px_15px_rgba(26,111,232,0.25)]"
-
+            className="w-9 h-9 flex items-center justify-center rounded-full glass border cursor-pointer"
+            style={{ color: "var(--blue-primary)" }}
           >
             {open ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </button>
 
           <a href="#inicio" className="absolute left-1/2 -translate-x-1/2 flex items-center">
-            <BrandLogo height={36} showText={true} />
+            <BrandLogo height={34} showText={true} dark={isDark} />
           </a>
+
+          {/* Quick theme toggle for mobile */}
+          <button
+            onClick={toggleTheme}
+            aria-label="Alternar tema visual"
+            className="w-9 h-9 flex items-center justify-center rounded-full glass border text-xs cursor-pointer shadow-sm hover:scale-105 transition"
+            title="Alternar tema"
+          >
+            {isDark ? "⚫" : "⚪"}
+          </button>
         </div>
 
       </nav>
 
 
       {open && (
-        <div className="lg:hidden mobile-menu p-4">
+        <div className="lg:hidden mobile-menu p-5">
 
           <div className="flex flex-col">
             {links.map(([l, h]) => (
@@ -232,6 +275,21 @@ function Navbar() {
                 {l}
               </a>
             ))}
+
+            {/* Mobile Menu Theme Selector Trigger */}
+            <button
+              onClick={() => {
+                setOpen(false);
+                openThemeModal();
+              }}
+              className="py-3 text-sm font-semibold transition border-b flex items-center justify-between w-full text-left cursor-pointer"
+              style={{ color: T.text, borderColor: "rgba(var(--blue-rgb),.10)" }}
+            >
+              <span>Escolher Atmosfera Visual</span>
+              <span className="text-xs px-2.5 py-1 rounded-full glass border font-bold flex items-center gap-1.5">
+                {isDark ? "⚫ Black Piano" : "⚪ Branco Titânio"}
+              </span>
+            </button>
           </div>
           <a
             href={WHATSAPP}
@@ -247,7 +305,7 @@ function Navbar() {
           aria-label="Fechar menu"
           onClick={() => setOpen(false)}
           className="md:hidden fixed inset-0 z-40"
-          style={{ background: "rgba(13,27,62,.15)" }}
+          style={{ background: "rgba(0,0,0,.5)" }}
         />
       )}
     </>
@@ -767,7 +825,7 @@ function Products() {
                 style={
                   f === fl
                     ? { background: T.grad, color: "#fff", boxShadow: "0 6px 20px rgba(var(--blue-rgb),.3)" }
-                    : { background: "rgba(255,255,255,.7)", border: "1px solid rgba(var(--blue-rgb),.2)", color: T.sub, backdropFilter: "blur(20px)" }
+                    : { background: "var(--glass-bg)", border: "1px solid var(--glass-border)", color: T.sub, backdropFilter: "var(--glass-blur)" }
                 }
               >
                 {fl}
@@ -778,7 +836,7 @@ function Products() {
           <div className="flex items-center gap-2 p-1 glass rounded-xl">
             <button
               onClick={() => setViewMode("grid-1")}
-              className={`p-2 rounded-lg transition-all ${viewMode === "grid-1" ? "bg-white shadow-sm" : "opacity-50"}`}
+              className={`p-2 rounded-lg transition-all cursor-pointer ${viewMode === "grid-1" ? "glass shadow-sm font-bold" : "opacity-50"}`}
               style={{ color: viewMode === "grid-1" ? T.primary : T.sub }}
               title="1 por linha"
             >
@@ -786,7 +844,7 @@ function Products() {
             </button>
             <button
               onClick={() => setViewMode("grid-2")}
-              className={`p-2 rounded-lg transition-all ${viewMode === "grid-2" ? "bg-white shadow-sm" : "opacity-50"}`}
+              className={`p-2 rounded-lg transition-all cursor-pointer ${viewMode === "grid-2" ? "glass shadow-sm font-bold" : "opacity-50"}`}
               style={{ color: viewMode === "grid-2" ? T.primary : T.sub }}
               title="2 por linha"
             >
@@ -1074,8 +1132,9 @@ function Reviews() {
 
 function SellUsed() {
   const fieldStyle = {
-    background: "rgba(255,255,255,.85)",
+    background: "var(--glass-bg)",
     color: T.text,
+    border: "1px solid var(--glass-border)",
   } as const;
   const [files, setFiles] = useState<string[]>([]);
   const [dragging, setDragging] = useState(false);
@@ -1236,14 +1295,15 @@ function About() {
   );
 }
 
-function Footer() {
+function Footer({ currentTheme }: { currentTheme?: ThemeMode }) {
+  const isDark = currentTheme === "black-piano";
   return (
     <footer id="contato" className="pt-20 pb-10 px-4 sm:px-6"
-            style={{ background: "rgba(255,255,255,.75)", backdropFilter: "blur(20px)", borderTop: "1px solid rgba(var(--blue-rgb),.15)" }}>
+            style={{ background: "var(--glass-bg)", backdropFilter: "var(--glass-blur)", borderTop: "1px solid var(--glass-border)" }}>
       <div className="max-w-7xl mx-auto">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <BrandLogo showText={true} />
+            <BrandLogo showText={true} dark={isDark} />
             <p className="text-sm mt-4 leading-relaxed" style={{ color: T.sub }}>
               A sua melhor experiência na compra de iPhones novos e seminovos em Teresópolis com entrega express no mesmo dia ou retirada na loja parceira SejaDelta.
             </p>
@@ -1323,10 +1383,43 @@ function WhatsFloat() {
 
 /* ---------- Page ---------- */
 function BrandStore() {
+  const [currentTheme, setCurrentTheme] = useState<ThemeMode>("white");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("terephones_theme") as ThemeMode | null;
+      if (saved === "black-piano" || saved === "white") {
+        setCurrentTheme(saved);
+        const root = document.documentElement;
+        root.classList.remove("theme-white", "theme-black-piano");
+        root.classList.add(saved === "black-piano" ? "theme-black-piano" : "theme-white");
+      }
+      const onThemeChanged = (e: any) => {
+        if (e.detail?.theme) {
+          setCurrentTheme(e.detail.theme);
+        }
+      };
+      window.addEventListener("theme-changed", onThemeChanged);
+      return () => window.removeEventListener("theme-changed", onThemeChanged);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const next: ThemeMode = currentTheme === "black-piano" ? "white" : "black-piano";
+    setCurrentTheme(next);
+    const root = document.documentElement;
+    root.classList.remove("theme-white", "theme-black-piano");
+    root.classList.add(next === "black-piano" ? "theme-black-piano" : "theme-white");
+    localStorage.setItem("terephones_theme", next);
+    window.dispatchEvent(new CustomEvent("theme-changed", { detail: { theme: next } }));
+    toast.success(next === "black-piano" ? "Tema Black Piano ativado!" : "Tema Branco Titânio ativado!");
+  };
+
   return (
     <div className="relative min-h-screen overflow-x-hidden" style={{ color: T.text }}>
+      <ThemeSelectorModal currentTheme={currentTheme} onThemeChange={setCurrentTheme} />
       <BackgroundOrbs />
-      <Navbar />
+      <Navbar currentTheme={currentTheme} toggleTheme={toggleTheme} />
       <main>
         <Hero />
         <VSL />
@@ -1338,7 +1431,7 @@ function BrandStore() {
         <SellUsed />
         <About />
       </main>
-      <Footer />
+      <Footer currentTheme={currentTheme} />
       <WhatsFloat />
     </div>
   );

@@ -129,6 +129,20 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR">
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var t = localStorage.getItem('terephones_theme');
+                if (t === 'black-piano') {
+                  document.documentElement.classList.add('theme-black-piano');
+                } else if (t === 'white') {
+                  document.documentElement.classList.add('theme-white');
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
         <HeadContent />
       </head>
       <body>

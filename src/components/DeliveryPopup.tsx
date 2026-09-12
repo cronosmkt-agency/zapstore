@@ -30,46 +30,48 @@ export function DeliveryPopup() {
       className="fixed z-[60] bottom-6 right-[5.75rem] left-4 md:bottom-6 md:left-6 md:right-auto md:max-w-xs animate-fade-in"
     >
       {/* Mobile: card compacto, alinhado ao botão de chat */}
-      <div className="md:hidden relative flex h-14 items-center gap-2 rounded-2xl border border-white/40 bg-white/85 px-3 py-2 pr-7 shadow-lg backdrop-blur-md">
+      <div className="md:hidden relative flex h-14 items-center gap-2 rounded-2xl glass px-3 py-2 pr-7 shadow-lg">
         <div className="shrink-0 grid h-8 w-8 place-items-center rounded-lg bg-primary/10">
           <BrandLogo height={24} showText={false} />
         </div>
         <div className="min-w-0">
-          <p className="flex items-center gap-1 text-[11px] font-semibold leading-tight text-gray-900">
+          <p className="flex items-center gap-1 text-[11px] font-semibold leading-tight" style={{ color: "var(--text-primary)" }}>
             {!afterHours && <span className="animate-pulse">🟢</span>}
             <span className="truncate">{title}</span>
           </p>
-          <p className="mt-0.5 truncate text-[10px] leading-tight text-gray-600">{subtitle}</p>
+          <p className="mt-0.5 truncate text-[10px] leading-tight" style={{ color: "var(--text-secondary)" }}>{subtitle}</p>
         </div>
         <button
           type="button"
           onClick={() => setClosed(true)}
           aria-label="Fechar aviso de entrega"
-          className="absolute right-1 top-1 rounded-full p-1 text-gray-400 transition-colors hover:text-gray-700"
+          className="absolute right-1 top-1 rounded-full p-1 opacity-60 transition-opacity hover:opacity-100 cursor-pointer"
+          style={{ color: "var(--text-primary)" }}
         >
           <X className="h-3 w-3" />
         </button>
       </div>
 
       {/* Desktop: card completo */}
-      <div className="hidden md:flex relative items-start gap-3 rounded-2xl border border-white/40 bg-white/80 p-4 pr-8 shadow-lg backdrop-blur-md">
+      <div className="hidden md:flex relative items-start gap-3 rounded-2xl glass p-4 pr-8 shadow-lg">
         <div className="shrink-0 grid h-10 w-10 place-items-center rounded-xl bg-primary/10">
           <BrandLogo height={28} showText={false} />
         </div>
 
         <div className="min-w-0">
-          <p className="flex items-center gap-1.5 text-sm font-semibold text-gray-900">
+          <p className="flex items-center gap-1.5 text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
             {!afterHours && <span className="animate-pulse">🟢</span>}
             <span className="truncate">{title}</span>
           </p>
-          <p className="mt-0.5 text-xs text-gray-600">{subtitle}</p>
+          <p className="mt-0.5 text-xs" style={{ color: "var(--text-secondary)" }}>{subtitle}</p>
         </div>
 
         <button
           type="button"
           onClick={() => setClosed(true)}
           aria-label="Fechar aviso de entrega"
-          className="absolute right-2 top-2 rounded-full p-1 text-gray-400 transition-colors hover:text-gray-700"
+          className="absolute right-2 top-2 rounded-full p-1 opacity-60 transition-opacity hover:opacity-100 cursor-pointer"
+          style={{ color: "var(--text-primary)" }}
         >
           <X className="h-3.5 w-3.5" />
         </button>
