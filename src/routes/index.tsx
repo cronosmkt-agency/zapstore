@@ -5,12 +5,15 @@ import {
   MessageCircle, Menu, X, Smartphone, Battery, Droplets, Unlock,
   ShieldCheck, Home, Check, Instagram, Facebook, Phone, Clock,
   ChevronDown, Zap, Camera, LayoutGrid, LayoutList, Building2, ShieldAlert,
-  Sun, Moon, Info
+  Sun, Moon, Info, FileSpreadsheet, RefreshCw
 } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { ThemeSelectorModal, type ThemeMode } from "@/components/ThemeSelectorModal";
 import { ProductDetailModal, type ProductItem } from "@/components/ProductDetailModal";
+import { GoogleSheetSyncModal } from "@/components/GoogleSheetSyncModal";
+import { fetchGoogleSheetInventory, STORAGE_SHEET_URL_KEY } from "@/services/googleSheets";
 import iphone15Pro from "@/assets/iphone-15-pro.webp";
+import heroIphoneWebp from "@/assets/hero-iphone.webp";
 const heroIphone = "https://ik.imagekit.io/zinma/tr:w-800,f-webp,q-85/Terephones-iphone.png";
 import iphone14 from "@/assets/iphone-14.webp";
 import iphone13 from "@/assets/iphone-13.webp";
@@ -95,24 +98,251 @@ const differentials = [
 ];
 
 const products: ProductItem[] = [
+  // 15 iPhones do Estoque Real da Loja
   {
-    name: "iPhone 15 Pro",
-    price: 6299,
-    cat: "Novos",
-    badge: "Lacrado Apple",
-    img: iphone15Pro,
-    specs: "128GB • Titânio Natural • 1 Ano Garantia Apple",
+    name: "iPhone 16 Pro Max 256GB Desert",
+    price: 5290,
+    cat: "Seminovos",
+    badge: "Bateria 98%",
+    img: heroIphoneWebp,
+    specs: "256GB • Titânio Deserto • Bateria 98%",
+    storage: "256 GB",
+    condition: "Seminovo Grade A+ Impecável",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "98% de Saúde Original",
+    screen: '6.9" Super Retina XDR ProMotion 120Hz',
+    camera: "Tripla 48MP Fusion + Ultra-Wide 48MP + Teleobjetiva 5x",
+    chip: "Apple A18 Pro com Ray Tracing",
+  },
+  {
+    name: "iPhone 16 Pro Max 256GB Desert (Unid. 2)",
+    price: 5290,
+    cat: "Seminovos",
+    badge: "Bateria 90%",
+    img: heroIphoneWebp,
+    specs: "256GB • Titânio Deserto • Bateria 90%",
+    storage: "256 GB",
+    condition: "Seminovo Grade A+ Impecável",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "90% de Saúde Original",
+    screen: '6.9" Super Retina XDR ProMotion 120Hz',
+    camera: "Tripla 48MP Fusion + Ultra-Wide 48MP + Teleobjetiva 5x",
+    chip: "Apple A18 Pro com Ray Tracing",
+  },
+  {
+    name: "iPhone 16 Pro Max 256GB Titânio Natural",
+    price: 5290,
+    cat: "Seminovos",
+    badge: "Bateria 89%",
+    img: heroIphoneWebp,
+    specs: "256GB • Titânio Natural • Bateria 89%",
+    storage: "256 GB",
+    condition: "Seminovo Grade A+ Impecável",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "89% de Saúde Original",
+    screen: '6.9" Super Retina XDR ProMotion 120Hz',
+    camera: "Tripla 48MP Fusion + Ultra-Wide 48MP + Teleobjetiva 5x",
+    chip: "Apple A18 Pro com Ray Tracing",
+  },
+  {
+    name: "iPhone 16 Pro 256GB Desert",
+    price: 4990,
+    cat: "Seminovos",
+    badge: "Bateria 99%",
+    img: heroIphoneWebp,
+    specs: "256GB • Titânio Deserto • Bateria 99%",
+    storage: "256 GB",
+    condition: "Seminovo Grade A+ Impecável",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "99% (Praticamente novo)",
+    screen: '6.3" Super Retina XDR ProMotion 120Hz',
+    camera: "Tripla 48MP Fusion + Ultra-Wide 48MP + Tele 5x",
+    chip: "Apple A18 Pro",
+  },
+  {
+    name: "iPhone 16 Pro 256GB Branco Titânio",
+    price: 4990,
+    cat: "Seminovos",
+    badge: "Bateria 92%",
+    img: heroIphoneWebp,
+    specs: "256GB • Titânio Branco • Bateria 92%",
+    storage: "256 GB",
+    condition: "Seminovo Grade A+ Impecável",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "92% de Saúde Original",
+    screen: '6.3" Super Retina XDR ProMotion 120Hz',
+    camera: "Tripla 48MP Fusion + Ultra-Wide 48MP + Tele 5x",
+    chip: "Apple A18 Pro",
+  },
+  {
+    name: "iPhone 16 128GB Branco",
+    price: 3790,
+    cat: "Seminovos",
+    badge: "Bateria 91%",
+    img: heroIphoneWebp,
+    specs: "128GB • Branco Estelar • Bateria 91%",
     storage: "128 GB",
-    condition: "Novo Lacrado Apple",
-    warranty: "1 Ano Garantia Mundial Apple",
-    battery: "100% (Novo Lacrado)",
-    screen: "6.1\" Super Retina XDR OLED 120Hz ProMotion",
+    condition: "Seminovo Grade A+ Impecável",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "91% de Saúde Original",
+    screen: '6.1" Super Retina XDR com Dynamic Island',
+    camera: "Câmera Fusion 48MP com controle de câmera",
+    chip: "Apple A18 Bionic",
+  },
+  {
+    name: "iPhone 16e 128GB Branco",
+    price: 2990,
+    cat: "Seminovos",
+    badge: "Bateria 92%",
+    img: heroIphoneWebp,
+    specs: "128GB • Branco • Bateria 92%",
+    storage: "128 GB",
+    condition: "Seminovo Grade A+ Impecável",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "92% de Saúde Original",
+    screen: '6.1" Super Retina XDR OLED',
+    camera: "Câmera 48MP Fusion Ultra Rápida",
+    chip: "Apple A18",
+  },
+  {
+    name: "iPhone 15 Pro 128GB Azul Titânio",
+    price: 3690,
+    cat: "Seminovos",
+    badge: "Bateria 85%",
+    img: iphone15Pro,
+    specs: "128GB • Titânio Azul • Bateria 85%",
+    storage: "128 GB",
+    condition: "Seminovo Grade A+ Impecável",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "85% (Testado e certificado)",
+    screen: '6.1" Super Retina XDR OLED 120Hz ProMotion',
     camera: "Tripla 48MP + Teleobjetiva 3x + Macro",
     chip: "A17 Pro (Arquitetura 3nm)",
   },
   {
-    name: "iPhone 15",
-    price: 4999,
+    name: "iPhone 14 Plus 128GB Preto",
+    price: 2790,
+    cat: "Seminovos",
+    badge: "Bateria 89%",
+    img: iphone14,
+    specs: "128GB • Meia-noite • Bateria 89%",
+    storage: "128 GB",
+    condition: "Seminovo Grade A+ Impecável",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "89% (Bateria de longa duração)",
+    screen: '6.7" Super Retina XDR OLED tela grande',
+    camera: "Dupla 12MP Avançada c/ Modo Ação e Cinema",
+    chip: "A15 Bionic com GPU de 5 núcleos",
+  },
+  {
+    name: "iPhone 14 128GB Preto",
+    price: 2390,
+    cat: "Seminovos",
+    badge: "Bateria 84%",
+    img: iphone14,
+    specs: "128GB • Meia-noite • Bateria 84%",
+    storage: "128 GB",
+    condition: "Seminovo Grade A+ Impecável",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "84% (Testado e certificado)",
+    screen: '6.1" Super Retina XDR OLED True Tone',
+    camera: "Dupla 12MP Avançada c/ Gravação 4K HDR",
+    chip: "A15 Bionic com GPU de 5 núcleos",
+  },
+  {
+    name: "iPhone 13 Pro Max 128GB Branco",
+    price: 2990,
+    cat: "Seminovos",
+    badge: "Bateria 85%",
+    img: iphone13,
+    specs: "128GB • Prateado / Branco • Bateria 85%",
+    storage: "128 GB",
+    condition: "Seminovo Grade A+ Impecável",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "85% (Testado em 25+ itens)",
+    screen: '6.7" Super Retina XDR 120Hz ProMotion',
+    camera: "Sistema Pro Triplo 12MP com Teleobjetiva 3x",
+    chip: "A15 Bionic com Neural Engine",
+  },
+  {
+    name: "iPhone 13 Pro Max 128GB Branco (Unid. 2)",
+    price: 2990,
+    cat: "Seminovos",
+    badge: "Bateria 84%",
+    img: iphone13,
+    specs: "128GB • Prateado / Branco • Bateria 84%",
+    storage: "128 GB",
+    condition: "Seminovo Grade A+ Impecável",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "84% (Testado e aprovado)",
+    screen: '6.7" Super Retina XDR 120Hz ProMotion',
+    camera: "Sistema Pro Triplo 12MP com Teleobjetiva 3x",
+    chip: "A15 Bionic com Neural Engine",
+  },
+  {
+    name: "iPhone 13 Pro Max 256GB Grafite",
+    price: 3190,
+    cat: "Seminovos",
+    badge: "Bateria 85%",
+    img: iphone13,
+    specs: "256GB • Grafite • Bateria 85%",
+    storage: "256 GB",
+    condition: "Seminovo Grade A+ Impecável",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "85% (Testado e aprovado)",
+    screen: '6.7" Super Retina XDR 120Hz ProMotion',
+    camera: "Sistema Pro Triplo 12MP com modo macro e tele 3x",
+    chip: "A15 Bionic Alta Performance",
+  },
+  {
+    name: "iPhone 13 128GB Preto",
+    price: 1590,
+    cat: "Seminovos",
+    badge: "Bateria 100% Nova",
+    img: iphone13,
+    specs: "128GB • Meia-noite • Bateria Trocada 100%",
+    storage: "128 GB",
+    condition: "Seminovo Revisado Grade A+",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "Bateria Nova Trocada (100% Saúde)",
+    screen: '6.1" Super Retina XDR OLED brilhante',
+    camera: "Dupla 12MP c/ Estabilização Sensor-Shift",
+    chip: "A15 Bionic Super Eficiente",
+  },
+  {
+    name: "iPhone 12 Pro Max 128GB Azul Pacífico",
+    price: 1990,
+    cat: "Seminovos",
+    badge: "Bateria 82%",
+    img: iphone12,
+    specs: "128GB • Azul Pacífico • Bateria 82%",
+    storage: "128 GB",
+    condition: "Seminovo Grade A+ Impecável",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "82% (Testado e certificado)",
+    screen: '6.7" Super Retina XDR OLED tela grande',
+    camera: "Sistema Pro Triplo 12MP com Sensor LiDAR",
+    chip: "A14 Bionic com conexão 5G",
+  },
+  // Novos Lacrados
+  {
+    name: "iPhone 16 Pro 128GB Lacrado",
+    price: 5990,
+    cat: "Novos",
+    badge: "Lacrado Apple",
+    img: heroIphoneWebp,
+    specs: "128GB • Titânio • 1 Ano Garantia Apple",
+    storage: "128 GB",
+    condition: "Novo Lacrado Apple",
+    warranty: "1 Ano Garantia Mundial Apple",
+    battery: "100% (Novo Lacrado)",
+    screen: '6.3" Super Retina XDR ProMotion 120Hz',
+    camera: "Tripla 48MP Fusion + Ultra-Wide 48MP + Tele 5x",
+    chip: "Apple A18 Pro",
+  },
+  {
+    name: "iPhone 15 128GB Lacrado",
+    price: 4690,
     cat: "Novos",
     badge: "Lacrado Apple",
     img: iphone15Pro,
@@ -121,99 +351,9 @@ const products: ProductItem[] = [
     condition: "Novo Lacrado Apple",
     warranty: "1 Ano Garantia Mundial Apple",
     battery: "100% (Novo Lacrado)",
-    screen: "6.1\" Super Retina XDR com Dynamic Island",
+    screen: '6.1" Super Retina XDR com Dynamic Island',
     camera: "Dupla 48MP c/ zoom óptico 2x de alta resolução",
     chip: "A16 Bionic Ultra Rápido",
-  },
-  {
-    name: "iPhone 14",
-    price: 3899,
-    cat: "Novos",
-    badge: "Pronta Entrega",
-    img: iphone14,
-    specs: "128GB • Modo Ação • 1 Ano Garantia Apple",
-    storage: "128 GB",
-    condition: "Novo Lacrado Apple",
-    warranty: "1 Ano Garantia Mundial Apple",
-    battery: "100% (Novo Lacrado)",
-    screen: "6.1\" Super Retina XDR OLED True Tone",
-    camera: "Dupla 12MP Avançada c/ Gravação 4K Dolby Vision",
-    chip: "A15 Bionic com GPU de 5 núcleos",
-  },
-  {
-    name: "iPhone 13",
-    price: 3399,
-    cat: "Novos",
-    badge: "Super Oferta",
-    img: iphone13,
-    specs: "128GB • Modo Cinema • Pronta Entrega",
-    storage: "128 GB",
-    condition: "Novo Lacrado Apple",
-    warranty: "1 Ano Garantia Mundial Apple",
-    battery: "100% (Novo Lacrado)",
-    screen: "6.1\" Super Retina XDR OLED brilhante",
-    camera: "Dupla 12MP c/ Estabilização Sensor-Shift",
-    chip: "A15 Bionic Super Eficiente",
-  },
-  {
-    name: "iPhone 14 Pro (seminovo)",
-    price: 4499,
-    cat: "Seminovos",
-    badge: "Grade A+ Impecável",
-    img: iphone14,
-    specs: "128GB • Dynamic Island • 90d Garantia",
-    storage: "128 GB",
-    condition: "Seminovo Grade A+ (Impecável, sem marcas)",
-    warranty: "90 Dias de Garantia Terephones",
-    battery: "Saúde 88% a 100% Testada",
-    screen: "6.1\" Super Retina XDR Always-On 120Hz",
-    camera: "Sistema Pro 48MP com sensor quad-pixel",
-    chip: "A16 Bionic com Neural Engine de 16 núcleos",
-  },
-  {
-    name: "iPhone 13 Pro (seminovo)",
-    price: 3699,
-    cat: "Seminovos",
-    badge: "Grade A+ Impecável",
-    img: iphone13,
-    specs: "128GB • Aço Inoxidável Cirúrgico • 120Hz",
-    storage: "128 GB",
-    condition: "Seminovo Grade A+ (100% Original)",
-    warranty: "90 Dias de Garantia Terephones",
-    battery: "Saúde 87% a 98% Testada",
-    screen: "6.1\" ProMotion 120Hz Super Fluida",
-    camera: "Sistema Pro Triplo 12MP com modo macro e tele 3x",
-    chip: "A15 Bionic Alta Performance",
-  },
-  {
-    name: "iPhone 12 (seminovo)",
-    price: 2399,
-    cat: "Seminovos",
-    badge: "Custo-Benefício",
-    img: iphone12,
-    specs: "128GB • Design Ceramic Shield • 5G",
-    storage: "128 GB",
-    condition: "Seminovo Grade A+ (Revisado em 25+ itens)",
-    warranty: "90 Dias de Garantia Terephones",
-    battery: "Saúde 86% a 95% Testada",
-    screen: "6.1\" Super Retina XDR OLED HDR10",
-    camera: "Dupla 12MP c/ Modo Noturno em todas as lentes",
-    chip: "A14 Bionic com conexão 5G",
-  },
-  {
-    name: "iPhone 11 (seminovo)",
-    price: 1799,
-    cat: "Seminovos",
-    badge: "Entrada Apple",
-    img: iphone12,
-    specs: "64GB/128GB • 100% Original • Revisado",
-    storage: "64 GB / 128 GB",
-    condition: "Seminovo Grade A+ (Excelente estado)",
-    warranty: "90 Dias de Garantia Terephones",
-    battery: "Saúde 85% a 95% Testada",
-    screen: "6.1\" Liquid Retina HD com True Tone",
-    camera: "Dupla 12MP Ultra-angular e Grande-angular",
-    chip: "A13 Bionic Rápido e Seguro",
   },
 ];
 
@@ -940,8 +1080,50 @@ function Products() {
   const [showAll, setShowAll] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(null);
 
-  const filteredList = f === "Todos" ? products : products.filter(p => p.cat === f);
-  const displayList = showAll ? filteredList : filteredList.slice(0, 4);
+  // Google Sheets Integration State
+  const [productList, setProductList] = useState<ProductItem[]>(products);
+  const [isSheetConnected, setIsSheetConnected] = useState(false);
+  const [sheetModalOpen, setSheetModalOpen] = useState(false);
+  const [sheetUrl, setSheetUrl] = useState("");
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  useEffect(() => {
+    const savedUrl =
+      localStorage.getItem(STORAGE_SHEET_URL_KEY) ||
+      ((import.meta.env.VITE_GOOGLE_SHEET_URL as string) || "");
+
+    if (savedUrl) {
+      setSheetUrl(savedUrl);
+      setIsSyncing(true);
+      fetchGoogleSheetInventory(savedUrl)
+        .then(items => {
+          setProductList(items);
+          setIsSheetConnected(true);
+        })
+        .catch(err => {
+          console.warn("Could not load Google Sheet inventory, using default catalog:", err);
+          setIsSheetConnected(false);
+        })
+        .finally(() => {
+          setIsSyncing(false);
+        });
+    }
+  }, []);
+
+  const handleSyncSuccess = (items: ProductItem[], url: string) => {
+    setProductList(items);
+    setSheetUrl(url);
+    setIsSheetConnected(true);
+  };
+
+  const handleResetDefault = () => {
+    setProductList(products);
+    setSheetUrl("");
+    setIsSheetConnected(false);
+  };
+
+  const filteredList = f === "Todos" ? productList : productList.filter(p => p.cat === f);
+  const displayList = showAll ? filteredList : filteredList.slice(0, 8);
 
   const handleProductWhatsApp = (prod: ProductItem) => {
     const text = `Olá, Terephones! Vi o *${prod.name}* no site por ${fmt(prod.price)} e gostaria de saber se tem a pronta-entrega para hoje em Teresópolis!`;
@@ -957,12 +1139,12 @@ function Products() {
           badge="Teresópolis / RJ"
         />
 
-        {/* Filtros e Alternador de Visualização */}
-        <div className="mt-10 flex flex-col md:flex-row items-center justify-between gap-5">
-          {/* Filtros de Categoria */}
+        {/* Barra de Ações: Sincronização Google Drive + Filtros + Alternador de Visualização */}
+        <div className="mt-8 sm:mt-10 flex flex-col md:flex-row items-center justify-between gap-4">
+          {/* Filtros de Categoria e Conexão Planilha */}
           <div className="flex flex-wrap items-center justify-center gap-2">
             {filters.map(fl => {
-              const count = fl === "Todos" ? products.length : products.filter(p => p.cat === fl).length;
+              const count = fl === "Todos" ? productList.length : productList.filter(p => p.cat === fl).length;
               const isActive = f === fl;
               return (
                 <button
@@ -990,6 +1172,26 @@ function Products() {
                 </button>
               );
             })}
+
+            {/* Botão de Conexão com Google Sheets */}
+            <button
+              onClick={() => setSheetModalOpen(true)}
+              className={`px-3 py-2 rounded-full text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm hover:scale-105 ml-1 ${
+                isSheetConnected
+                  ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30"
+                  : "bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:border-blue-500"
+              }`}
+              title="Sincronizar estoque automaticamente com o Google Drive"
+            >
+              <FileSpreadsheet className={`w-3.5 h-3.5 ${isSheetConnected ? "text-emerald-500" : "text-blue-500"}`} />
+              <span className="hidden sm:inline">
+                {isSheetConnected ? "Planilha Google Conectada" : "Sincronizar Google Drive"}
+              </span>
+              <span className="sm:hidden">
+                {isSheetConnected ? "Google Conectado" : "Sincronizar"}
+              </span>
+              {isSyncing && <RefreshCw className="w-3 h-3 animate-spin text-blue-500" />}
+            </button>
           </div>
 
           {/* Alternador de Visualização em 3 Modos */}
@@ -1310,13 +1512,13 @@ function Products() {
         )}
 
         {/* Botão Ver Todos */}
-        {!showAll && filteredList.length > 4 && (
+        {!showAll && filteredList.length > 8 && (
           <div className="mt-12 text-center">
             <button
               onClick={() => setShowAll(true)}
               className="btn-glass px-8 py-3.5 text-sm font-bold inline-flex items-center gap-2 cursor-pointer shadow-md hover:scale-105 transition-transform"
             >
-              <span>Ver todos os {filteredList.length} modelos</span>
+              <span>Ver todos os {filteredList.length} modelos disponíveis</span>
               <ChevronDown className="w-4 h-4" />
             </button>
           </div>
@@ -1329,6 +1531,16 @@ function Products() {
         isOpen={!!selectedProduct}
         onClose={() => setSelectedProduct(null)}
         whatsappNumber={WHATSAPP_NUMBER}
+      />
+
+      {/* Modal de Sincronização com Google Sheets */}
+      <GoogleSheetSyncModal
+        isOpen={sheetModalOpen}
+        onClose={() => setSheetModalOpen(false)}
+        onSyncSuccess={handleSyncSuccess}
+        onResetDefault={handleResetDefault}
+        currentUrl={sheetUrl}
+        isCustomActive={isSheetConnected}
       />
     </section>
   );
