@@ -108,7 +108,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
               "@type": "Organization",
               name: "Terephones",
               alternateName: "Terephones iPhones Teresópolis",
-              telephone: "+5521993446336",
+              telephone: "+5521964639999",
               areaServed: "Teresópolis, RJ",
               logo: "https://ik.imagekit.io/zinma/TerePhones-Logo.png",
               image: "https://ik.imagekit.io/zinma/TerePhones-Logo.png",

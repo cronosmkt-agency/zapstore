@@ -5,10 +5,11 @@ import {
   MessageCircle, Menu, X, Smartphone, Battery, Droplets, Unlock,
   ShieldCheck, Home, Check, Instagram, Facebook, Phone, Clock,
   ChevronDown, Zap, Camera, LayoutGrid, LayoutList, Building2, ShieldAlert,
-  Sun, Moon
+  Sun, Moon, Info
 } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { ThemeSelectorModal, type ThemeMode } from "@/components/ThemeSelectorModal";
+import { ProductDetailModal, type ProductItem } from "@/components/ProductDetailModal";
 import iphone15Pro from "@/assets/iphone-15-pro.webp";
 const heroIphone = "https://ik.imagekit.io/zinma/Terephones-iphone.png";
 import iphone14 from "@/assets/iphone-14.webp";
@@ -37,7 +38,7 @@ export const Route = createFileRoute("/")({
           name: "Terephones",
           description:
             "Venda de iPhones novos e seminovos com Entrega Express no mesmo dia e ponto de retirada na loja parceira SejaDelta em Teresópolis - RJ.",
-          telephone: "+5521993446336",
+          telephone: "+5521964639999",
           address: {
             "@type": "PostalAddress",
             streetAddress: "Teresópolis",
@@ -67,9 +68,9 @@ export const Route = createFileRoute("/")({
   component: BrandStore,
 });
 
-const WHATSAPP_NUMBER = "5521993446336";
+const WHATSAPP_NUMBER = "5521964639999";
 const WHATSAPP = "https://wa.me/" + WHATSAPP_NUMBER;
-const PHONE_DISPLAY = "(21) 99344-6336";
+const PHONE_DISPLAY = "(21) 96463-9999";
 const INSTAGRAM_HANDLE = "@terephones";
 const INSTAGRAM_URL = "https://instagram.com/terephones";
 
@@ -93,15 +94,127 @@ const differentials = [
   { icon: Star, title: "Pague só na Entrega", desc: "Sem risco de golpe: confira e teste o aparelho antes de fazer o pagamento" },
 ];
 
-const products: { name: string; price: number; cat: string; badge: string; img: string; specs?: string }[] = [
-  { name: "iPhone 15 Pro", price: 6299, cat: "Novos", badge: "Lacrado Apple", img: iphone15Pro, specs: "128GB • Titânio • 1 Ano Garantia Apple" },
-  { name: "iPhone 15", price: 4999, cat: "Novos", badge: "Lacrado Apple", img: iphone15Pro, specs: "128GB • Dynamic Island • 1 Ano Garantia" },
-  { name: "iPhone 14", price: 3899, cat: "Novos", badge: "Pronta Entrega", img: iphone14, specs: "128GB • Bateria Longa Duração" },
-  { name: "iPhone 13", price: 3399, cat: "Novos", badge: "Super Oferta", img: iphone13, specs: "128GB • Câmera Cinema • Pronta Entrega" },
-  { name: "iPhone 14 Pro (seminovo)", price: 4499, cat: "Seminovos", badge: "Grade A+ Impecável", img: iphone14, specs: "128GB • Bateria 88%+ • 90d Garantia" },
-  { name: "iPhone 13 Pro (seminovo)", price: 3699, cat: "Seminovos", badge: "Grade A+ Impecável", img: iphone13, specs: "128GB • Tela 120Hz ProMotion" },
-  { name: "iPhone 12 (seminovo)", price: 2399, cat: "Seminovos", badge: "Custo-Benefício", img: iphone12, specs: "128GB • Testado em 25+ Itens" },
-  { name: "iPhone 11 (seminovo)", price: 1799, cat: "Seminovos", badge: "Entrada Apple", img: iphone12, specs: "64GB/128GB • 100% Original" },
+const products: ProductItem[] = [
+  {
+    name: "iPhone 15 Pro",
+    price: 6299,
+    cat: "Novos",
+    badge: "Lacrado Apple",
+    img: iphone15Pro,
+    specs: "128GB • Titânio Natural • 1 Ano Garantia Apple",
+    storage: "128 GB",
+    condition: "Novo Lacrado Apple",
+    warranty: "1 Ano Garantia Mundial Apple",
+    battery: "100% (Novo Lacrado)",
+    screen: "6.1\" Super Retina XDR OLED 120Hz ProMotion",
+    camera: "Tripla 48MP + Teleobjetiva 3x + Macro",
+    chip: "A17 Pro (Arquitetura 3nm)",
+  },
+  {
+    name: "iPhone 15",
+    price: 4999,
+    cat: "Novos",
+    badge: "Lacrado Apple",
+    img: iphone15Pro,
+    specs: "128GB • Dynamic Island • 1 Ano Garantia Apple",
+    storage: "128 GB",
+    condition: "Novo Lacrado Apple",
+    warranty: "1 Ano Garantia Mundial Apple",
+    battery: "100% (Novo Lacrado)",
+    screen: "6.1\" Super Retina XDR com Dynamic Island",
+    camera: "Dupla 48MP c/ zoom óptico 2x de alta resolução",
+    chip: "A16 Bionic Ultra Rápido",
+  },
+  {
+    name: "iPhone 14",
+    price: 3899,
+    cat: "Novos",
+    badge: "Pronta Entrega",
+    img: iphone14,
+    specs: "128GB • Modo Ação • 1 Ano Garantia Apple",
+    storage: "128 GB",
+    condition: "Novo Lacrado Apple",
+    warranty: "1 Ano Garantia Mundial Apple",
+    battery: "100% (Novo Lacrado)",
+    screen: "6.1\" Super Retina XDR OLED True Tone",
+    camera: "Dupla 12MP Avançada c/ Gravação 4K Dolby Vision",
+    chip: "A15 Bionic com GPU de 5 núcleos",
+  },
+  {
+    name: "iPhone 13",
+    price: 3399,
+    cat: "Novos",
+    badge: "Super Oferta",
+    img: iphone13,
+    specs: "128GB • Modo Cinema • Pronta Entrega",
+    storage: "128 GB",
+    condition: "Novo Lacrado Apple",
+    warranty: "1 Ano Garantia Mundial Apple",
+    battery: "100% (Novo Lacrado)",
+    screen: "6.1\" Super Retina XDR OLED brilhante",
+    camera: "Dupla 12MP c/ Estabilização Sensor-Shift",
+    chip: "A15 Bionic Super Eficiente",
+  },
+  {
+    name: "iPhone 14 Pro (seminovo)",
+    price: 4499,
+    cat: "Seminovos",
+    badge: "Grade A+ Impecável",
+    img: iphone14,
+    specs: "128GB • Dynamic Island • 90d Garantia",
+    storage: "128 GB",
+    condition: "Seminovo Grade A+ (Impecável, sem marcas)",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "Saúde 88% a 100% Testada",
+    screen: "6.1\" Super Retina XDR Always-On 120Hz",
+    camera: "Sistema Pro 48MP com sensor quad-pixel",
+    chip: "A16 Bionic com Neural Engine de 16 núcleos",
+  },
+  {
+    name: "iPhone 13 Pro (seminovo)",
+    price: 3699,
+    cat: "Seminovos",
+    badge: "Grade A+ Impecável",
+    img: iphone13,
+    specs: "128GB • Aço Inoxidável Cirúrgico • 120Hz",
+    storage: "128 GB",
+    condition: "Seminovo Grade A+ (100% Original)",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "Saúde 87% a 98% Testada",
+    screen: "6.1\" ProMotion 120Hz Super Fluida",
+    camera: "Sistema Pro Triplo 12MP com modo macro e tele 3x",
+    chip: "A15 Bionic Alta Performance",
+  },
+  {
+    name: "iPhone 12 (seminovo)",
+    price: 2399,
+    cat: "Seminovos",
+    badge: "Custo-Benefício",
+    img: iphone12,
+    specs: "128GB • Design Ceramic Shield • 5G",
+    storage: "128 GB",
+    condition: "Seminovo Grade A+ (Revisado em 25+ itens)",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "Saúde 86% a 95% Testada",
+    screen: "6.1\" Super Retina XDR OLED HDR10",
+    camera: "Dupla 12MP c/ Modo Noturno em todas as lentes",
+    chip: "A14 Bionic com conexão 5G",
+  },
+  {
+    name: "iPhone 11 (seminovo)",
+    price: 1799,
+    cat: "Seminovos",
+    badge: "Entrada Apple",
+    img: iphone12,
+    specs: "64GB/128GB • 100% Original • Revisado",
+    storage: "64 GB / 128 GB",
+    condition: "Seminovo Grade A+ (Excelente estado)",
+    warranty: "90 Dias de Garantia Terephones",
+    battery: "Saúde 85% a 95% Testada",
+    screen: "6.1\" Liquid Retina HD com True Tone",
+    camera: "Dupla 12MP Ultra-angular e Grande-angular",
+    chip: "A13 Bionic Rápido e Seguro",
+  },
 ];
 
 const filters = ["Todos", "Novos", "Seminovos"];
@@ -454,18 +567,18 @@ function Hero() {
           <p className="mt-6 text-lg max-w-xl" style={{ color: T.sub }}>
             Entrega Express em até 2 horas na sua porta em Teresópolis ou Retirada presencial na loja parceira <strong>SejaDelta</strong>. Compre com procedência, até 1 ano de garantia Apple e pague somente na entrega! 🍎⚡
           </p>
-          <div className="mt-8 flex flex-wrap gap-4 justify-center lg:justify-start">
-            <a href="#produtos" className="btn-primary-glow inline-flex items-center gap-2">
-              <ShoppingCart className="w-4 h-4" /> Ver modelos
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
+            <a href="#produtos" className="btn-primary-glow inline-flex items-center justify-center gap-2 py-3.5 px-6 text-center font-bold text-sm sm:text-base">
+              <ShoppingCart className="w-4 h-4" /> Ver Modelos Disponíveis
             </a>
-            <a href={WHATSAPP} className="btn-glass hidden lg:inline-flex items-center gap-2">
-              <MessageCircle className="w-4 h-4" /> Chamar no WhatsApp
+            <a href={WHATSAPP} className="btn-whatsapp inline-flex items-center justify-center gap-2 py-3.5 px-6 text-center font-bold text-sm sm:text-base">
+              <MessageCircle className="w-4 h-4 fill-white" /> Falar no WhatsApp
             </a>
           </div>
           <div className="mt-6 lg:mt-10 flex flex-wrap justify-center lg:justify-start items-center gap-4 sm:gap-6 text-sm font-medium" style={{ color: T.sub }}>
-            <div className="flex items-center gap-2"><Star className="w-4 h-4" style={{ color: T.sub }} /> 4,9 no Google</div>
-            <div className="flex items-center gap-2"><Truck className="w-4 h-4" style={{ color: T.sub }} /> Entrega Express 2h</div>
-            <div className="flex items-center gap-2"><Building2 className="w-4 h-4" style={{ color: T.sub }} /> Retirada na SejaDelta</div>
+            <div className="flex items-center gap-1.5"><Star className="w-4 h-4 fill-amber-400 text-amber-400" /> <span className="font-bold text-slate-800 dark:text-slate-100">4,9</span> no Google</div>
+            <div className="flex items-center gap-1.5"><Truck className="w-4 h-4 text-sky-500" /> Entrega Express 2h</div>
+            <div className="flex items-center gap-1.5"><Building2 className="w-4 h-4 text-indigo-500" /> Retirada na SejaDelta</div>
           </div>
         </div>
 
@@ -798,72 +911,116 @@ function Products() {
   const [f, setF] = useState("Todos");
   const [viewMode, setViewMode] = useState<"grid-1" | "grid-2">("grid-2");
   const [showAll, setShowAll] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(null);
 
   const filteredList = f === "Todos" ? products : products.filter(p => p.cat === f);
   const displayList = showAll ? filteredList : filteredList.slice(0, 4);
 
-  const handleProductWhatsApp = (prod: typeof products[0]) => {
-    const text = `Olá, Terephones! Vi o ${prod.name} no site por ${fmt(prod.price)} e gostaria de saber se tem a pronta-entrega para hoje em Teresópolis!`;
+  const handleProductWhatsApp = (prod: ProductItem) => {
+    const text = `Olá, Terephones! Vi o *${prod.name}* no site por ${fmt(prod.price)} e gostaria de saber se tem a pronta-entrega para hoje em Teresópolis!`;
     window.open(`${WHATSAPP}?text=${encodeURIComponent(text)}`, "_blank");
   };
 
   return (
-    <section id="produtos" className="py-10 sm:py-24 px-4 sm:px-6">
+    <section id="produtos" className="py-14 sm:py-24 px-4 sm:px-6 relative">
       <div className="max-w-7xl mx-auto">
-        <SectionTitle eyebrow="Estoque Pronta Entrega" title="Modelos em Destaque" badge="Teresópolis / RJ" />
-        
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex flex-wrap justify-center gap-3">
-            {filters.map(fl => (
-              <button
-                key={fl}
-                onClick={() => {
-                  setF(fl);
-                  setShowAll(false);
-                }}
-                className="px-5 py-2 text-sm font-semibold rounded-full transition-all"
-                style={
-                  f === fl
-                    ? { background: T.grad, color: "#fff", boxShadow: "0 6px 20px rgba(var(--blue-rgb),.3)" }
-                    : { background: "var(--glass-bg)", border: "1px solid var(--glass-border)", color: T.sub, backdropFilter: "var(--glass-blur)" }
-                }
-              >
-                {fl}
-              </button>
-            ))}
+        <SectionTitle
+          eyebrow="Estoque Pronta Entrega"
+          title="iPhones Prontos Para Retirada ou Entrega"
+          badge="Teresópolis / RJ"
+        />
+
+        {/* Filtros e Alternador de Visualização */}
+        <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-5">
+          <div className="flex flex-wrap justify-center gap-2.5">
+            {filters.map(fl => {
+              const count = fl === "Todos" ? products.length : products.filter(p => p.cat === fl).length;
+              const isActive = f === fl;
+              return (
+                <button
+                  key={fl}
+                  onClick={() => {
+                    setF(fl);
+                    setShowAll(false);
+                  }}
+                  className="px-5 py-2.5 text-xs sm:text-sm font-bold rounded-full transition-all flex items-center gap-2 cursor-pointer"
+                  style={
+                    isActive
+                      ? {
+                          background: T.grad,
+                          color: "#fff",
+                          boxShadow: "0 6px 20px rgba(var(--blue-rgb),.35)",
+                        }
+                      : {
+                          background: "var(--glass-bg)",
+                          border: "1px solid var(--glass-border)",
+                          color: T.sub,
+                          backdropFilter: "var(--glass-blur)",
+                        }
+                  }
+                >
+                  <span>{fl}</span>
+                  <span
+                    className={`text-[11px] px-2 py-0.5 rounded-full font-semibold ${
+                      isActive ? "bg-white/20 text-white" : "bg-slate-200/50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300"
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
-          <div className="flex items-center gap-2 p-1 glass rounded-xl">
+          <div className="flex items-center gap-1.5 p-1 glass rounded-2xl">
             <button
               onClick={() => setViewMode("grid-1")}
-              className={`p-2 rounded-lg transition-all cursor-pointer ${viewMode === "grid-1" ? "glass shadow-sm font-bold" : "opacity-50"}`}
+              className={`p-2 rounded-xl transition-all cursor-pointer ${
+                viewMode === "grid-1" ? "glass shadow-sm font-bold" : "opacity-50 hover:opacity-100"
+              }`}
               style={{ color: viewMode === "grid-1" ? T.primary : T.sub }}
-              title="1 por linha"
+              title="Visualização em Lista (1 por linha)"
+              aria-label="Visualização em Lista"
             >
-              <LayoutList className="w-5 h-5" />
+              <LayoutList className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
             <button
               onClick={() => setViewMode("grid-2")}
-              className={`p-2 rounded-lg transition-all cursor-pointer ${viewMode === "grid-2" ? "glass shadow-sm font-bold" : "opacity-50"}`}
+              className={`p-2 rounded-xl transition-all cursor-pointer ${
+                viewMode === "grid-2" ? "glass shadow-sm font-bold" : "opacity-50 hover:opacity-100"
+              }`}
               style={{ color: viewMode === "grid-2" ? T.primary : T.sub }}
-              title="2 por linha"
+              title="Visualização em Grade (2 ou 4 por linha)"
+              aria-label="Visualização em Grade"
             >
-              <LayoutGrid className="w-5 h-5" />
+              <LayoutGrid className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
         </div>
 
-        <div className={`mt-12 grid gap-4 sm:gap-6 ${
-          viewMode === "grid-1" 
-            ? "grid-cols-1 max-w-2xl mx-auto" 
-            : "grid-cols-2 lg:grid-cols-4"
-        }`}>
+        {/* Grid de Produtos */}
+        <div
+          className={`mt-10 grid gap-4 sm:gap-6 ${
+            viewMode === "grid-1"
+              ? "grid-cols-1 max-w-3xl mx-auto"
+              : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+          }`}
+        >
           {displayList.map(p => (
-            <div key={p.name} className={`glass-card p-4 sm:p-5 flex flex-col ${viewMode === "grid-1" ? "sm:flex-row sm:items-center sm:gap-8" : ""}`}>
-              <div className={`relative rounded-2xl mb-4 overflow-hidden flex items-center justify-center shrink-0 ${
-                viewMode === "grid-1" ? "h-48 sm:h-56 sm:w-56" : "h-40 sm:h-44"
+            <div
+              key={p.name}
+              className={`product-card p-4 sm:p-5 flex flex-col justify-between ${
+                viewMode === "grid-1" ? "sm:flex-row sm:items-center sm:gap-8" : ""
               }`}
-                   style={{ background: "radial-gradient(circle at center, rgba(var(--blue-rgb),.10), rgba(255,255,255,0) 70%)" }}>
+            >
+              {/* Box de Imagem com Spotlight */}
+              <div
+                className={`product-image-box mb-4 shrink-0 cursor-pointer ${
+                  viewMode === "grid-1" ? "h-48 sm:h-56 sm:w-56" : "h-44 sm:h-48"
+                }`}
+                onClick={() => setSelectedProduct(p)}
+                title="Clique para ver detalhes"
+              >
                 <img
                   src={p.img}
                   alt={p.name}
@@ -873,33 +1030,80 @@ function Products() {
                   className="h-full w-auto object-contain p-2"
                   style={{ filter: "drop-shadow(0 14px 22px rgba(13,27,62,0.18))" }}
                 />
-                <span className="absolute top-2 left-2 text-[9px] sm:text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 sm:py-1 rounded-full"
-                      style={{ background: "var(--blue-light)", color: T.primary, border: "1px solid rgba(var(--blue-rgb),.25)" }}>
+
+                {/* Badge de Status / Condição */}
+                <span
+                  className="absolute top-2.5 left-2.5 text-[9px] sm:text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-1 rounded-full shadow-sm"
+                  style={{
+                    background: p.cat === "Novos" ? "rgba(34, 197, 94, 0.16)" : "var(--blue-light)",
+                    color: p.cat === "Novos" ? "#16a34a" : T.primary,
+                    border: p.cat === "Novos" ? "1px solid rgba(34, 197, 94, 0.3)" : "1px solid rgba(var(--blue-rgb),.25)",
+                    backdropFilter: "blur(8px)",
+                  }}
+                >
                   {p.badge}
                 </span>
               </div>
-              
-              <div className="flex-1 flex flex-col">
-                <h3 className="font-bold text-base sm:text-lg" style={{ color: T.text }}>{p.name}</h3>
-                {p.specs && (
-                  <p className="text-[11px] font-medium mt-0.5" style={{ color: T.sub }}>{p.specs}</p>
-                )}
-                <div className="mt-2">
-                  <div className="text-xl sm:text-2xl font-black" style={{ color: T.primary }}>{fmt(p.price)}</div>
-                  <div className="text-[10px] sm:text-xs mt-0.5" style={{ color: T.muted }}>no PIX ou até 12x de {fmt(p.price / 12)}</div>
+
+              {/* Informações e Ações */}
+              <div className="flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-extrabold text-base sm:text-lg tracking-tight" style={{ color: T.text }}>
+                      {p.name}
+                    </h3>
+                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
+                      {p.storage || "128GB"}
+                    </span>
+                  </div>
+
+                  {p.specs && (
+                    <p className="text-[11px] sm:text-xs font-medium mt-1 leading-snug" style={{ color: T.sub }}>
+                      {p.specs}
+                    </p>
+                  )}
+
+                  {/* Bloco de Preços com Alto Contraste */}
+                  <div className="mt-3.5 pt-3 border-t border-slate-200/50 dark:border-slate-800/80">
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-xl sm:text-2xl font-black text-gradient-blue">
+                        {fmt(p.price)}
+                      </span>
+                      <span className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400">
+                        à vista PIX
+                      </span>
+                    </div>
+                    <div className="text-[11px] mt-0.5 font-medium" style={{ color: T.muted }}>
+                      ou até 12x de {fmt(p.price / 12)} (até 18x no cartão)
+                    </div>
+                  </div>
                 </div>
-                <div className={`mt-4 sm:mt-5 flex gap-2 pt-4 border-t ${viewMode === "grid-1" ? "sm:mt-auto" : ""}`} style={{ borderColor: "rgba(var(--blue-rgb),.12)" }}>
+
+                {/* Dois Botões Obrigatórios: WhatsApp + Ver Informações */}
+                <div
+                  className={`mt-4 pt-3.5 border-t flex flex-col gap-2 ${
+                    viewMode === "grid-1" ? "sm:flex-row sm:items-center sm:gap-3" : ""
+                  }`}
+                  style={{ borderColor: "rgba(var(--blue-rgb),.12)" }}
+                >
+                  {/* Botão 1: Pedir no WhatsApp */}
                   <button
                     onClick={() => handleProductWhatsApp(p)}
-                    className="btn-primary-glow flex-1 text-[10px] sm:text-xs text-center py-2 flex items-center justify-center gap-1 cursor-pointer"
+                    className="btn-whatsapp w-full py-2.5 px-3.5 text-xs flex items-center justify-center gap-1.5 font-bold cursor-pointer transition-all shadow-md"
+                    title={`Pedir ${p.name} no WhatsApp da Terephones`}
                   >
-                    <ShoppingCart className="w-3.5 h-3.5" /> Pedir no WhatsApp
+                    <MessageCircle className="w-4 h-4 fill-white shrink-0" />
+                    <span>Pedir no WhatsApp</span>
                   </button>
+
+                  {/* Botão 2: Ver Informações */}
                   <button
-                    onClick={() => handleProductWhatsApp(p)}
-                    className="btn-glass flex-none px-3 text-xs text-center py-2 flex items-center justify-center cursor-pointer"
+                    onClick={() => setSelectedProduct(p)}
+                    className="btn-outline-glass w-full py-2.5 px-3.5 text-xs flex items-center justify-center gap-1.5 font-bold cursor-pointer transition-all"
+                    title={`Ver Ficha Técnica e Garantia do ${p.name}`}
                   >
-                    <MessageCircle className="w-3.5 h-3.5" />
+                    <Info className="w-4 h-4 text-sky-500 shrink-0" />
+                    <span>Ver Informações</span>
                   </button>
                 </div>
               </div>
@@ -907,17 +1111,27 @@ function Products() {
           ))}
         </div>
 
+        {/* Botão Ver Todos */}
         {!showAll && filteredList.length > 4 && (
           <div className="mt-12 text-center">
             <button
               onClick={() => setShowAll(true)}
-              className="btn-glass px-8 py-3 text-sm font-bold inline-flex items-center gap-2 cursor-pointer"
+              className="btn-glass px-8 py-3.5 text-sm font-bold inline-flex items-center gap-2 cursor-pointer shadow-md hover:scale-105 transition-transform"
             >
-              Ver todos os modelos <ChevronDown className="w-4 h-4" />
+              <span>Ver todos os {filteredList.length} modelos</span>
+              <ChevronDown className="w-4 h-4" />
             </button>
           </div>
         )}
       </div>
+
+      {/* Modal com Ficha Técnica Completa */}
+      <ProductDetailModal
+        product={selectedProduct}
+        isOpen={!!selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+        whatsappNumber={WHATSAPP_NUMBER}
+      />
     </section>
   );
 }
@@ -1260,22 +1474,30 @@ function About() {
             </p>
             <div className="mt-8 space-y-4">
               <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 mt-0.5 text-blue-600 shrink-0" />
+                <MapPin className="w-5 h-5 mt-0.5 shrink-0" style={{ color: "var(--blue-primary)" }} />
                 <div className="text-sm" style={{ color: T.sub }}>
                   <strong>Ponto de Retirada Parceiro Oficial:</strong><br />
                   Loja SejaDelta — Teresópolis - RJ
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5 text-blue-600 shrink-0" />
+                <Clock className="w-5 h-5 shrink-0" style={{ color: "var(--blue-primary)" }} />
                 <div className="text-sm" style={{ color: T.sub }}>Segunda a Sábado — 10:00 às 18:00</div>
               </div>
               <div className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-blue-600 shrink-0" />
-                <div className="text-sm" style={{ color: T.sub }}>WhatsApp: {PHONE_DISPLAY}</div>
+                <Phone className="w-5 h-5 shrink-0" style={{ color: "var(--blue-primary)" }} />
+                <a
+                  href={WHATSAPP}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-semibold hover:underline"
+                  style={{ color: T.sub }}
+                >
+                  WhatsApp: {PHONE_DISPLAY}
+                </a>
               </div>
               <div className="flex items-center gap-3">
-                <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0" />
+                <ShieldCheck className="w-5 h-5 shrink-0" style={{ color: "var(--blue-primary)" }} />
                 <div className="text-sm" style={{ color: T.sub }}>Garantia Oficial Apple de 1 ano (Lacrados) • 90 dias loja (Seminovos)</div>
               </div>
             </div>
@@ -1323,12 +1545,20 @@ function Footer({ currentTheme }: { currentTheme?: ThemeMode }) {
           <div>
             <div className="font-bold mb-4" style={{ color: T.text }}>Atendimento</div>
             <div className="text-sm space-y-2.5" style={{ color: T.sub }}>
-              <div className="flex items-center gap-2"><Phone className="w-4 h-4 text-blue-600" /> {PHONE_DISPLAY}</div>
-              <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-blue-600 transition">
-                <Instagram className="w-4 h-4 text-blue-600" /> {INSTAGRAM_HANDLE}
+              <a
+                href={WHATSAPP}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 hover:text-emerald-500 transition font-medium"
+              >
+                <Phone className="w-4 h-4 shrink-0" style={{ color: "var(--blue-primary)" }} />
+                <span>{PHONE_DISPLAY}</span>
               </a>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <Clock className="w-3.5 h-3.5" /> Seg a Sáb das 10h às 18h
+              <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-sky-400 transition">
+                <Instagram className="w-4 h-4 shrink-0" style={{ color: "var(--blue-primary)" }} /> {INSTAGRAM_HANDLE}
+              </a>
+              <div className="flex items-center gap-2 text-xs" style={{ color: T.muted }}>
+                <Clock className="w-3.5 h-3.5 shrink-0" /> Seg a Sáb das 10h às 18h
               </div>
             </div>
           </div>
@@ -1372,11 +1602,28 @@ function WhatsFloat() {
       href={WHATSAPP}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Falar no WhatsApp"
-      className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full flex items-center justify-center wa-float shadow-xl hover:scale-110 transition-transform"
-      style={{ background: T.grad }}
+      aria-label="Falar no WhatsApp oficial da Terephones"
+      className="fixed bottom-6 right-6 z-40 group flex items-center gap-2 p-2 sm:p-2.5 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
+      style={{
+        background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
+        boxShadow: "0 10px 30px rgba(34, 197, 94, 0.45)",
+      }}
+      title="Falar com a Terephones no WhatsApp: (21) 96463-9999"
     >
-      <MessageCircle className="w-7 h-7 text-white" />
+      <div className="relative flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12">
+        <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white fill-white" />
+        {/* Pulse online badge */}
+        <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+          <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-300 border-2 border-emerald-600" />
+        </span>
+      </div>
+
+      {/* Text label on desktop */}
+      <div className="hidden sm:flex flex-col pr-3 pl-1 text-left leading-tight text-white">
+        <span className="text-[10px] uppercase font-bold tracking-wider opacity-90">Online agora</span>
+        <span className="text-xs font-black tracking-tight">(21) 96463-9999</span>
+      </div>
     </a>
   );
 }
