@@ -647,10 +647,8 @@ div[style*="Edit with Lovable"],
   height: 380px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(26,111,232,0.10) 0%, rgba(41,121,255,0.06) 40%, transparent 70%);
-  transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 9998;
-  transition: transform 0.12s ease-out;
   will-change: transform;
 }
 .cursor-dot {
@@ -660,10 +658,9 @@ div[style*="Edit with Lovable"],
   height: 8px;
   border-radius: 50%;
   background: rgba(26,111,232,0.55);
-  transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 9999;
-  transition: transform 0.05s ease-out, width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
+  transition: width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
   will-change: transform;
   box-shadow: 0 0 10px rgba(26,111,232,0.4), 0 0 20px rgba(26,111,232,0.2);
 }
@@ -672,8 +669,19 @@ div[style*="Edit with Lovable"],
   height: 20px;
   background: rgba(26,111,232,0.3);
 }
-@media (max-width: 768px) {
+@media (max-width: 768px), (hover: none) {
   .cursor-glow-orb, .cursor-dot { display: none !important; }
+}
+
+/* ============ Offscreen Performance: content-visibility ============ */
+#sejadelta,
+#entrega,
+#troca,
+#depoimentos,
+#faq,
+footer {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 700px;
 }
 
 /* ============ Ripple (mobile) ============ */

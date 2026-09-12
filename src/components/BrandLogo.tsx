@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 
-export const TEREPHONES_LOGO_URL = "https://ik.imagekit.io/zinma/TerePhones-Logo.png";
+export const TEREPHONES_LOGO_URL = "https://ik.imagekit.io/zinma/tr:w-160,f-auto,q-85/TerePhones-Logo.png";
 
 interface BrandLogoProps {
   height?: number;

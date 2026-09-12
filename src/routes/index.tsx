@@ -11,7 +11,7 @@ import { BrandLogo } from "@/components/BrandLogo";
 import { ThemeSelectorModal, type ThemeMode } from "@/components/ThemeSelectorModal";
 import { ProductDetailModal, type ProductItem } from "@/components/ProductDetailModal";
 import iphone15Pro from "@/assets/iphone-15-pro.webp";
-const heroIphone = "https://ik.imagekit.io/zinma/Terephones-iphone.png";
+const heroIphone = "https://ik.imagekit.io/zinma/tr:w-800,f-webp,q-85/Terephones-iphone.png";
 import iphone14 from "@/assets/iphone-14.webp";
 import iphone13 from "@/assets/iphone-13.webp";
 import iphone12 from "@/assets/iphone-12.webp";
@@ -427,16 +427,41 @@ function Navbar({
 
 function TiltPhone() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number | undefined>(undefined);
   const targetRef = useRef({ rotX: 0, rotY: 0 });
   const currentRef = useRef({ rotX: 0, rotY: 0 });
-  const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let isRunning = false;
+
+    const animate = () => {
+      const speed = 0.08;
+      const diffX = targetRef.current.rotX - currentRef.current.rotX;
+      const diffY = targetRef.current.rotY - currentRef.current.rotY;
+      currentRef.current.rotX += diffX * speed;
+      currentRef.current.rotY += diffY * speed;
+      el.style.transform = `perspective(900px) rotateX(${currentRef.current.rotX}deg) rotateY(${currentRef.current.rotY}deg) scale3d(1.04, 1.04, 1.04)`;
+
+      if (Math.abs(diffX) > 0.02 || Math.abs(diffY) > 0.02 || targetRef.current.rotX !== 0 || targetRef.current.rotY !== 0) {
+        frameRef.current = requestAnimationFrame(animate);
+      } else {
+        isRunning = false;
+        frameRef.current = undefined;
+      }
+    };
+
+    const startAnimate = () => {
+      if (!isRunning) {
+        isRunning = true;
+        frameRef.current = requestAnimationFrame(animate);
+      }
+    };
 
     const onMove = (e: MouseEvent) => {
       const rect = el.getBoundingClientRect();
@@ -445,24 +470,23 @@ function TiltPhone() {
       const dx = (e.clientX - cx) / (rect.width / 2);
       const dy = (e.clientY - cy) / (rect.height / 2);
       targetRef.current = { rotX: -dy * 18, rotY: dx * 18 };
-      setGlowPos({
-        x: ((e.clientX - rect.left) / rect.width) * 100,
-        y: ((e.clientY - rect.top) / rect.height) * 100,
-      });
-    };
-    const onLeave = () => { targetRef.current = { rotX: 0, rotY: 0 }; };
 
-    const animate = () => {
-      const speed = 0.08;
-      currentRef.current.rotX += (targetRef.current.rotX - currentRef.current.rotX) * speed;
-      currentRef.current.rotY += (targetRef.current.rotY - currentRef.current.rotY) * speed;
-      el.style.transform = `perspective(900px) rotateX(${currentRef.current.rotX}deg) rotateY(${currentRef.current.rotY}deg) scale3d(1.04, 1.04, 1.04)`;
-      frameRef.current = requestAnimationFrame(animate);
+      if (glowRef.current) {
+        const gx = ((e.clientX - rect.left) / rect.width) * 100;
+        const gy = ((e.clientY - rect.top) / rect.height) * 100;
+        glowRef.current.style.background = `radial-gradient(circle at ${gx}% ${gy}%, rgba(26,111,232,0.18), transparent 65%)`;
+      }
+      startAnimate();
     };
 
-    el.addEventListener("mousemove", onMove);
-    el.addEventListener("mouseleave", onLeave);
-    frameRef.current = requestAnimationFrame(animate);
+    const onLeave = () => {
+      targetRef.current = { rotX: 0, rotY: 0 };
+      startAnimate();
+    };
+
+    el.addEventListener("mousemove", onMove, { passive: true });
+    el.addEventListener("mouseleave", onLeave, { passive: true });
+
     return () => {
       el.removeEventListener("mousemove", onMove);
       el.removeEventListener("mouseleave", onLeave);
@@ -477,13 +501,14 @@ function TiltPhone() {
       style={{ animationDelay: ".2s", transformStyle: "preserve-3d", willChange: "transform" }}
     >
       <div
+        ref={glowRef}
         aria-hidden="true"
         style={{
           position: "absolute",
           width: "320px",
           height: "320px",
           borderRadius: "50%",
-          background: `radial-gradient(circle at ${glowPos.x}% ${glowPos.y}%, rgba(26,111,232,0.18), transparent 65%)`,
+          background: "radial-gradient(circle at 50% 50%, rgba(26,111,232,0.18), transparent 65%)",
           filter: "blur(40px)",
           pointerEvents: "none",
           zIndex: 0,
@@ -668,8 +693,10 @@ function VimeoPlayer() {
           aria-label="Reproduzir vídeo da Terephones"
         >
           <img
-            src="https://ik.imagekit.io/zinma/Terephones-capa.png"
+            src="https://ik.imagekit.io/zinma/tr:w-800,f-webp,q-80/Terephones-capa.png"
             alt="Thumbnail do vídeo Terephones"
+            width={800}
+            height={450}
             className="absolute inset-0 w-full h-full object-cover"
             style={{ opacity: 0.45, borderRadius: "18px" }}
             loading="lazy"

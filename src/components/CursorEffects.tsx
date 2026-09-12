@@ -1,81 +1,76 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 export function CursorEffects() {
   const orbRef = useRef<HTMLDivElement | null>(null);
   const dotRef = useRef<HTMLDivElement | null>(null);
-  const posRef = useRef({ x: 0, y: 0 });
+  const posRef = useRef({ x: -200, y: -200 });
   const rafRef = useRef<number | undefined>(undefined);
-
-  const onMouseMove = useCallback((e: MouseEvent) => {
-    posRef.current = { x: e.clientX, y: e.clientY };
-  }, []);
+  const isMovingRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (window.matchMedia("(max-width: 768px)").matches) return;
+    // Only activate on devices with a mouse/precision cursor
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
-    const animate = () => {
-      const { x, y } = posRef.current;
-      if (orbRef.current) {
-        orbRef.current.style.left = `${x}px`;
-        orbRef.current.style.top = `${y}px`;
+    const orb = orbRef.current;
+    const dot = dotRef.current;
+    if (!orb || !dot) return;
+
+    let currentX = -200;
+    let currentY = -200;
+
+    const render = () => {
+      // GPU accelerated lerp
+      currentX += (posRef.current.x - currentX) * 0.16;
+      currentY += (posRef.current.y - currentY) * 0.16;
+
+      orb.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`;
+      dot.style.transform = `translate3d(${posRef.current.x}px, ${posRef.current.y}px, 0) translate(-50%, -50%)`;
+
+      if (Math.abs(posRef.current.x - currentX) > 0.15 || Math.abs(posRef.current.y - currentY) > 0.15) {
+        rafRef.current = requestAnimationFrame(render);
+      } else {
+        isMovingRef.current = false;
+        rafRef.current = undefined;
       }
-      if (dotRef.current) {
-        dotRef.current.style.left = `${x}px`;
-        dotRef.current.style.top = `${y}px`;
-      }
-      rafRef.current = requestAnimationFrame(animate);
     };
 
-    const onEnter = () => dotRef.current?.classList.add("hovered");
-    const onLeave = () => dotRef.current?.classList.remove("hovered");
-    const clickables = Array.from(
-      document.querySelectorAll('a, button, [role="button"]'),
-    );
-    clickables.forEach((el) => {
-      el.addEventListener("mouseenter", onEnter);
-      el.addEventListener("mouseleave", onLeave);
-    });
+    const startRender = () => {
+      if (!isMovingRef.current) {
+        isMovingRef.current = true;
+        rafRef.current = requestAnimationFrame(render);
+      }
+    };
+
+    const onMouseMove = (e: MouseEvent) => {
+      posRef.current = { x: e.clientX, y: e.clientY };
+      startRender();
+    };
+
+    // Single delegated listener for hover states across all interactive elements
+    const onMouseOver = (e: MouseEvent) => {
+      const target = (e.target as HTMLElement)?.closest?.('a, button, [role="button"], input, select');
+      if (target) {
+        dot.classList.add("hovered");
+      } else {
+        dot.classList.remove("hovered");
+      }
+    };
 
     window.addEventListener("mousemove", onMouseMove, { passive: true });
-    rafRef.current = requestAnimationFrame(animate);
+    document.addEventListener("mouseover", onMouseOver, { passive: true });
 
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseover", onMouseOver);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      clickables.forEach((el) => {
-        el.removeEventListener("mouseenter", onEnter);
-        el.removeEventListener("mouseleave", onLeave);
-      });
     };
-  }, [onMouseMove]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const onTouch = (e: TouchEvent) => {
-      const touch = e.touches[0];
-      if (!touch) return;
-
-      const ripple = document.createElement("div");
-      ripple.className = "touch-ripple";
-      ripple.setAttribute("aria-hidden", "true");
-      ripple.style.left = `${touch.clientX}px`;
-      ripple.style.top = `${touch.clientY}px`;
-      ripple.style.width = "180px";
-      ripple.style.height = "180px";
-      document.body.appendChild(ripple);
-      ripple.addEventListener("animationend", () => ripple.remove());
-    };
-
-    window.addEventListener("touchstart", onTouch, { passive: true });
-    return () => window.removeEventListener("touchstart", onTouch);
   }, []);
 
   return (
     <>
-      <div ref={orbRef} className="cursor-glow-orb" aria-hidden="true" />
-      <div ref={dotRef} className="cursor-dot" aria-hidden="true" />
+      <div ref={orbRef} className="cursor-glow-orb" aria-hidden="true" style={{ top: 0, left: 0, willChange: "transform" }} />
+      <div ref={dotRef} className="cursor-dot" aria-hidden="true" style={{ top: 0, left: 0, willChange: "transform" }} />
     </>
   );
 }
