@@ -498,7 +498,7 @@ export function transformCsvToProducts(rows: string[][]): ProductItem[] {
 /**
  * Fetches and syncs inventory from Google Sheets
  */
-export async function fetchGoogleSheetInventory(sheetUrl: string): Promise<ProductItem[]> {
+export async function fetchGoogleSheetInventory(sheetUrl: string = DEFAULT_SHEET_URL): Promise<ProductItem[]> {
   const csvUrl = normalizeGoogleSheetUrl(sheetUrl);
   if (!csvUrl) {
     throw new Error("URL da planilha inválida ou vazia.");
