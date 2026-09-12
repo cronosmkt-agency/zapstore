@@ -1,16 +1,20 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import {
   Truck, Wrench, DollarSign, Recycle, Star, MapPin, ShoppingCart,
   MessageCircle, Menu, X, Smartphone, Battery, Droplets, Unlock,
   ShieldCheck, Home, Check, Instagram, Facebook, Phone, Clock,
   ChevronDown, Zap, Camera, LayoutGrid, Building2, ShieldAlert,
-  Sun, Moon, Info
+  Sun, Moon, Info, ShoppingBag
 } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { ThemeSelectorModal, type ThemeMode } from "@/components/ThemeSelectorModal";
 import { ProductDetailModal, type ProductItem } from "@/components/ProductDetailModal";
 import { fetchGoogleSheetInventory, DEFAULT_SHEET_URL, DEVICE_IMAGES } from "@/services/googleSheets";
+import { SiteNavbar } from "@/components/SiteNavbar";
+import { SiteFooter } from "@/components/SiteFooter";
+import { WhatsFloat } from "@/components/WhatsFloat";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
 const heroIphone = "https://ik.imagekit.io/zinma/tr:w-800,f-webp,q-85/Terephones-iphone.png";
 import { toast } from "sonner";
 
@@ -387,177 +391,7 @@ function BackgroundOrbs() {
 }
 
 
-function Navbar({
-  currentTheme,
-  toggleTheme,
-}: {
-  currentTheme: ThemeMode;
-  toggleTheme: () => void;
-}) {
-  const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [afterHours, setAfterHours] = useState(false);
-  const isDark = currentTheme === "black-piano";
 
-  useEffect(() => {
-    const now = new Date();
-    const minutes = now.getHours() * 60 + now.getMinutes();
-    // Same logic as DeliveryPopup: after 18:00 (18 * 60)
-    setAfterHours(minutes >= 18 * 60);
-  }, []);
-  useEffect(() => {
-    let raf = 0;
-    const on = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        setScrolled(window.scrollY > 20);
-      });
-    };
-    on();
-    window.addEventListener("scroll", on, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", on);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
-  const links = [
-    ["Início", "#inicio"], ["Produtos", "#produtos"],
-    ["Delivery", "#delivery"], ["Contato", "#contato"],
-  ];
-
-  const openThemeModal = () => {
-    window.dispatchEvent(new CustomEvent("open-theme-modal"));
-  };
-
-  return (
-    <>
-      {/* Desktop navbar */}
-      <div
-        className="hidden lg:block fixed inset-x-0 z-[60] header-top-bar"
-        style={{ top: scrolled ? 64 : 76 }}
-      />
-      <nav className={`hidden lg:block fixed top-0 inset-x-0 z-50 navbar-desk ${scrolled ? "scrolled" : ""}`}>
-
-        <div className="navbar-desk-inner">
-          <a href="#inicio" className="shrink-0 logo-desk">
-            <BrandLogo height={scrolled ? 44 : 52} showText={true} dark={isDark} />
-          </a>
-          <div className="flex items-center justify-center nav-links-desk">
-            {links.map(([l, h]) => (
-              <a key={h} href={h} className="nav-link nav-link-desk">{l}</a>
-            ))}
-          </div>
-          <div className="flex items-center gap-4 justify-end">
-            {/* Theme Toggle Button */}
-            <button
-              onClick={toggleTheme}
-              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold glass transition-all hover:scale-105 cursor-pointer border shadow-sm"
-              title={isDark ? "Mudar para Branco Titânio" : "Mudar para Black Piano"}
-            >
-              {isDark ? (
-                <>
-                  <span className="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]" />
-                  <span className="text-slate-200">Black Piano</span>
-                </>
-              ) : (
-                <>
-                  <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shadow-[0_0_8px_rgba(26,111,232,0.4)]" />
-                  <span className="text-slate-700">Branco</span>
-                </>
-              )}
-            </button>
-
-            <div className="badge-aberto">
-              {afterHours ? "Fechado — Abre amanhã às 10:00" : "Aberto até 18:00"}
-            </div>
-            <span className="h-6 border-l" style={{ borderColor: "rgba(var(--blue-rgb),0.18)" }} />
-            <a href={WHATSAPP} className="btn-pedir-agora">Pedir Agora</a>
-          </div>
-        </div>
-      </nav>
-
-      {/* Mobile pill navbar */}
-      <nav className={`lg:hidden nav-pill ${scrolled ? "scrolled" : ""}`}>
-        <div className="relative flex items-center justify-between h-14 px-4">
-          <button
-            onClick={() => setOpen(!open)}
-            aria-label="Menu"
-            className="w-9 h-9 flex items-center justify-center rounded-full glass border cursor-pointer"
-            style={{ color: "var(--blue-primary)" }}
-          >
-            {open ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-          </button>
-
-          <a href="#inicio" className="absolute left-1/2 -translate-x-1/2 flex items-center">
-            <BrandLogo height={34} showText={true} dark={isDark} />
-          </a>
-
-          {/* Quick theme toggle for mobile */}
-          <button
-            onClick={toggleTheme}
-            aria-label="Alternar tema visual"
-            className="w-9 h-9 flex items-center justify-center rounded-full glass border text-xs cursor-pointer shadow-sm hover:scale-105 transition"
-            title="Alternar tema"
-          >
-            {isDark ? "⚫" : "⚪"}
-          </button>
-        </div>
-
-      </nav>
-
-
-      {open && (
-        <div className="lg:hidden mobile-menu p-5">
-
-          <div className="flex flex-col">
-            {links.map(([l, h]) => (
-              <a
-                key={h}
-                href={h}
-                onClick={() => setOpen(false)}
-                className="py-3 text-sm font-semibold transition border-b last:border-0"
-                style={{ color: T.text, borderColor: "rgba(var(--blue-rgb),.10)" }}
-              >
-                {l}
-              </a>
-            ))}
-
-            {/* Mobile Menu Theme Selector Trigger */}
-            <button
-              onClick={() => {
-                setOpen(false);
-                openThemeModal();
-              }}
-              className="py-3 text-sm font-semibold transition border-b flex items-center justify-between w-full text-left cursor-pointer"
-              style={{ color: T.text, borderColor: "rgba(var(--blue-rgb),.10)" }}
-            >
-              <span>Escolher Atmosfera Visual</span>
-              <span className="section-pill text-xs py-1 px-3">
-                {isDark ? "⚫ Black Piano" : "⚪ Branco Titânio"}
-              </span>
-            </button>
-          </div>
-          <a
-            href={WHATSAPP}
-            onClick={() => setOpen(false)}
-            className="btn-primary-glow text-center text-sm mt-4 block"
-          >
-            Pedir Agora
-          </a>
-        </div>
-      )}
-      {open && (
-        <button
-          aria-label="Fechar menu"
-          onClick={() => setOpen(false)}
-          className="md:hidden fixed inset-0 z-40"
-          style={{ background: "rgba(0,0,0,.5)" }}
-        />
-      )}
-    </>
-  );
-}
 
 function TiltPhone() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -727,12 +561,12 @@ function Hero() {
             Entrega Express em até 2 horas na sua porta em Teresópolis ou Retirada presencial na loja parceira <strong>SejaDelta</strong>. Compre com procedência, até 1 ano de garantia Apple e pague somente na entrega! 🍎⚡
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
-            <a href="#produtos" className="btn-primary-glow inline-flex items-center justify-center gap-2 py-3.5 px-6 text-center font-bold text-sm sm:text-base">
-              <ShoppingCart className="w-4 h-4" /> Ver Modelos Disponíveis
-            </a>
-            <a href={WHATSAPP} className="btn-whatsapp inline-flex items-center justify-center gap-2 py-3.5 px-6 text-center font-bold text-sm sm:text-base">
-              <MessageCircle className="w-4 h-4 fill-white" /> Falar no WhatsApp
-            </a>
+            <Link to="/loja" className="btn-primary-glow inline-flex items-center justify-center gap-2 py-3.5 px-6 text-center font-bold text-sm sm:text-base">
+              <ShoppingBag className="w-4 h-4" /> Ver iPhones na Loja
+            </Link>
+            <Link to="/chat" className="btn-whatsapp inline-flex items-center justify-center gap-2 py-3.5 px-6 text-center font-bold text-sm sm:text-base">
+              <MessageCircle className="w-4 h-4 fill-white" /> Tirar Dúvidas & Pedir no Chat
+            </Link>
           </div>
           <div className="mt-6 lg:mt-10 flex flex-wrap justify-center lg:justify-start items-center gap-4 sm:gap-6 text-sm font-medium" style={{ color: T.sub }}>
             <div className="flex items-center gap-1.5"><Star className="w-4 h-4 fill-amber-400 text-amber-400" /> <span className="font-bold text-slate-800 dark:text-slate-100">4,9</span> no Google</div>
@@ -1399,18 +1233,23 @@ function Products() {
           </div>
         )}
 
-        {/* Botão Ver Todos */}
-        {!showAll && filteredList.length > 8 && (
-          <div className="mt-12 text-center">
-            <button
-              onClick={() => setShowAll(true)}
-              className="btn-glass px-8 py-3.5 text-sm font-bold inline-flex items-center gap-2 cursor-pointer shadow-md hover:scale-105 transition-transform"
-            >
-              <span>Ver todos os {filteredList.length} modelos disponíveis</span>
-              <ChevronDown className="w-4 h-4" />
-            </button>
-          </div>
-        )}
+        {/* Botão Ver Todos e Acessar Loja Completa */}
+        <div className="mt-12 max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link
+            to="/loja"
+            className="btn-primary-glow w-full sm:w-auto px-8 py-3.5 text-sm font-bold inline-flex items-center justify-center gap-2 shadow-lg"
+          >
+            <ShoppingBag className="w-4 h-4" />
+            <span>Ver Todos os Modelos na Loja Completa</span>
+          </Link>
+          <Link
+            to="/chat"
+            className="btn-glass w-full sm:w-auto px-8 py-3.5 text-sm font-bold inline-flex items-center justify-center gap-2 shadow-md"
+          >
+            <MessageCircle className="w-4 h-4 text-emerald-400" />
+            <span>Tirar Dúvidas & Pedir no Chat</span>
+          </Link>
+        </div>
       </div>
 
       {/* Modal com Ficha Técnica Completa */}
@@ -1805,200 +1644,6 @@ function About() {
   );
 }
 
-function Footer({ currentTheme }: { currentTheme?: ThemeMode }) {
-  const isDark = currentTheme === "black-piano";
-  return (
-    <footer id="contato" className="pt-20 pb-28 sm:pb-10 px-4 sm:px-6"
-            style={{ background: "var(--glass-bg)", backdropFilter: "var(--glass-blur)", borderTop: "1px solid var(--glass-border)" }}>
-      <div className="max-w-7xl mx-auto">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div>
-            <BrandLogo showText={true} dark={isDark} />
-            <p className="text-sm mt-4 leading-relaxed" style={{ color: T.sub }}>
-              A sua melhor experiência na compra de iPhones novos e seminovos em Teresópolis com entrega express no mesmo dia ou retirada na loja parceira SejaDelta.
-            </p>
-          </div>
-          <FooterCol title="Navegação" links={[
-            ["Modelos Disponíveis", "#produtos"],
-            ["Entrega Express 2h", "#delivery"],
-            ["Retirada na SejaDelta", "#retirada"],
-            ["Troca Inteligente", "#troca"],
-          ]} />
-          <FooterCol title="Institucional" links={[
-            ["Sobre a Terephones", "#sobre"],
-            ["Parceria SejaDelta", "#sobre"],
-            ["Garantia & Procedência", "#diferenciais"],
-            ["WhatsApp Vendas", WHATSAPP],
-          ]} />
-          <div>
-            <div className="font-bold mb-4" style={{ color: T.text }}>Atendimento</div>
-            <div className="text-sm space-y-2.5" style={{ color: T.sub }}>
-              <a
-                href={WHATSAPP}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 hover:text-emerald-500 transition font-medium"
-              >
-                <Phone className="w-4 h-4 shrink-0" style={{ color: "var(--blue-primary)" }} />
-                <span>{PHONE_DISPLAY}</span>
-              </a>
-              <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-sky-400 transition">
-                <Instagram className="w-4 h-4 shrink-0" style={{ color: "var(--blue-primary)" }} /> {INSTAGRAM_HANDLE}
-              </a>
-              <div className="flex items-center gap-2 text-xs" style={{ color: T.muted }}>
-                <Clock className="w-3.5 h-3.5 shrink-0" /> Seg a Sáb das 10h às 18h
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="mt-12 text-center">
-          <a
-            href={INSTAGRAM_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-3xl sm:text-4xl font-black text-gradient-blue hover:opacity-80 transition"
-          >
-            {INSTAGRAM_HANDLE}
-          </a>
-        </div>
-        <div className="mt-10 h-px" style={{ background: "linear-gradient(90deg, transparent, var(--blue-primary), var(--blue-vivid), transparent)" }} />
-        <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs" style={{ color: T.muted }}>
-          <div>© {new Date().getFullYear()} Terephones — Teresópolis, RJ. Todos os direitos reservados.</div>
-          <div>Entrega no mesmo dia • Retirada na loja física parceira SejaDelta</div>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-function FooterCol({ title, links }: { title: string; links: [string, string][] }) {
-  return (
-    <div>
-      <div className="font-bold mb-4" style={{ color: T.text }}>{title}</div>
-      <ul className="space-y-2 text-sm">
-        {links.map(([l, h]) => (
-          <li key={l}><a href={h} className="transition hover:text-blue-600" style={{ color: T.sub }}>{l}</a></li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function WhatsFloat() {
-  return (
-    <a
-      href={WHATSAPP}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Falar no WhatsApp oficial da Terephones"
-      className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] right-3.5 sm:bottom-6 sm:right-6 z-40 group flex items-center gap-2 p-1.5 sm:p-2 rounded-full shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
-      style={{
-        background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
-        boxShadow: "0 6px 22px rgba(34, 197, 94, 0.4)",
-      }}
-      title="Falar com a Terephones no WhatsApp: (21) 96463-9999"
-    >
-      <div className="relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10">
-        <MessageCircle className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-white fill-white" />
-        {/* Pulse online badge */}
-        <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-300 border border-emerald-600" />
-        </span>
-      </div>
-
-      {/* Text label on desktop */}
-      <div className="hidden sm:flex flex-col pr-2.5 pl-0.5 text-left leading-tight text-white">
-        <span className="text-[9px] uppercase font-bold tracking-wider opacity-90">Online agora</span>
-        <span className="text-[11px] font-black tracking-tight">(21) 96463-9999</span>
-      </div>
-    </a>
-  );
-}
-
-/**
- * Mobile Bottom Navigation Bar (Footer de Navegação Rápida)
- * Abas: Início, Loja, Chat
- */
-function MobileBottomNav() {
-  const [activeTab, setActiveTab] = useState<"inicio" | "loja" | "chat">("inicio");
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const produtosEl = document.getElementById("produtos");
-      const produtosTop = produtosEl ? produtosEl.offsetTop - 220 : 500;
-
-      if (scrollY >= produtosTop) {
-        setActiveTab("loja");
-      } else {
-        setActiveTab("inicio");
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const handleNav = (tab: "inicio" | "loja" | "chat") => {
-    setActiveTab(tab);
-    if (tab === "inicio") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else if (tab === "loja") {
-      document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" });
-    } else if (tab === "chat") {
-      window.open(WHATSAPP, "_blank");
-    }
-  };
-
-  return (
-    <nav
-      aria-label="Navegação rápida mobile"
-      className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/92 dark:bg-slate-950/92 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800/80 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.5)] px-4 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
-    >
-      <div className="grid grid-cols-3 max-w-xs mx-auto items-center">
-        {/* Início */}
-        <button
-          onClick={() => handleNav("inicio")}
-          className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition-all cursor-pointer ${
-            activeTab === "inicio"
-              ? "text-blue-600 dark:text-sky-400 font-black"
-              : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-semibold"
-          }`}
-        >
-          <Home className={`w-5 h-5 transition-transform ${activeTab === "inicio" ? "scale-110 stroke-[2.5]" : "stroke-[1.8]"}`} />
-          <span className="text-[11px] leading-none">Início</span>
-        </button>
-
-        {/* Loja */}
-        <button
-          onClick={() => handleNav("loja")}
-          className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition-all cursor-pointer ${
-            activeTab === "loja"
-              ? "text-blue-600 dark:text-sky-400 font-black"
-              : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-semibold"
-          }`}
-        >
-          <Smartphone className={`w-5 h-5 transition-transform ${activeTab === "loja" ? "scale-110 stroke-[2.5]" : "stroke-[1.8]"}`} />
-          <span className="text-[11px] leading-none">Loja</span>
-        </button>
-
-        {/* Chat */}
-        <button
-          onClick={() => handleNav("chat")}
-          className="flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition-all cursor-pointer text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 font-black group"
-        >
-          <div className="relative">
-            <MessageCircle className="w-5 h-5 transition-transform group-hover:scale-110 stroke-[2.2]" />
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-950 animate-pulse" />
-          </div>
-          <span className="text-[11px] leading-none">Chat</span>
-        </button>
-      </div>
-    </nav>
-  );
-}
-
 /* ---------- Page ---------- */
 function BrandStore() {
   const [currentTheme, setCurrentTheme] = useState<ThemeMode>("white");
@@ -2045,7 +1690,7 @@ function BrandStore() {
     <div className="relative min-h-screen overflow-x-hidden" style={{ color: T.text }}>
       <ThemeSelectorModal currentTheme={currentTheme} onThemeChange={setCurrentTheme} />
       <BackgroundOrbs />
-      <Navbar currentTheme={currentTheme} toggleTheme={toggleTheme} />
+      <SiteNavbar currentTheme={currentTheme} toggleTheme={toggleTheme} />
       <main>
         <Hero />
         <VSL />
@@ -2057,7 +1702,7 @@ function BrandStore() {
         <SellUsed />
         <About />
       </main>
-      <Footer currentTheme={currentTheme} />
+      <SiteFooter currentTheme={currentTheme} />
       <WhatsFloat />
       <MobileBottomNav />
     </div>
