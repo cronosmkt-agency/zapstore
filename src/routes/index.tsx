@@ -5,13 +5,12 @@ import {
   MessageCircle, Menu, X, Smartphone, Battery, Droplets, Unlock,
   ShieldCheck, Home, Check, Instagram, Facebook, Phone, Clock,
   ChevronDown, Zap, Camera, LayoutGrid, LayoutList, Building2, ShieldAlert,
-  Sun, Moon, Info, FileSpreadsheet, RefreshCw
+  Sun, Moon, Info
 } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { ThemeSelectorModal, type ThemeMode } from "@/components/ThemeSelectorModal";
 import { ProductDetailModal, type ProductItem } from "@/components/ProductDetailModal";
-import { GoogleSheetSyncModal } from "@/components/GoogleSheetSyncModal";
-import { fetchGoogleSheetInventory, STORAGE_SHEET_URL_KEY } from "@/services/googleSheets";
+import { fetchGoogleSheetInventory, DEFAULT_SHEET_URL } from "@/services/googleSheets";
 import iphone15Pro from "@/assets/iphone-15-pro.webp";
 import heroIphoneWebp from "@/assets/hero-iphone.webp";
 const heroIphone = "https://ik.imagekit.io/zinma/tr:w-800,f-webp,q-85/Terephones-iphone.png";
@@ -1080,47 +1079,26 @@ function Products() {
   const [showAll, setShowAll] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(null);
 
-  // Google Sheets Integration State
+  // Carregamento transparente e em tempo real da Planilha Google oficial
   const [productList, setProductList] = useState<ProductItem[]>(products);
-  const [isSheetConnected, setIsSheetConnected] = useState(false);
-  const [sheetModalOpen, setSheetModalOpen] = useState(false);
-  const [sheetUrl, setSheetUrl] = useState("");
-  const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
-    const savedUrl =
-      localStorage.getItem(STORAGE_SHEET_URL_KEY) ||
-      ((import.meta.env.VITE_GOOGLE_SHEET_URL as string) || "");
+    const sheetUrl =
+      (import.meta.env.VITE_GOOGLE_SHEET_URL as string) ||
+      DEFAULT_SHEET_URL;
 
-    if (savedUrl) {
-      setSheetUrl(savedUrl);
-      setIsSyncing(true);
-      fetchGoogleSheetInventory(savedUrl)
+    if (sheetUrl) {
+      fetchGoogleSheetInventory(sheetUrl)
         .then(items => {
-          setProductList(items);
-          setIsSheetConnected(true);
+          if (items && items.length > 0) {
+            setProductList(items);
+          }
         })
         .catch(err => {
-          console.warn("Could not load Google Sheet inventory, using default catalog:", err);
-          setIsSheetConnected(false);
-        })
-        .finally(() => {
-          setIsSyncing(false);
+          console.warn("Utilizando catálogo padrão Terephones:", err);
         });
     }
   }, []);
-
-  const handleSyncSuccess = (items: ProductItem[], url: string) => {
-    setProductList(items);
-    setSheetUrl(url);
-    setIsSheetConnected(true);
-  };
-
-  const handleResetDefault = () => {
-    setProductList(products);
-    setSheetUrl("");
-    setIsSheetConnected(false);
-  };
 
   const filteredList = f === "Todos" ? productList : productList.filter(p => p.cat === f);
   const displayList = showAll ? filteredList : filteredList.slice(0, 8);
@@ -1139,9 +1117,9 @@ function Products() {
           badge="Teresópolis / RJ"
         />
 
-        {/* Barra de Ações: Sincronização Google Drive + Filtros + Alternador de Visualização */}
+        {/* Filtros e Alternador de Visualização */}
         <div className="mt-8 sm:mt-10 flex flex-col md:flex-row items-center justify-between gap-4">
-          {/* Filtros de Categoria e Conexão Planilha */}
+          {/* Filtros de Categoria */}
           <div className="flex flex-wrap items-center justify-center gap-2">
             {filters.map(fl => {
               const count = fl === "Todos" ? productList.length : productList.filter(p => p.cat === fl).length;
@@ -1172,26 +1150,6 @@ function Products() {
                 </button>
               );
             })}
-
-            {/* Botão de Conexão com Google Sheets */}
-            <button
-              onClick={() => setSheetModalOpen(true)}
-              className={`px-3 py-2 rounded-full text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm hover:scale-105 ml-1 ${
-                isSheetConnected
-                  ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30"
-                  : "bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:border-blue-500"
-              }`}
-              title="Sincronizar estoque automaticamente com o Google Drive"
-            >
-              <FileSpreadsheet className={`w-3.5 h-3.5 ${isSheetConnected ? "text-emerald-500" : "text-blue-500"}`} />
-              <span className="hidden sm:inline">
-                {isSheetConnected ? "Planilha Google Conectada" : "Sincronizar Google Drive"}
-              </span>
-              <span className="sm:hidden">
-                {isSheetConnected ? "Google Conectado" : "Sincronizar"}
-              </span>
-              {isSyncing && <RefreshCw className="w-3 h-3 animate-spin text-blue-500" />}
-            </button>
           </div>
 
           {/* Alternador de Visualização em 3 Modos */}
@@ -1531,16 +1489,6 @@ function Products() {
         isOpen={!!selectedProduct}
         onClose={() => setSelectedProduct(null)}
         whatsappNumber={WHATSAPP_NUMBER}
-      />
-
-      {/* Modal de Sincronização com Google Sheets */}
-      <GoogleSheetSyncModal
-        isOpen={sheetModalOpen}
-        onClose={() => setSheetModalOpen(false)}
-        onSyncSuccess={handleSyncSuccess}
-        onResetDefault={handleResetDefault}
-        currentUrl={sheetUrl}
-        isCustomActive={isSheetConnected}
       />
     </section>
   );

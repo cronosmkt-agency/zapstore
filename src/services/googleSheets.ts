@@ -7,6 +7,9 @@ import iphone12 from "@/assets/iphone-12.webp";
 
 export const STORAGE_SHEET_URL_KEY = "terephones_google_sheet_url";
 
+export const DEFAULT_SHEET_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRS0rZTaegIAfLgamTF-li05aIL96-4GiakjguCPF6BCq7-eCb_dumv-mY43ChHDDEorAYFQ0NXDmhD/pub?gid=626696730&single=true&output=csv";
+
 /**
  * Intelligent image selector based on iPhone model name
  */
