@@ -1,9 +1,35 @@
 import type { ProductItem } from "@/components/ProductDetailModal";
-import heroIphoneWebp from "@/assets/hero-iphone.webp";
-import iphone15Pro from "@/assets/iphone-15-pro.webp";
-import iphone14 from "@/assets/iphone-14.webp";
-import iphone13 from "@/assets/iphone-13.webp";
-import iphone12 from "@/assets/iphone-12.webp";
+import iphone16ProMaxDesert from "@/assets/devices/iphone-16-pro-max-desert.webp";
+import iphone16ProMaxNatural from "@/assets/devices/iphone-16-pro-max-natural.webp";
+import iphone16ProDesert from "@/assets/devices/iphone-16-pro-desert.webp";
+import iphone16ProWhite from "@/assets/devices/iphone-16-pro-white.webp";
+import iphone16White from "@/assets/devices/iphone-16-white.webp";
+import iphone16eWhite from "@/assets/devices/iphone-16e-white.webp";
+import iphone15ProBlue from "@/assets/devices/iphone-15-pro-blue.webp";
+import iphone15Black from "@/assets/devices/iphone-15-black.webp";
+import iphone14PlusBlack from "@/assets/devices/iphone-14-plus-black.webp";
+import iphone14Black from "@/assets/devices/iphone-14-black.webp";
+import iphone13ProMaxWhite from "@/assets/devices/iphone-13-pro-max-white.webp";
+import iphone13ProMaxGraphite from "@/assets/devices/iphone-13-pro-max-graphite.webp";
+import iphone13Black from "@/assets/devices/iphone-13-black.webp";
+import iphone12ProMaxBlue from "@/assets/devices/iphone-12-pro-max-blue.webp";
+
+export const DEVICE_IMAGES = {
+  iphone16ProMaxDesert,
+  iphone16ProMaxNatural,
+  iphone16ProDesert,
+  iphone16ProWhite,
+  iphone16White,
+  iphone16eWhite,
+  iphone15ProBlue,
+  iphone15Black,
+  iphone14PlusBlack,
+  iphone14Black,
+  iphone13ProMaxWhite,
+  iphone13ProMaxGraphite,
+  iphone13Black,
+  iphone12ProMaxBlue,
+};
 
 export const STORAGE_SHEET_URL_KEY = "terephones_google_sheet_url";
 
@@ -11,29 +37,95 @@ export const DEFAULT_SHEET_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRS0rZTaegIAfLgamTF-li05aIL96-4GiakjguCPF6BCq7-eCb_dumv-mY43ChHDDEorAYFQ0NXDmhD/pub?gid=626696730&single=true&output=csv";
 
 /**
- * Intelligent image selector based on iPhone model name
+ * Intelligent image selector based on authentic iPhone model name and color/finish
  */
 export function getProductImageByModel(name: string): string {
   const n = name.toLowerCase();
-  if (n.includes("16 pro") || n.includes("16 pro max")) {
-    return heroIphoneWebp;
+
+  // iPhone 16 Pro Max
+  if (n.includes("16 pro max")) {
+    if (n.includes("natural") || n.includes("cinza") || n.includes("gray")) {
+      return iphone16ProMaxNatural;
+    }
+    if (n.includes("branco") || n.includes("white") || n.includes("prata") || n.includes("silver")) {
+      return iphone16ProWhite;
+    }
+    return iphone16ProMaxDesert;
   }
-  if (n.includes("16") || n.includes("16e")) {
-    return heroIphoneWebp;
+
+  // iPhone 16 Pro
+  if (n.includes("16 pro")) {
+    if (n.includes("branco") || n.includes("white") || n.includes("prata") || n.includes("silver")) {
+      return iphone16ProWhite;
+    }
+    if (n.includes("natural") || n.includes("cinza")) {
+      return iphone16ProMaxNatural;
+    }
+    return iphone16ProDesert;
   }
+
+  // iPhone 16e
+  if (n.includes("16e")) {
+    return iphone16eWhite;
+  }
+
+  // iPhone 16 base / plus
+  if (n.includes("16")) {
+    return iphone16White;
+  }
+
+  // iPhone 15 Pro / Pro Max
+  if (n.includes("15 pro")) {
+    return iphone15ProBlue;
+  }
+
+  // iPhone 15 base / plus
   if (n.includes("15")) {
-    return iphone15Pro;
+    return iphone15Black;
   }
+
+  // iPhone 14 Plus
+  if (n.includes("14 plus")) {
+    return iphone14PlusBlack;
+  }
+
+  // iPhone 14 / 14 Pro
   if (n.includes("14")) {
-    return iphone14;
+    return iphone14Black;
   }
+
+  // iPhone 13 Pro Max
+  if (n.includes("13 pro max")) {
+    if (n.includes("grafite") || n.includes("graphite") || n.includes("preto") || n.includes("black") || n.includes("cinza")) {
+      return iphone13ProMaxGraphite;
+    }
+    return iphone13ProMaxWhite;
+  }
+
+  // iPhone 13 Pro
+  if (n.includes("13 pro")) {
+    if (n.includes("grafite") || n.includes("graphite") || n.includes("preto") || n.includes("black")) {
+      return iphone13ProMaxGraphite;
+    }
+    return iphone13ProMaxWhite;
+  }
+
+  // iPhone 13 base / mini
   if (n.includes("13")) {
-    return iphone13;
+    return iphone13Black;
   }
+
+  // iPhone 12 Pro Max
+  if (n.includes("12 pro max")) {
+    return iphone12ProMaxBlue;
+  }
+
+  // iPhone 12 / 11 / outros
   if (n.includes("12") || n.includes("11")) {
-    return iphone12;
+    return iphone12ProMaxBlue;
   }
-  return heroIphoneWebp;
+
+  return iphone16ProMaxDesert;
 }
 
 /**

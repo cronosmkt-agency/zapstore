@@ -92,3 +92,52 @@ test("parseCSV parses standard CSV text and handles quotes and linebreaks", () =
   assert.equal(rows[1][3], "R$ 5.290,00");
   assert.equal(rows[2][2], "Bateria Trocada (100%)");
 });
+
+function getDeviceImageKeyByModel(name) {
+  const n = name.toLowerCase();
+  if (n.includes("16 pro max")) {
+    if (n.includes("natural") || n.includes("cinza") || n.includes("gray")) return "16-pro-max-natural";
+    if (n.includes("branco") || n.includes("white") || n.includes("prata") || n.includes("silver")) return "16-pro-white";
+    return "16-pro-max-desert";
+  }
+  if (n.includes("16 pro")) {
+    if (n.includes("branco") || n.includes("white") || n.includes("prata") || n.includes("silver")) return "16-pro-white";
+    if (n.includes("natural") || n.includes("cinza")) return "16-pro-max-natural";
+    return "16-pro-desert";
+  }
+  if (n.includes("16e")) return "16e-white";
+  if (n.includes("16")) return "16-white";
+  if (n.includes("15 pro")) return "15-pro-blue";
+  if (n.includes("15")) return "15-black";
+  if (n.includes("14 plus")) return "14-plus-black";
+  if (n.includes("14")) return "14-black";
+  if (n.includes("13 pro max")) {
+    if (n.includes("grafite") || n.includes("graphite") || n.includes("preto") || n.includes("black")) return "13-pro-max-graphite";
+    return "13-pro-max-white";
+  }
+  if (n.includes("13 pro")) {
+    if (n.includes("grafite") || n.includes("graphite") || n.includes("preto") || n.includes("black")) return "13-pro-max-graphite";
+    return "13-pro-max-white";
+  }
+  if (n.includes("13")) return "13-black";
+  if (n.includes("12 pro max")) return "12-pro-max-blue";
+  if (n.includes("12") || n.includes("11")) return "12-pro-max-blue";
+  return "16-pro-max-desert";
+}
+
+test("getDeviceImageKeyByModel maps all 13 real catalog models to accurate assets", () => {
+  assert.equal(getDeviceImageKeyByModel("IPHONE 16 PRO MAX 256GB DESERT (SEMINOVO)"), "16-pro-max-desert");
+  assert.equal(getDeviceImageKeyByModel("IPHONE 16 PRO MAX 256GB NATURAL (SEMINOVO)"), "16-pro-max-natural");
+  assert.equal(getDeviceImageKeyByModel("IPHONE 16 PRO 256GB DESERT (SEMINOVO)"), "16-pro-desert");
+  assert.equal(getDeviceImageKeyByModel("IPHONE 16 PRO 256GB BRANCO (SEMINOVO)"), "16-pro-white");
+  assert.equal(getDeviceImageKeyByModel("IPHONE 16 128GB BRANCO (SEMINOVO)"), "16-white");
+  assert.equal(getDeviceImageKeyByModel("IPHONE 16e 128GB BRANCO (SEMINOVO)"), "16e-white");
+  assert.equal(getDeviceImageKeyByModel("IPHONE 15 PRO 128GB AZUL (SEMINOVO)"), "15-pro-blue");
+  assert.equal(getDeviceImageKeyByModel("IPHONE 14 PLUS 128GB PRETO (SEMINOVO)"), "14-plus-black");
+  assert.equal(getDeviceImageKeyByModel("IPHONE 14 128GB PRETO (SEMINOVO)"), "14-black");
+  assert.equal(getDeviceImageKeyByModel("IPHONE 13 PRO MAX 128GB BRANCO (SEMINOVO)"), "13-pro-max-white");
+  assert.equal(getDeviceImageKeyByModel("IPHONE 13 PRO MAX 256GB GRAFITE (SEMINOVO)"), "13-pro-max-graphite");
+  assert.equal(getDeviceImageKeyByModel("IPHONE 13 128GB PRETO (SEMINOVO)"), "13-black");
+  assert.equal(getDeviceImageKeyByModel("IPHONE 12 PRO MAX 128GB AZUL (SEMINOVO)"), "12-pro-max-blue");
+});
+
