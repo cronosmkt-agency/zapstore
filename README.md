@@ -1,24 +1,17 @@
-# A Casa da Maçã
+# 📱 Terephones — iPhones em Teresópolis
 
-oi
+Site oficial da **Terephones**, operação de venda de iPhones novos e seminovos em Teresópolis/RJ.
 
-This project was built with [Lovable](https://lovable.dev).
+## 🚀 Proposta de Valor
+- **Entrega Express em até 2 horas** na porta em qualquer bairro de Teresópolis.
+- **Ponto de Retirada Presencial** na loja física parceira **SejaDelta**.
+- **Garantia:** 1 ano oficial Apple (lacrados) / 90 dias loja (seminovos selecionados).
+- **Pagamento Seguro:** PIX com super desconto ou até 18x no cartão no ato do recebimento.
 
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/56ca6929-5599-4341-b59d-46b20e59c673).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
-```
+## 🛠️ Stack Tecnológica
+- React 19 + TypeScript
+- Vite
+- TanStack Router / TanStack Start
+- Tailwind CSS v4
+- Lucide React + Sonner
+- Hospedagem na Vercel

@@ -4,23 +4,23 @@ import {
   Truck, Wrench, DollarSign, Recycle, Star, MapPin, ShoppingCart,
   MessageCircle, Menu, X, Smartphone, Battery, Droplets, Unlock,
   ShieldCheck, Home, Check, Instagram, Facebook, Phone, Clock,
-  ChevronDown, Zap, Camera, LayoutGrid, LayoutList
+  ChevronDown, Zap, Camera, LayoutGrid, LayoutList, Building2, ShieldAlert
 } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
 import iphone15Pro from "@/assets/iphone-15-pro.webp";
 const heroIphone = "https://ik.imagekit.io/cronosmkt/Smart-A%20Casa%20da%20Ma%C3%A7a.png?updatedAt=1785982404561";
 import iphone14 from "@/assets/iphone-14.webp";
 import iphone13 from "@/assets/iphone-13.webp";
 import iphone12 from "@/assets/iphone-12.webp";
-const brandLogoUrl = "https://ik.imagekit.io/cronosmkt/A%20Casa%20da%20Ma%C3%A7a.png?updatedAt=1785982094106";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "A Casa da Maçã — iPhones, Assistência e Delivery em Teresópolis" },
-      { name: "description", content: "Compre iPhones, acessórios e conserte seu smartphone com delivery em Teresópolis - RJ. Loja A Casa da Maçã: 4,9★ no Google, melhores preços da região." },
-      { property: "og:title", content: "A Casa da Maçã — iPhones, Assistência e Delivery em Teresópolis" },
-      { property: "og:description", content: "Compre, repare e revenda com quem mais entende de smartphone em Teresópolis. Delivery até você." },
+      { title: "Terephones — iPhones Novos & Seminovos em Teresópolis" },
+      { name: "description", content: "Compre seu iPhone novo ou seminovo com Entrega Express em até 2h na sua porta ou retire na loja parceira SejaDelta em Teresópolis - RJ. Garantia de até 1 ano." },
+      { property: "og:title", content: "Terephones — iPhones Novos & Seminovos em Teresópolis" },
+      { property: "og:description", content: "Entrega no mesmo dia em domicílio ou retirada presencial na SejaDelta. Seu novo iPhone em Teresópolis com pagamento seguro na entrega." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -32,13 +32,13 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "LocalBusiness",
-          name: "A Casa da Maçã",
+          name: "Terephones",
           description:
-            "Loja de iPhones, acessórios e assistência técnica com delivery em Teresópolis - RJ.",
+            "Venda de iPhones novos e seminovos com Entrega Express no mesmo dia e ponto de retirada na loja parceira SejaDelta em Teresópolis - RJ.",
           telephone: "+5521993446336",
           address: {
             "@type": "PostalAddress",
-            streetAddress: "Av. José Joaquim de Araújo Regadas, 146",
+            streetAddress: "Teresópolis",
             addressLocality: "Teresópolis",
             addressRegion: "RJ",
             addressCountry: "BR",
@@ -65,8 +65,11 @@ export const Route = createFileRoute("/")({
   component: BrandStore,
 });
 
-const WHATSAPP = "https://wa.me/5521993446336";
+const WHATSAPP_NUMBER = "5521993446336";
+const WHATSAPP = "https://wa.me/" + WHATSAPP_NUMBER;
 const PHONE_DISPLAY = "(21) 99344-6336";
+const INSTAGRAM_HANDLE = "@terephones";
+const INSTAGRAM_URL = "https://instagram.com/terephones";
 
 /* ---------- Tokens util ---------- */
 const T = {
@@ -80,44 +83,42 @@ const T = {
 
 /* ---------- Data ---------- */
 const differentials = [
-  { icon: Truck, title: "Delivery Express", desc: "Seu iPhone novo na sua porta em Teresópolis" },
-  { icon: Wrench, title: "Qualidade Garantida", desc: "Aparelhos revisados e com garantia total" },
-  { icon: DollarSign, title: "Menor Preço", desc: "Melhores preços em iPhones da região" },
-  { icon: Recycle, title: "Valorização do Usado", desc: "Traga seu aparelho e ganhe o melhor valor" },
-  { icon: Star, title: "4,9 no Google", desc: "Avaliações 5 estrelas de clientes reais" },
-  { icon: MapPin, title: "Loja + Delivery", desc: "Atendimento presencial ou onde você estiver" },
+  { icon: Truck, title: "Entrega Express em 2h", desc: "Seu novo iPhone entregue na sua porta em qualquer bairro de Teresópolis" },
+  { icon: Building2, title: "Ponto Físico na SejaDelta", desc: "Ponto parceiro oficial para você ver de perto, testar na mão e retirar" },
+  { icon: ShieldCheck, title: "1 Ano de Garantia Apple", desc: "Aparelhos lacrados com garantia mundial Apple e seminovos com 90 dias" },
+  { icon: DollarSign, title: "Desconto no PIX & 18x", desc: "Melhores preços da região no PIX ou parcele em até 18x no cartão" },
+  { icon: Recycle, title: "Troca com Troco (Trade-In)", desc: "Seu iPhone usado entra na troca com avaliação honesta e rápida" },
+  { icon: Star, title: "Pague só na Entrega", desc: "Sem risco de golpe: confira e teste o aparelho antes de fazer o pagamento" },
 ];
 
-const products: { name: string; price: number; cat: string; badge: string; img: string }[] = [
-  { name: "iPhone 15 Pro", price: 6999, cat: "Novos", badge: "Pronta Entrega", img: iphone15Pro },
-  { name: "iPhone 14", price: 4499, cat: "Novos", badge: "Pronta Entrega", img: iphone14 },
-  { name: "iPhone 13", price: 3299, cat: "Novos", badge: "Delivery", img: iphone13 },
-  { name: "iPhone 12 (seminovo)", price: 2499, cat: "Seminovos", badge: "Seminovo", img: iphone12 },
-  { name: "iPhone 15 Pro Max", price: 7899, cat: "Novos", badge: "Pronta Entrega", img: iphone15Pro },
-  { name: "iPhone 14 Pro", price: 5299, cat: "Novos", badge: "Pronta Entrega", img: iphone14 },
-  { name: "iPhone 13 mini", price: 2899, cat: "Novos", badge: "Delivery", img: iphone13 },
-  { name: "iPhone 11 (seminovo)", price: 1999, cat: "Seminovos", badge: "Seminovo", img: iphone12 },
+const products: { name: string; price: number; cat: string; badge: string; img: string; specs?: string }[] = [
+  { name: "iPhone 15 Pro", price: 6299, cat: "Novos", badge: "Lacrado Apple", img: iphone15Pro, specs: "128GB • Titânio • 1 Ano Garantia Apple" },
+  { name: "iPhone 15", price: 4999, cat: "Novos", badge: "Lacrado Apple", img: iphone15Pro, specs: "128GB • Dynamic Island • 1 Ano Garantia" },
+  { name: "iPhone 14", price: 3899, cat: "Novos", badge: "Pronta Entrega", img: iphone14, specs: "128GB • Bateria Longa Duração" },
+  { name: "iPhone 13", price: 3399, cat: "Novos", badge: "Super Oferta", img: iphone13, specs: "128GB • Câmera Cinema • Pronta Entrega" },
+  { name: "iPhone 14 Pro (seminovo)", price: 4499, cat: "Seminovos", badge: "Grade A+ Impecável", img: iphone14, specs: "128GB • Bateria 88%+ • 90d Garantia" },
+  { name: "iPhone 13 Pro (seminovo)", price: 3699, cat: "Seminovos", badge: "Grade A+ Impecável", img: iphone13, specs: "128GB • Tela 120Hz ProMotion" },
+  { name: "iPhone 12 (seminovo)", price: 2399, cat: "Seminovos", badge: "Custo-Benefício", img: iphone12, specs: "128GB • Testado em 25+ Itens" },
+  { name: "iPhone 11 (seminovo)", price: 1799, cat: "Seminovos", badge: "Entrada Apple", img: iphone12, specs: "64GB/128GB • 100% Original" },
 ];
 
 const filters = ["Todos", "Novos", "Seminovos"];
 
-const services = [
-  { icon: Smartphone, title: "Troca de Tela", desc: "Original e com garantia. A partir de R$ 299" },
-  { icon: Battery, title: "Troca de Bateria", desc: "Bateria 100% original. A partir de R$ 199" },
-  { icon: Droplets, title: "Dano por Água", desc: "Recuperação e limpeza especializada" },
-  { icon: Unlock, title: "Desbloqueio", desc: "Desbloqueio oficial e seguro" },
-  { icon: ShieldCheck, title: "Diagnóstico Grátis", desc: "Seu aparelho avaliado sem custo" },
-  { icon: Home, title: "Visita Domiciliar", desc: "Técnico vai até você — Delivery Técnico" },
-];
+const comboUpsell = {
+  title: "Kit Essencial Proteção Total",
+  desc: "Capa MagSafe Antichoque + Película 3D Privacidade + Carregador Turbo 20W USB-C homologado",
+  originalPrice: 180,
+  promoPrice: 99,
+};
 
 const reviews = [
-  { name: "Ricardo Santos", text: "Excelente atendimento! Comprei meu iPhone 15 Pro com eles e o preço foi o melhor de Teresópolis. Recomendo muito!" },
-  { name: "Fernanda Lima", text: "Fiquei impressionada com a rapidez da entrega. Comprei pelo WhatsApp e em menos de 2 horas o iPhone estava na minha mão. Nota 10!" },
-  { name: "Bruno Ferreira", text: "A Casa da Maçã é nota 10. Fiz a troca inteligente do meu usado e peguei um novo com facilidade. Equipe muito honesta." },
-  { name: "Beatriz Lopes", text: "O delivery é fantástico! Chegou super rápido e o atendimento pelo WhatsApp foi muito atencioso. Virei cliente fiel!" },
-  { name: "Lucas Mendes", text: "Melhor lugar para comprar acessórios originais e iPhones novos. Atendimento impecável e produtos de procedência garantida." },
-  { name: "Juliana Costa", text: "Vendi meu iPhone antigo por um valor muito justo e já saí com um novo configurado. Processo transparente e sem burocracia." },
-  { name: "Tiago Souza", text: "Equipe extremamente profissional. O atendimento personalizado me ajudou a escolher o modelo ideal para o meu trabalho." },
+  { name: "Fernanda Lima", neighborhood: "Agriões", text: "Fiquei impressionada com a rapidez. Comprei pelo WhatsApp da Terephones e em menos de 1h30 o aparelho estava aqui no meu prédio. Paguei no cartão na entrega. Nota 10!" },
+  { name: "Ricardo Santos", neighborhood: "Alto", text: "Fui retirar na loja parceira SejaDelta. Ambiente super seguro, equipe atenciosa, conferi tudo na hora e já saí com a película aplicada." },
+  { name: "Bruno Ferreira", neighborhood: "Várzea", text: "A Terephones é nota 10. Fiz a troca inteligente do meu iPhone 11 pelo 14 Pro com facilidade. Zinma e equipe muito honestos e transparentes." },
+  { name: "Beatriz Lopes", neighborhood: "Comary", text: "Estava receosa de pedir pela internet e ficar esperando os Correios subirem a serra. A Terephones entregou na minha porta no mesmo dia. Atendimento impecável!" },
+  { name: "Lucas Mendes", neighborhood: "Barra do Imbuí", text: "Aparelho 100% lacrado com 1 ano de garantia oficial Apple verificado na hora. Melhor preço e atendimento de Teresópolis." },
+  { name: "Juliana Costa", neighborhood: "Taumaturgo", text: "Vendi meu iPhone antigo por um valor muito justo no Trade-in e peguei o 15. Processo limpo, rápido e sem burocracia." },
+  { name: "Tiago Souza", neighborhood: "Tijuca", text: "Excelente consultoria pelo WhatsApp. Me mandou fotos e laudo do seminovo antes de enviar a rota. O aparelho parece que saiu de fábrica!" },
 ];
 
 const fmt = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -132,27 +133,6 @@ function BackgroundOrbs() {
       <div className="deco-shape rounded-3xl" style={{ width: 120, height: 120, top: "18%", left: "6%", transform: "rotate(18deg)" }} />
       <div className="deco-shape rounded-full" style={{ width: 80, height: 80, top: "62%", right: "9%", animationDelay: "-3s" }} />
       <div className="deco-shape rounded-2xl" style={{ width: 60, height: 60, top: "40%", right: "22%", animationDelay: "-5s" }} />
-    </div>
-  );
-}
-
-function BrandLogo({ height = 40, showText = true }: { height?: number; showText?: boolean }) {
-  return (
-    <div className="flex items-center gap-2">
-      <img
-        src={brandLogoUrl}
-        alt="A Casa da Maçã"
-        decoding="async"
-        width={height * 1.5}
-        height={height}
-        style={{ height, width: "auto" }}
-        className="object-contain shrink-0"
-      />
-      {showText && (
-        <span className="font-bold text-base sm:text-lg whitespace-nowrap" style={{ color: T.text }}>
-          A Casa da <span style={{ color: T.primary }}>Maçã</span>
-        </span>
-      )}
     </div>
   );
 }
@@ -354,7 +334,7 @@ function TiltPhone() {
       />
       <img
         src={heroIphone}
-        alt="iPhone A Casa da Maçã em destaque"
+        alt="iPhone Terephones em destaque"
         fetchPriority="high"
         decoding="async"
         width={520}
@@ -407,27 +387,27 @@ function Hero() {
         <div className="fade-up relative z-20">
           <div className="glass inline-flex items-center gap-2 px-3 py-1.5 text-xs mb-4 lg:mb-6" style={{ borderRadius: 999 }}>
             <Zap className="w-3.5 h-3.5" style={{ color: T.primary }} />
-            <span className="font-medium" style={{ color: T.sub }}>A referência em smartphones em Teresópolis</span>
+            <span className="font-medium" style={{ color: T.sub }}>iPhones Novos & Seminovos em Teresópolis</span>
           </div>
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.05] tracking-tight" style={{ color: T.text }}>
-            O <span className="text-gradient-blue">iPhone</span> que você quer,<br />
-            na sua porta.
+            O seu novo <span className="text-gradient-blue">iPhone</span>,<br />
+            na sua mão hoje.
           </h1>
           <p className="mt-6 text-lg max-w-xl" style={{ color: T.sub }}>
-            Compre, repare e revenda com quem mais entende de smartphone em
-            Teresópolis. Delivery até você! 🚀
+            Entrega Express em até 2 horas na sua porta em Teresópolis ou Retirada presencial na loja parceira <strong>SejaDelta</strong>. Compre com procedência, até 1 ano de garantia Apple e pague somente na entrega! 🍎⚡
           </p>
           <div className="mt-8 flex flex-wrap gap-4 justify-center lg:justify-start">
             <a href="#produtos" className="btn-primary-glow inline-flex items-center gap-2">
-              <ShoppingCart className="w-4 h-4" /> Ver produtos
+              <ShoppingCart className="w-4 h-4" /> Ver modelos
             </a>
             <a href={WHATSAPP} className="btn-glass hidden lg:inline-flex items-center gap-2">
-              <MessageCircle className="w-4 h-4" /> WhatsApp
+              <MessageCircle className="w-4 h-4" /> Chamar no WhatsApp
             </a>
           </div>
           <div className="mt-6 lg:mt-10 flex flex-wrap justify-center lg:justify-start items-center gap-4 sm:gap-6 text-sm font-medium" style={{ color: T.sub }}>
             <div className="flex items-center gap-2"><Star className="w-4 h-4" style={{ color: T.sub }} /> 4,9 no Google</div>
-            <div className="flex items-center gap-2"><Truck className="w-4 h-4" style={{ color: T.sub }} /> Delivery no mesmo dia</div>
+            <div className="flex items-center gap-2"><Truck className="w-4 h-4" style={{ color: T.sub }} /> Entrega Express 2h</div>
+            <div className="flex items-center gap-2"><Building2 className="w-4 h-4" style={{ color: T.sub }} /> Retirada na SejaDelta</div>
           </div>
         </div>
 
@@ -514,11 +494,11 @@ function VimeoPlayer() {
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setLoaded(true); }}
-          aria-label="Reproduzir vídeo da A Casa da Maçã"
+          aria-label="Reproduzir vídeo da Terephones"
         >
           <img
             src="https://ik.imagekit.io/cronosmkt/Casa%20da%20Ma%C3%A7%C3%A3%20Background.jpg"
-            alt="Thumbnail do vídeo A Casa da Maçã"
+            alt="Thumbnail do vídeo Terephones"
             className="absolute inset-0 w-full h-full object-cover"
             style={{ opacity: 0.45, borderRadius: "18px" }}
             loading="lazy"
@@ -564,7 +544,7 @@ function VimeoPlayer() {
             className="absolute inset-0 w-full h-full"
             allow="autoplay; fullscreen; picture-in-picture"
             allowFullScreen
-            title="Conheça a A Casa da Maçã"
+            title="Conheça a Terephones"
             style={{ border: "none", borderRadius: "18px" }}
           />
 
@@ -652,13 +632,13 @@ function VSL() {
       <div className="max-w-4xl mx-auto relative">
         <div className="text-center mb-10">
           <div className="text-xs uppercase tracking-[0.3em] font-bold text-gradient-blue mb-3">
-            Conheça a A Casa da Maçã
+            Experiência Terephones
           </div>
           <h2 className="text-3xl sm:text-4xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
-            Veja por que somos <span className="text-gradient-blue">a referência</span> em Teresópolis
+            Veja por que somos <span className="text-gradient-blue">a escolha nº 1</span> em Teresópolis
           </h2>
           <p className="mt-3 text-base max-w-xl mx-auto" style={{ color: "var(--text-secondary)" }}>
-            Qualidade, preço e atendimento que só a A Casa da Maçã oferece. Assista e descubra.
+            Qualidade, procedência, entrega em até 2 horas e o respaldo de uma loja parceira física em Teresópolis.
           </p>
         </div>
 
@@ -674,10 +654,10 @@ function VSL() {
                 aria-hidden="true" style={{ color: "var(--blue-primary)" }}>
                 <polygon points="6 3 20 12 6 21 6 3" />
               </svg>
-              <span className="text-xs font-medium">A Casa da Maçã — Teresópolis, RJ</span>
+              <span className="text-xs font-medium">Terephones — Teresópolis, RJ</span>
             </div>
             <a
-              href="https://wa.me/552120080400"
+              href={WHATSAPP}
               className="btn-primary-glow text-xs py-2 px-4 hidden sm:inline-flex items-center gap-1.5"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
@@ -685,7 +665,7 @@ function VSL() {
                 strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" />
               </svg>
-              Falar com a A Casa da Maçã
+              Falar com a Terephones
             </a>
           </div>
         </div>
@@ -697,13 +677,13 @@ function VSL() {
           </div>
           <span className="hidden sm:inline" style={{ color: "rgba(var(--blue-rgb), 0.25)" }}>|</span>
           <div className="flex items-center justify-center gap-2">
-            <span style={{ color: "var(--blue-primary)" }}>✓</span>
-            <span>Avaliações reais</span>
+            <span style={{ color: "var(--blue-primary)" }}>🏢</span>
+            <span>Ponto Físico na SejaDelta</span>
           </div>
           <span className="hidden sm:inline" style={{ color: "rgba(var(--blue-rgb), 0.25)" }}>|</span>
           <div className="flex items-center justify-center gap-2">
             <span style={{ color: "var(--blue-primary)" }}>🚚</span>
-            <span>Delivery no mesmo dia</span>
+            <span>Entrega Express em 2h</span>
           </div>
         </div>
 
@@ -740,7 +720,7 @@ function Differentials() {
   return (
     <section id="diferenciais" className="py-10 sm:py-24 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
-        <SectionTitle eyebrow="Por que A Casa da Maçã" title="Diferenciais que só quem entende oferece" />
+        <SectionTitle eyebrow="Por que a Terephones" title="Diferenciais que garantem sua tranquilidade" />
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mt-8 sm:mt-14">
           {differentials.map((d) => (
             <div key={d.title} className="glass-card p-4 sm:p-7 group">
@@ -764,10 +744,15 @@ function Products() {
   const filteredList = f === "Todos" ? products : products.filter(p => p.cat === f);
   const displayList = showAll ? filteredList : filteredList.slice(0, 4);
 
+  const handleProductWhatsApp = (prod: typeof products[0]) => {
+    const text = `Olá, Terephones! Vi o ${prod.name} no site por ${fmt(prod.price)} e gostaria de saber se tem a pronta-entrega para hoje em Teresópolis!`;
+    window.open(`${WHATSAPP}?text=${encodeURIComponent(text)}`, "_blank");
+  };
+
   return (
     <section id="produtos" className="py-10 sm:py-24 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
-        <SectionTitle eyebrow="Loja A Casa da Maçã" title="Nossos Produtos" />
+        <SectionTitle eyebrow="Estoque Pronta Entrega" title="Modelos em Destaque" badge="Teresópolis / RJ" />
         
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-wrap justify-center gap-3">
@@ -838,17 +823,26 @@ function Products() {
               
               <div className="flex-1 flex flex-col">
                 <h3 className="font-bold text-base sm:text-lg" style={{ color: T.text }}>{p.name}</h3>
-                <div className="mt-1 sm:mt-2">
+                {p.specs && (
+                  <p className="text-[11px] font-medium mt-0.5" style={{ color: T.sub }}>{p.specs}</p>
+                )}
+                <div className="mt-2">
                   <div className="text-xl sm:text-2xl font-black" style={{ color: T.primary }}>{fmt(p.price)}</div>
-                  <div className="text-[10px] sm:text-xs mt-0.5 sm:mt-1" style={{ color: T.muted }}>12x de {fmt(p.price / 12)}</div>
+                  <div className="text-[10px] sm:text-xs mt-0.5" style={{ color: T.muted }}>no PIX ou até 12x de {fmt(p.price / 12)}</div>
                 </div>
                 <div className={`mt-4 sm:mt-5 flex gap-2 pt-4 border-t ${viewMode === "grid-1" ? "sm:mt-auto" : ""}`} style={{ borderColor: "rgba(var(--blue-rgb),.12)" }}>
-                  <a href={WHATSAPP} className="btn-primary-glow flex-1 text-[10px] sm:text-xs text-center py-2 flex items-center justify-center gap-1">
-                    <ShoppingCart className="w-3.5 h-3.5" /> Comprar
-                  </a>
-                  <a href={WHATSAPP} className="btn-glass flex-none px-3 text-xs text-center py-2 flex items-center justify-center">
+                  <button
+                    onClick={() => handleProductWhatsApp(p)}
+                    className="btn-primary-glow flex-1 text-[10px] sm:text-xs text-center py-2 flex items-center justify-center gap-1 cursor-pointer"
+                  >
+                    <ShoppingCart className="w-3.5 h-3.5" /> Pedir no WhatsApp
+                  </button>
+                  <button
+                    onClick={() => handleProductWhatsApp(p)}
+                    className="btn-glass flex-none px-3 text-xs text-center py-2 flex items-center justify-center cursor-pointer"
+                  >
                     <MessageCircle className="w-3.5 h-3.5" />
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
@@ -859,9 +853,9 @@ function Products() {
           <div className="mt-12 text-center">
             <button
               onClick={() => setShowAll(true)}
-              className="btn-glass px-8 py-3 text-sm font-bold inline-flex items-center gap-2"
+              className="btn-glass px-8 py-3 text-sm font-bold inline-flex items-center gap-2 cursor-pointer"
             >
-              Ver mais <ChevronDown className="w-4 h-4" />
+              Ver todos os modelos <ChevronDown className="w-4 h-4" />
             </button>
           </div>
         )}
@@ -870,33 +864,139 @@ function Products() {
   );
 }
 
-function Services() {
+function HybridSejaDelta() {
+  const comboWhatsApp = () => {
+    const text = `Olá! Gostaria de incluir o Combo de Proteção Total (Capa MagSafe + Película 3D + Fonte 20W) por R$ 99 no meu pedido!`;
+    window.open(`${WHATSAPP}?text=${encodeURIComponent(text)}`, "_blank");
+  };
+
   return (
-    <section id="servicos" className="py-10 sm:py-24 px-4 sm:px-6">
+    <section id="retirada" className="py-10 sm:py-24 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
-        <SectionTitle eyebrow="Assistência Técnica" title="Serviços A Casa da Maçã" badge="#casadamac_" />
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mt-8 sm:mt-14">
-          {services.map(s => (
-            <div key={s.title} className="glass-card p-4 sm:p-7 flex flex-col">
-              <IconBadge Icon={s.icon} />
-              <h3 className="text-sm sm:text-xl font-bold" style={{ color: T.text }}>{s.title}</h3>
-              <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm" style={{ color: T.sub }}>{s.desc}</p>
-              <a href={WHATSAPP} className="btn-glass mt-4 sm:mt-6 inline-block text-center text-xs sm:text-sm px-3 py-2 sm:px-6 sm:py-3 self-start">Agendar</a>
+        <SectionTitle
+          eyebrow="Modelo Híbrido Exclusivo"
+          title="Como Você Prefere Receber Seu iPhone?"
+          badge="Loja Parceira SejaDelta"
+        />
+
+        <div className="grid md:grid-cols-2 gap-6 sm:gap-8 mt-10 sm:mt-14">
+          {/* Card 1: Entrega Express */}
+          <div className="glass-card p-6 sm:p-9 flex flex-col justify-between border-2" style={{ borderColor: "rgba(var(--blue-rgb), 0.3)" }}>
+            <div>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 text-white" style={{ background: T.grad }}>
+                <Truck className="w-6 h-6" />
+              </div>
+              <div className="inline-block text-xs font-bold uppercase tracking-wider text-gradient-blue mb-2">
+                Opção 1 • Máxima Comodidade
+              </div>
+              <h3 className="text-2xl font-black" style={{ color: T.text }}>
+                Entrega Express na Sua Porta em até 2h
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed" style={{ color: T.sub }}>
+                Você pede pelo nosso WhatsApp e nosso entregador leva até você em qualquer bairro de Teresópolis. Você não paga nada adiantado: confere a caixa, confere o lacre, testa o aparelho e paga na hora no PIX ou no cartão de crédito em até 18x.
+              </p>
+              <ul className="mt-6 space-y-2.5 text-sm" style={{ color: T.sub }}>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>Entrega no mesmo dia em Várzea, Agriões, Alto, Comary, Barra e região</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>Sem risco de extravio dos Correios ou golpes online</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>Máquina de cartão levada até você</span>
+                </li>
+              </ul>
             </div>
-          ))}
+            <a
+              href={WHATSAPP}
+              className="btn-primary-glow mt-8 text-center text-sm py-3 flex items-center justify-center gap-2"
+            >
+              <Truck className="w-4 h-4" /> Solicitar Entrega Express
+            </a>
+          </div>
+
+          {/* Card 2: Retirada SejaDelta */}
+          <div className="glass-card p-6 sm:p-9 flex flex-col justify-between border-2" style={{ borderColor: "rgba(var(--blue-rgb), 0.3)" }}>
+            <div>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 text-white" style={{ background: T.grad }}>
+                <Building2 className="w-6 h-6" />
+              </div>
+              <div className="inline-block text-xs font-bold uppercase tracking-wider text-gradient-blue mb-2">
+                Opção 2 • Ver & Testar Pessoalmente
+              </div>
+              <h3 className="text-2xl font-black" style={{ color: T.text }}>
+                Retirada na Loja Parceira SejaDelta
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed" style={{ color: T.sub }}>
+                Faz questão de segurar o aparelho na mão, conferir as cores ao vivo ou prefere o ambiente acolhedor de uma loja física? Retire seu iPhone diretamente no nosso ponto oficial parceiro na loja <strong>SejaDelta</strong> em Teresópolis.
+              </p>
+              <ul className="mt-6 space-y-2.5 text-sm" style={{ color: T.sub }}>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>Atendimento prioritário com voucher Terephones</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>Vitrine com expositores de capas, películas e caixas de som</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>Película aplicada na hora pela equipe SejaDelta</span>
+                </li>
+              </ul>
+            </div>
+            <a
+              href={`${WHATSAPP}?text=${encodeURIComponent("Olá! Gostaria de reservar um iPhone para retirar na loja SejaDelta em Teresópolis.")}`}
+              className="btn-glass mt-8 text-center text-sm py-3 flex items-center justify-center gap-2"
+            >
+              <Building2 className="w-4 h-4" /> Reservar para Retirar na SejaDelta
+            </a>
+          </div>
+        </div>
+
+        {/* Banner Combo Proteção Total */}
+        <div className="mt-8 glass-card p-6 sm:p-8 relative overflow-hidden border border-emerald-500/30">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+            <div>
+              <span className="bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                Oferta Especial de Lançamento
+              </span>
+              <h4 className="text-2xl font-black mt-2" style={{ color: T.text }}>
+                {comboUpsell.title}
+              </h4>
+              <p className="text-sm mt-1 max-w-2xl" style={{ color: T.sub }}>
+                {comboUpsell.desc}. Saia com seu iPhone 100% blindado desde o primeiro minuto!
+              </p>
+            </div>
+            <div className="flex items-center gap-4 shrink-0">
+              <div className="text-right">
+                <span className="text-xs line-through text-gray-400 block">{fmt(comboUpsell.originalPrice)}</span>
+                <span className="text-3xl font-black text-emerald-600">{fmt(comboUpsell.promoPrice)}</span>
+              </div>
+              <button
+                onClick={comboWhatsApp}
+                className="btn-primary-glow text-sm px-6 py-3 cursor-pointer"
+              >
+                Garantir Combo
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-
 function DeliverySection() {
   const benefits = [
-    "Entrega no mesmo dia em Teresópolis",
-    "Atendimento personalizado via WhatsApp",
-    "Pagamento seguro na entrega",
-    "Produtos com garantia e procedência",
+    "Entrega no mesmo dia em até 2 horas em Teresópolis",
+    "Atendimento consultivo e VIP via WhatsApp",
+    "Pagamento seguro no ato do recebimento (PIX ou cartão até 18x)",
+    "Ponto de retirada presencial na loja parceira SejaDelta",
+    "Garantia de 1 ano oficial Apple (lacrados) ou 90 dias (seminovos)",
   ];
   return (
     <section id="delivery" className="py-10 sm:py-24 px-4 sm:px-6">
@@ -907,13 +1007,13 @@ function DeliverySection() {
           <div>
             <div className="inline-flex items-center gap-2 glass px-3 py-1.5 text-xs font-semibold mb-5"
                  style={{ borderRadius: 999, color: T.sub }}>
-              <Truck className="w-3.5 h-3.5" style={{ color: T.primary }} /> Delivery A Casa da Maçã
+              <Truck className="w-3.5 h-3.5" style={{ color: T.primary }} /> Logística Terephones
             </div>
             <h2 className="text-4xl sm:text-5xl font-black leading-tight" style={{ color: T.text }}>
-              Na sua porta, <span className="text-gradient-blue">no seu tempo.</span>
+              Na sua porta em até 2h, <span className="text-gradient-blue">sem frete lento.</span>
             </h2>
             <p className="mt-5 text-lg" style={{ color: T.sub }}>
-              Levamos produtos e serviços técnicos diretamente até você em Teresópolis e região.
+              Chega de esperar dias pelos Correios e rezar para subir a serra. Na Terephones você escolhe agora e recebe hoje em mãos com total segurança.
             </p>
             <ul className="mt-8 space-y-3">
               {benefits.map(b => (
@@ -927,7 +1027,7 @@ function DeliverySection() {
               ))}
             </ul>
             <a href={WHATSAPP} className="btn-primary-glow wa-float mt-8 inline-flex items-center gap-2">
-              <MessageCircle className="w-5 h-5" /> Chamar no WhatsApp
+              <MessageCircle className="w-5 h-5" /> Falar com Especialista no WhatsApp
             </a>
           </div>
           <div className="flex justify-center">
@@ -946,7 +1046,7 @@ function Reviews() {
   return (
     <section className="py-10 sm:py-24 px-4 sm:px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto">
-        <SectionTitle eyebrow="Avaliações" title="O que nossos clientes dizem" badge="Google 4,9 ★" />
+        <SectionTitle eyebrow="Depoimentos Reais" title="Quem Compra em Teresópolis Recomenda" badge="Google 4,9 ★" />
         <div className="mt-14 relative">
           <div className="marquee">
             {doubled.map((r, i) => (
@@ -958,7 +1058,7 @@ function Reviews() {
                   </div>
                   <div>
                     <div className="font-semibold text-sm" style={{ color: T.text }}>{r.name}</div>
-                    <div className="text-xs" style={{ color: T.primary }}>Avaliação Google</div>
+                    <div className="text-xs" style={{ color: T.primary }}>{r.neighborhood} • Teresópolis</div>
                   </div>
                 </div>
                 <div className="flex gap-0.5 mb-3 text-yellow-500 text-sm">★★★★★</div>
@@ -996,27 +1096,27 @@ function SellUsed() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const mensagem =
-      `Olá, equipe A Casa da Maçã! Vim pelo site e tenho interesse na Troca Inteligente. Aqui estão os dados do meu aparelho para pré-avaliação:\n\n` +
-      `📱 *Meu aparelho:* ${aparelhoAtual}\n\n` +
+      `Olá, equipe Terephones! Vim pelo site e tenho interesse na Troca Inteligente (Trade-In). Aqui estão os dados do meu aparelho para pré-avaliação:\n\n` +
+      `📱 *Meu iPhone atual:* ${aparelhoAtual}\n\n` +
       `💾 *Armazenamento:* ${armazenamento}\n\n` +
       `🔋 *Saúde da Bateria:* ${bateria}%\n\n` +
       `✨ *Estado de conservação:* ${estado}\n\n` +
-      `🎯 *Aparelho que desejo:* ${aparelhoDesejado}\n\n` +
+      `🎯 *Modelo que desejo comprar:* ${aparelhoDesejado}\n\n` +
       `📞 *Meu WhatsApp:* ${whatsapp}\n\n` +
-      `*(Tenho as fotos do aparelho prontas para enviar por aqui)*`;
+      `*(Tenho fotos do aparelho prontas para enviar por aqui)*`;
 
-    toast.success("Redirecionando para o WhatsApp...");
-    window.open("https://wa.me/5521993446336?text=" + encodeURIComponent(mensagem), "_blank");
+    toast.success("Redirecionando para o WhatsApp da Terephones...");
+    window.open(`${WHATSAPP}?text=${encodeURIComponent(mensagem)}`, "_blank");
   };
 
   const cls = "glass px-4 py-3 outline-none placeholder:opacity-60 w-full";
 
   return (
-    <section id="contato" className="py-10 sm:py-24 px-4 sm:px-6 scroll-mt-24">
+    <section id="troca" className="py-10 sm:py-24 px-4 sm:px-6 scroll-mt-24">
       <div className="max-w-3xl mx-auto glass-card p-6 sm:p-10">
-        <SectionTitle eyebrow="Troca inteligente" title="Simulador de avaliação do seu aparelho" />
+        <SectionTitle eyebrow="Troca Inteligente" title="Simulador de Avaliação do Seu Usado" badge="Melhor Valor de Terê" />
         <form className="mt-10 grid sm:grid-cols-2 gap-4" onSubmit={handleSubmit}>
-          <input required placeholder="Qual o seu iPhone atual?" className={cls} style={fieldStyle}
+          <input required placeholder="Qual o seu iPhone atual? (Ex: 11 64GB)" className={cls} style={fieldStyle}
                  value={aparelhoAtual} onChange={(e) => setAparelhoAtual(e.target.value)} />
 
           <select required className={cls} style={fieldStyle}
@@ -1033,13 +1133,13 @@ function SellUsed() {
           <select required className={cls} style={fieldStyle}
                   value={estado} onChange={(e) => setEstado(e.target.value)}>
             <option value="" disabled>Estado de conservação</option>
-            <option>Perfeito estado</option>
-            <option>Marcas de uso</option>
-            <option>Tela trincada</option>
-            <option>Defeito</option>
+            <option>Perfeito estado (sem marcas)</option>
+            <option>Marcas leves de uso</option>
+            <option>Tela trincada / Detalhes físicos</option>
+            <option>Necessita reparo / Troca de peça</option>
           </select>
 
-          <input required placeholder="Qual modelo você deseja comprar?" className={cls} style={fieldStyle}
+          <input required placeholder="Qual modelo você deseja comprar? (Ex: 14 Pro)" className={cls} style={fieldStyle}
                  value={aparelhoDesejado} onChange={(e) => setAparelhoDesejado(e.target.value)} />
 
           <input required placeholder="(21) 99999-9999" className={cls} style={fieldStyle}
@@ -1072,13 +1172,13 @@ function SellUsed() {
             )}
           </div>
 
-          <button className="btn-primary-glow sm:col-span-2 py-3 flex items-center justify-center gap-2">
+          <button className="btn-primary-glow sm:col-span-2 py-3 flex items-center justify-center gap-2 cursor-pointer">
             <MessageCircle className="w-5 h-5" />
             Receber Avaliação no WhatsApp
           </button>
 
           <p className="sm:col-span-2 text-center text-xs" style={{ color: T.muted }}>
-            Nossa equipe analisará as informações e enviará uma pré-avaliação em poucos minutos.
+            Nossa equipe analisa seus dados e envia uma pré-avaliação em poucos minutos pelo WhatsApp.
           </p>
         </form>
       </div>
@@ -1092,35 +1192,39 @@ function About() {
       <div className="max-w-6xl mx-auto glass p-8 sm:p-12">
         <div className="grid lg:grid-cols-2 gap-10">
           <div>
-            <SectionTitle eyebrow="Quem somos" title="A Casa da Maçã — a Apple experience de Teresópolis" />
-            <p className="mt-6 leading-relaxed" style={{ color: T.sub }}>
-              A <span className="text-gradient-blue font-bold">A Casa da Maçã</span> nasceu para
-              transformar a relação dos teresopolitanos com seus smartphones:
-              produtos originais, assistência técnica de confiança e um atendimento
-              que trata cada cliente como único.
+            <SectionTitle eyebrow="Sobre a Terephones" title="A Apple Experience de Teresópolis" />
+            <p className="mt-6 leading-relaxed text-base" style={{ color: T.sub }}>
+              A <span className="text-gradient-blue font-bold">Terephones</span> nasceu para revolucionar a forma como moradores de Teresópolis compram e trocam seus iPhones: unindo a agilidade do digital com a segurança e suporte de um ponto físico presencial.
+            </p>
+            <p className="mt-4 leading-relaxed text-sm" style={{ color: T.sub }}>
+              Em parceria com a conceituada loja <strong>SejaDelta</strong>, oferecemos um ecossistema completo: você pode solicitar sua <strong>Entrega Express em domicílio em até 2h</strong> ou retirar presencialmente na loja com atendimento personalizado, aplicação de películas e garantia estendida.
             </p>
             <div className="mt-8 space-y-4">
               <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 mt-0.5" style={{ color: T.primary }} />
+                <MapPin className="w-5 h-5 mt-0.5 text-blue-600 shrink-0" />
                 <div className="text-sm" style={{ color: T.sub }}>
-                  Av. José Joaquim de Araújo Regadas, 146 — Várzea<br />
-                  Teresópolis - RJ, 25953-040
+                  <strong>Ponto de Retirada Parceiro Oficial:</strong><br />
+                  Loja SejaDelta — Teresópolis - RJ
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5" style={{ color: T.primary }} />
+                <Clock className="w-5 h-5 text-blue-600 shrink-0" />
                 <div className="text-sm" style={{ color: T.sub }}>Segunda a Sábado — 10:00 às 18:00</div>
               </div>
               <div className="flex items-center gap-3">
-                <Phone className="w-5 h-5" style={{ color: T.primary }} />
-                <div className="text-sm" style={{ color: T.sub }}>{PHONE_DISPLAY}</div>
+                <Phone className="w-5 h-5 text-blue-600 shrink-0" />
+                <div className="text-sm" style={{ color: T.sub }}>WhatsApp: {PHONE_DISPLAY}</div>
+              </div>
+              <div className="flex items-center gap-3">
+                <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0" />
+                <div className="text-sm" style={{ color: T.sub }}>Garantia Oficial Apple de 1 ano (Lacrados) • 90 dias loja (Seminovos)</div>
               </div>
             </div>
           </div>
-          <div className="rounded-2xl overflow-hidden relative"
+          <div className="rounded-2xl overflow-hidden relative flex flex-col justify-center"
                style={{ border: "1px solid rgba(var(--blue-rgb),.2)", boxShadow: "0 20px 60px rgba(var(--blue-rgb),.15)" }}>
             <iframe
-              title="A Casa da Maçã — Localização"
+              title="Terephones e SejaDelta — Localização em Teresópolis"
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3685.8344589947883!2d-42.97341072469956!3d-22.416416979603593!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x99b9a62254f15d%3A0xcf823f6685514b8a!2sAv.%20Jos%C3%A9%20Joaquim%20de%20Ara%C3%BAjo%20Regadas%2C%20146%20-%20V%C3%A1rzea%2C%20Teres%C3%B3polis%20-%20RJ%2C%2025953-040!5e0!3m2!1spt-BR!2sbr!4v1710000000000!5m2!1spt-BR!2sbr"
               className="w-full h-full min-h-[340px]"
               loading="lazy"
@@ -1140,34 +1244,49 @@ function Footer() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <BrandLogo showText={true} />
-            <p className="text-sm mt-4" style={{ color: T.sub }}>
-              A experiência premium em smartphones que Teresópolis merece.
+            <p className="text-sm mt-4 leading-relaxed" style={{ color: T.sub }}>
+              A sua melhor experiência na compra de iPhones novos e seminovos em Teresópolis com entrega express no mesmo dia ou retirada na loja parceira SejaDelta.
             </p>
           </div>
-          <FooterCol title="Loja" links={[
-            ["iPhones", "#produtos"], ["Acessórios", "#produtos"],
-            ["Seminovos", "#produtos"], ["Peças", "#produtos"],
+          <FooterCol title="Navegação" links={[
+            ["Modelos Disponíveis", "#produtos"],
+            ["Entrega Express 2h", "#delivery"],
+            ["Retirada na SejaDelta", "#retirada"],
+            ["Troca Inteligente", "#troca"],
           ]} />
           <FooterCol title="Institucional" links={[
-            ["Sobre Nós", "#sobre"], ["Localização", "#sobre"],
-            ["Contato", "#contato"], ["WhatsApp", WHATSAPP],
+            ["Sobre a Terephones", "#sobre"],
+            ["Parceria SejaDelta", "#sobre"],
+            ["Garantia & Procedência", "#diferenciais"],
+            ["WhatsApp Vendas", WHATSAPP],
           ]} />
           <div>
-            <div className="font-bold mb-4" style={{ color: T.text }}>Contato</div>
-            <div className="text-sm space-y-2" style={{ color: T.sub }}>
-              <div className="flex items-center gap-2"><Phone className="w-4 h-4" /> {PHONE_DISPLAY}</div>
-              <a href="https://instagram.com/casadamac_" className="flex items-center gap-2"><Instagram className="w-4 h-4" /> @casadamac_</a>
-              <a href="https://facebook.com/casadamac" className="flex items-center gap-2"><Facebook className="w-4 h-4" /> casadamac</a>
+            <div className="font-bold mb-4" style={{ color: T.text }}>Atendimento</div>
+            <div className="text-sm space-y-2.5" style={{ color: T.sub }}>
+              <div className="flex items-center gap-2"><Phone className="w-4 h-4 text-blue-600" /> {PHONE_DISPLAY}</div>
+              <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-blue-600 transition">
+                <Instagram className="w-4 h-4 text-blue-600" /> {INSTAGRAM_HANDLE}
+              </a>
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <Clock className="w-3.5 h-3.5" /> Seg a Sáb das 10h às 18h
+              </div>
             </div>
           </div>
         </div>
         <div className="mt-12 text-center">
-          <div className="text-4xl font-black text-gradient-blue">@casadamac_</div>
+          <a
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-3xl sm:text-4xl font-black text-gradient-blue hover:opacity-80 transition"
+          >
+            {INSTAGRAM_HANDLE}
+          </a>
         </div>
         <div className="mt-10 h-px" style={{ background: "linear-gradient(90deg, transparent, var(--blue-primary), var(--blue-vivid), transparent)" }} />
         <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs" style={{ color: T.muted }}>
-          <div>© {new Date().getFullYear()} A Casa da Maçã — Teresópolis, RJ. Todos os direitos reservados.</div>
-          <div>Feito com 💙 em Teresópolis</div>
+          <div>© {new Date().getFullYear()} Terephones — Teresópolis, RJ. Todos os direitos reservados.</div>
+          <div>Entrega no mesmo dia • Retirada na loja física parceira SejaDelta</div>
         </div>
       </div>
     </footer>
@@ -1180,7 +1299,7 @@ function FooterCol({ title, links }: { title: string; links: [string, string][] 
       <div className="font-bold mb-4" style={{ color: T.text }}>{title}</div>
       <ul className="space-y-2 text-sm">
         {links.map(([l, h]) => (
-          <li key={l}><a href={h} className="transition" style={{ color: T.sub }}>{l}</a></li>
+          <li key={l}><a href={h} className="transition hover:text-blue-600" style={{ color: T.sub }}>{l}</a></li>
         ))}
       </ul>
     </div>
@@ -1191,8 +1310,10 @@ function WhatsFloat() {
   return (
     <a
       href={WHATSAPP}
-      aria-label="WhatsApp"
-      className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full flex items-center justify-center wa-float"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Falar no WhatsApp"
+      className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full flex items-center justify-center wa-float shadow-xl hover:scale-110 transition-transform"
       style={{ background: T.grad }}
     >
       <MessageCircle className="w-7 h-7 text-white" />
@@ -1211,6 +1332,7 @@ function BrandStore() {
         <VSL />
         <Differentials />
         <Products />
+        <HybridSejaDelta />
         <DeliverySection />
         <Reviews />
         <SellUsed />
