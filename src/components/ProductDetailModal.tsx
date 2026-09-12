@@ -161,19 +161,19 @@ export function ProductDetailModal({
                 {product.name}
               </h2>
 
-              <p className="text-xs sm:text-sm font-semibold mt-1 text-slate-600 dark:text-slate-300">
+              <p className="text-xs sm:text-sm font-semibold mt-1 text-slate-600 dark:text-slate-200">
                 {product.specs || "Disponível para pronta-entrega em Teresópolis / RJ"}
               </p>
 
               {/* Preço */}
               <div className="mt-3.5 product-modal-price-box p-4">
-                <div className="text-[11px] uppercase font-extrabold tracking-wider text-slate-500 dark:text-sky-300">
+                <div className="price-label text-[11px] uppercase font-extrabold tracking-wider text-slate-500 dark:text-sky-300">
                   Valor à vista no PIX
                 </div>
                 <div className="text-3xl font-black text-gradient-blue mt-0.5">
                   {fmt(product.price)}
                 </div>
-                <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-700 dark:text-slate-200 font-medium">
+                <div className="price-installments mt-1 flex items-center gap-1.5 text-xs text-slate-700 dark:text-slate-200 font-medium">
                   <CreditCard className="w-3.5 h-3.5 text-sky-500 shrink-0" />
                   <span>ou até 12x de {fmt(product.price / 12)} (até 18x no cartão)</span>
                 </div>
@@ -189,68 +189,68 @@ export function ProductDetailModal({
 
           {/* Ficha Técnica / Especificações em Grid */}
           <div>
-            <h3 className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-1.5">
+            <h3 className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-slate-800 dark:text-slate-100 mb-3 flex items-center gap-1.5">
               <Smartphone className="w-4 h-4 text-sky-400" />
               Especificações Técnicas do Modelo
             </h3>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
               <div className="product-modal-box p-3">
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
+                <div className="spec-label flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
                   <Smartphone className="w-3.5 h-3.5 text-sky-400" />
                   Armazenamento
                 </div>
-                <div className="text-xs sm:text-sm font-extrabold mt-1 text-slate-900 dark:text-white">
+                <div className="spec-value text-xs sm:text-sm font-extrabold mt-1 text-slate-900 dark:text-white">
                   {product.storage || "128 GB"}
                 </div>
               </div>
 
               <div className="product-modal-box p-3">
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
+                <div className="spec-label flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
                   <Battery className="w-3.5 h-3.5 text-emerald-400" />
                   Saúde da Bateria
                 </div>
-                <div className="text-xs sm:text-sm font-extrabold mt-1 text-emerald-600 dark:text-emerald-400">
+                <div className="spec-value text-xs sm:text-sm font-extrabold mt-1 text-emerald-600 dark:text-emerald-400">
                   {product.battery || (isNovo ? "100% (Lacrado Apple)" : "88% a 100% (Alta Performance)")}
                 </div>
               </div>
 
               <div className="product-modal-box p-3">
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
+                <div className="spec-label flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
                   <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />
                   Garantia
                 </div>
-                <div className="text-xs sm:text-sm font-extrabold mt-1 text-blue-600 dark:text-sky-300">
+                <div className="spec-value text-xs sm:text-sm font-extrabold mt-1 text-blue-600 dark:text-sky-300">
                   {product.warranty || (isNovo ? "1 Ano Mundial Apple" : "90 Dias Garantia Terephones")}
                 </div>
               </div>
 
               <div className="product-modal-box p-3">
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
+                <div className="spec-label flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
                   <Smartphone className="w-3.5 h-3.5 text-sky-400" />
                   Tela
                 </div>
-                <div className="text-xs sm:text-sm font-extrabold mt-1 text-slate-900 dark:text-white truncate">
+                <div className="spec-value text-xs sm:text-sm font-extrabold mt-1 text-slate-900 dark:text-white truncate">
                   {product.screen || "Super Retina XDR OLED"}
                 </div>
               </div>
 
               <div className="product-modal-box p-3">
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
+                <div className="spec-label flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
                   <Camera className="w-3.5 h-3.5 text-sky-400" />
                   Câmeras
                 </div>
-                <div className="text-xs sm:text-sm font-extrabold mt-1 text-slate-900 dark:text-white truncate">
+                <div className="spec-value text-xs sm:text-sm font-extrabold mt-1 text-slate-900 dark:text-white truncate">
                   {product.camera || "Sistema Apple c/ Modo Cinema"}
                 </div>
               </div>
 
               <div className="product-modal-box p-3">
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
+                <div className="spec-label flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
                   <Cpu className="w-3.5 h-3.5 text-sky-400" />
                   Processador
                 </div>
-                <div className="text-xs sm:text-sm font-extrabold mt-1 text-slate-900 dark:text-white truncate">
+                <div className="spec-value text-xs sm:text-sm font-extrabold mt-1 text-slate-900 dark:text-white truncate">
                   {product.chip || "Apple Bionic Alta Velocidade"}
                 </div>
               </div>
@@ -293,10 +293,10 @@ export function ProductDetailModal({
         {/* Footer Actions (Responsivo e sem cortar) */}
         <div className="product-modal-footer px-4 sm:px-7 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
           <div className="text-center sm:text-left">
-            <div className="text-[11px] text-slate-500 dark:text-slate-300">
+            <div className="footer-helper text-[11px] text-slate-500 dark:text-slate-300">
               Dúvidas ou quer negociar? Fale direto no WhatsApp:
             </div>
-            <div className="text-xs font-extrabold text-slate-900 dark:text-sky-300">
+            <div className="footer-phone text-xs font-extrabold text-slate-900 dark:text-sky-300">
               (21) 96463-9999 • Atendimento Imediato
             </div>
           </div>

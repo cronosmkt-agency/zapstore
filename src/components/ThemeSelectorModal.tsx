@@ -52,8 +52,12 @@ export function ThemeSelectorModal({
 
   const applyTheme = (theme: ThemeMode) => {
     const root = document.documentElement;
-    root.classList.remove("theme-white", "theme-black-piano");
-    root.classList.add(theme === "black-piano" ? "theme-black-piano" : "theme-white");
+    root.classList.remove("theme-white", "theme-black-piano", "dark");
+    if (theme === "black-piano") {
+      root.classList.add("theme-black-piano", "dark");
+    } else {
+      root.classList.add("theme-white");
+    }
     localStorage.setItem("terephones_theme", theme);
     if (onThemeChange) {
       onThemeChange(theme);

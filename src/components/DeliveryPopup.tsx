@@ -14,7 +14,11 @@ export function DeliveryPopup() {
     setAfterHours(minutes >= 18 * 60);
 
     const t = setTimeout(() => setVisible(true), 3000);
-    return () => clearTimeout(t);
+    const dismissTimer = setTimeout(() => setClosed(true), 12000);
+    return () => {
+      clearTimeout(t);
+      clearTimeout(dismissTimer);
+    };
   }, []);
 
   if (!visible || closed) return null;
@@ -27,7 +31,7 @@ export function DeliveryPopup() {
   return (
     <div
       role="status"
-      className="fixed z-[60] bottom-6 right-[5.75rem] left-4 md:bottom-6 md:left-6 md:right-auto md:max-w-xs animate-fade-in"
+      className="fixed z-[55] bottom-24 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-auto sm:max-w-xs animate-fade-in"
     >
       {/* Mobile: card compacto, alinhado ao botão de chat */}
       <div className="md:hidden relative flex h-14 items-center gap-2 rounded-2xl glass px-3 py-2 pr-7 shadow-lg">

@@ -140,9 +140,10 @@ function RootShell({ children }: { children: ReactNode }) {
               try {
                 var t = localStorage.getItem('terephones_theme');
                 if (t === 'black-piano') {
-                  document.documentElement.classList.add('theme-black-piano');
+                  document.documentElement.classList.add('theme-black-piano', 'dark');
                 } else if (t === 'white') {
                   document.documentElement.classList.add('theme-white');
+                  document.documentElement.classList.remove('dark');
                 }
               } catch (e) {}
             `,

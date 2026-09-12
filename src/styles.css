@@ -921,21 +921,50 @@ html.theme-black-piano body {
   box-shadow: 0 25px 80px rgba(0, 0, 0, 0.95), 0 0 40px rgba(56, 189, 248, 0.15) !important;
 }
 
+.theme-black-piano .product-modal-container h2 {
+  color: #ffffff !important;
+}
+
 .theme-black-piano .product-modal-box {
-  background: rgba(17, 24, 39, 0.85) !important;
+  background: rgba(18, 24, 38, 0.95) !important;
   border: 1px solid rgba(255, 255, 255, 0.14) !important;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+  color: #ffffff !important;
+}
+
+.theme-black-piano .product-modal-box .spec-label {
+  color: #94a3b8 !important;
+}
+
+.theme-black-piano .product-modal-box .spec-value {
+  color: #ffffff !important;
 }
 
 .theme-black-piano .product-modal-price-box {
-  background: rgba(14, 21, 37, 0.9) !important;
-  border: 1px solid rgba(56, 189, 248, 0.4) !important;
+  background: rgba(14, 21, 37, 0.95) !important;
+  border: 1px solid rgba(56, 189, 248, 0.45) !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
 }
 
+.theme-black-piano .product-modal-price-box .price-label {
+  color: #38bdf8 !important;
+}
+
+.theme-black-piano .product-modal-price-box .price-installments {
+  color: #e2e8f0 !important;
+}
+
 .theme-black-piano .product-modal-footer {
-  background: #06080e !important;
+  background: #05070c !important;
   border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.theme-black-piano .product-modal-footer .footer-helper {
+  color: #cbd5e1 !important;
+}
+
+.theme-black-piano .product-modal-footer .footer-phone {
+  color: #38bdf8 !important;
 }
 
 .theme-black-piano input,
