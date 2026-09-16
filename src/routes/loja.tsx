@@ -36,7 +36,7 @@ export const Route = createFileRoute("/loja")({
       {
         name: "description",
         content:
-          "Veja todos os iPhones novos e seminovos disponíveis hoje em Teresópolis - RJ. Entrega Express em até 2h ou retirada na SejaDelta.",
+          "Veja todos os iPhones novos e seminovos disponíveis hoje em Teresópolis - RJ. Entrega Express em até 1h ou retirada na SejaDelta.",
       },
       { property: "og:title", content: "Loja de iPhones em Teresópolis — Terephones" },
       {
@@ -98,7 +98,10 @@ function LojaPage() {
     }
     localStorage.setItem("terephones_theme", next);
     window.dispatchEvent(new CustomEvent("theme-changed", { detail: { theme: next } }));
-    toast.success(next === "black-piano" ? "Tema Black Piano ativado!" : "Tema Branco Titânio ativado!");
+    toast.success(next === "black-piano" ? "Modo Black ativado" : "Modo Branco ativado", {
+      id: "theme-toggle",
+      duration: 1200,
+    });
   };
 
   const handleOpenDetail = (prod: ProductItem) => {
@@ -111,9 +114,33 @@ function LojaPage() {
     window.open(`${WHATSAPP}?text=${encodeURIComponent(text)}`, "_blank");
   };
 
+  const handleOrderInChat = (prod: ProductItem) => {
+    try {
+      sessionStorage.setItem(
+        "terephones_order_product",
+        JSON.stringify({
+          name: prod.name,
+          price: prod.price,
+          img: prod.img,
+          badge: prod.badge,
+          cat: prod.cat,
+          storage: prod.storage || (prod.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() ?? "128GB"),
+          battery: prod.battery || "",
+        })
+      );
+    } catch {
+      // ignore
+    }
+  };
+
   // Filter & Search
   const filtered = productList.filter((item) => {
-    const matchCat = activeFilter === "Todos" || item.cat === activeFilter;
+    const matchCat =
+      activeFilter === "Todos" ||
+      item.cat === activeFilter ||
+      (activeFilter === "Lacrados" && (item.cat === "Novos" || item.cat === "Lacrados")) ||
+      (activeFilter === "Novos" && (item.cat === "Novos" || item.cat === "Lacrados")) ||
+      (activeFilter === "Seminovos" && item.cat === "Seminovos");
     const matchSearch =
       searchQuery.trim() === "" ||
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -127,33 +154,29 @@ function LojaPage() {
       <ThemeSelectorModal currentTheme={currentTheme} onThemeChange={setCurrentTheme} />
       <SiteNavbar currentTheme={currentTheme} toggleTheme={toggleTheme} />
 
-      <main className="pt-24 sm:pt-32 pb-16 px-4 sm:px-6 max-w-7xl mx-auto">
+      <main className="pt-20 sm:pt-32 pb-24 sm:pb-16 px-3 sm:px-6 max-w-7xl mx-auto">
         {/* Header da Loja */}
         <div className="text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold glass mb-3 border border-blue-500/20 text-blue-600 dark:text-sky-400">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Estoque Oficial Atualizado Hoje em Teresópolis</span>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold glass mb-2 border border-blue-500/20 text-blue-600 dark:text-sky-400">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span>Estoque Hoje ({filtered.length} disponíveis)</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
             Catálogo Completo de <span className="text-gradient-blue">iPhones</span>
           </h1>
-
-          <p className="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-300">
-            Aparelhos 100% testados em mais de 25 itens técnicos. Pague só no momento da entrega ou retire na loja parceira SejaDelta.
-          </p>
         </div>
 
-        {/* Barra de Busca & Filtros Rápidos */}
-        <div className="mt-8 max-w-2xl mx-auto flex flex-col sm:flex-row items-center gap-3">
+        {/* Barra de Busca Desktop */}
+        <div className="hidden sm:flex mt-6 max-w-2xl mx-auto items-center gap-3">
           <div className="relative w-full">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Buscar por modelo (ex: 16 Pro, 15, Branco, 256GB)..."
+              placeholder="Buscar modelo (ex: 16 Pro, 15, 256GB)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl glass border border-slate-200 dark:border-slate-800 text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 transition"
+              className="w-full pl-10 pr-16 py-2.5 rounded-2xl glass border border-slate-200 dark:border-slate-800 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 transition text-slate-900 dark:text-white shadow-xs"
             />
             {searchQuery && (
               <button
@@ -166,28 +189,31 @@ function LojaPage() {
           </div>
         </div>
 
-        {/* Filtros Mobile: Segmented Control Unificado (1 linha) */}
-        <div className="sm:hidden mt-6 flex flex-col gap-3">
+        {/* Controles Mobile: Filtros de Categoria + Barra de Busca à esquerda dos botões Grade/Vitrine */}
+        <div className="sm:hidden mt-3.5 flex flex-col gap-2">
+          {/* Categorias Pills */}
           <div className="grid grid-cols-3 p-1 rounded-2xl bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 shadow-inner backdrop-blur-md">
             {filters.map((fl) => {
               const count =
                 fl === "Todos"
                   ? productList.length
+                  : fl === "Lacrados" || fl === "Novos"
+                  ? productList.filter((p) => p.cat === "Novos" || p.cat === "Lacrados").length
                   : productList.filter((p) => p.cat === fl).length;
               const isActive = activeFilter === fl;
               return (
                 <button
                   key={fl}
                   onClick={() => setActiveFilter(fl)}
-                  className={`flex items-center justify-center gap-1.5 py-2 px-1 text-xs rounded-xl transition-all cursor-pointer ${
+                  className={`flex items-center justify-center gap-1.5 py-1.5 px-1 text-xs rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                     isActive
-                      ? "btn-primary-glow text-white shadow-md font-black scale-[1.02]"
+                      ? "btn-primary-glow text-white shadow-md font-black"
                       : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-bold"
                   }`}
                 >
-                  <span className="truncate">{fl}</span>
+                  <span className="whitespace-nowrap">{fl}</span>
                   <span
-                    className={`text-[10px] px-1.5 py-0.5 rounded-full font-black shrink-0 ${
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-black shrink-0 ${
                       isActive
                         ? "bg-white/25 text-white"
                         : "bg-slate-200/90 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
@@ -200,18 +226,31 @@ function LojaPage() {
             })}
           </div>
 
-          <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-              <span>
-                {filtered.length} {filtered.length === 1 ? "aparelho encontrado" : "aparelhos encontrados"}
-              </span>
+          {/* Linha Combinada: Barra de busca à esquerda + Grade/Vitrine à direita */}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Buscar modelo..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-8 pr-7 py-2 rounded-xl glass border border-slate-200 dark:border-slate-800 text-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 transition text-slate-900 dark:text-white shadow-xs"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  ✕
+                </button>
+              )}
             </div>
 
-            <div className="flex items-center p-0.5 bg-slate-100/90 dark:bg-slate-900/90 rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs">
+            <div className="flex items-center p-0.5 bg-slate-100/90 dark:bg-slate-900/90 rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs shrink-0">
               <button
                 onClick={() => setViewMode("compact")}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   viewMode === "compact"
                     ? "btn-primary-glow text-white shadow-xs"
                     : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
@@ -219,12 +258,12 @@ function LojaPage() {
                 title="Grade 2 por linha"
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
-                <span className="text-[11px]">Grade 2x</span>
+                <span className="text-[10px]">Grade</span>
               </button>
 
               <button
                 onClick={() => setViewMode("showcase")}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   viewMode === "showcase"
                     ? "btn-primary-glow text-white shadow-xs"
                     : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
@@ -232,7 +271,7 @@ function LojaPage() {
                 title="Vitrine 1 por linha"
               >
                 <Smartphone className="w-3.5 h-3.5" />
-                <span className="text-[11px]">Vitrine 1x</span>
+                <span className="text-[10px]">Vitrine</span>
               </button>
             </div>
           </div>
@@ -245,6 +284,8 @@ function LojaPage() {
               const count =
                 fl === "Todos"
                   ? productList.length
+                  : fl === "Lacrados" || fl === "Novos"
+                  ? productList.filter((p) => p.cat === "Novos" || p.cat === "Lacrados").length
                   : productList.filter((p) => p.cat === fl).length;
               const isActive = activeFilter === fl;
               return (
@@ -298,29 +339,33 @@ function LojaPage() {
           </div>
         ) : (
           <div
-            className={`mt-8 ${
+            className={`mt-6 sm:mt-8 ${
               viewMode === "showcase" ? "hidden sm:grid" : "grid"
-            } grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6`}
+            } grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-6`}
           >
             {filtered.map((prod, idx) => (
               <div
                 key={prod.name + idx}
-                className="group relative rounded-2xl sm:rounded-3xl glass p-3 sm:p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl border border-slate-200/60 dark:border-slate-800/80 hover:-translate-y-1"
+                className="group relative rounded-2xl sm:rounded-3xl glass p-2.5 sm:p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl border border-slate-200/60 dark:border-slate-800/80 hover:-translate-y-1"
               >
                 {/* Badge Superior */}
-                <div className="flex items-center justify-between gap-1 mb-2">
+                <div className="flex items-center justify-between gap-1 mb-1.5 sm:mb-2">
                   <span className="text-[10px] sm:text-xs font-extrabold px-2 sm:px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-sky-950/60 text-blue-700 dark:text-sky-300 border border-blue-200/60 dark:border-sky-800/40">
                     {prod.badge}
                   </span>
-                  {prod.storage && (
-                    <span className="text-[10px] font-bold text-slate-400">
+                  {prod.quantity && prod.quantity > 1 ? (
+                    <span className="text-[10px] font-black text-blue-600 dark:text-sky-400 shrink-0">
+                      {prod.quantity} un.
+                    </span>
+                  ) : prod.storage ? (
+                    <span className="text-[10px] font-bold text-slate-400 shrink-0">
                       {prod.storage}
                     </span>
-                  )}
+                  ) : null}
                 </div>
 
                 {/* Imagem do Aparelho */}
-                <div className="relative aspect-4/5 w-full flex items-center justify-center p-2 sm:p-4 mb-3">
+                <div className="relative aspect-4/5 w-full flex items-center justify-center p-1 sm:p-4 mb-2 sm:mb-3">
                   <img
                     src={prod.img}
                     alt={prod.name}
@@ -335,30 +380,32 @@ function LojaPage() {
                     {prod.name}
                   </h3>
 
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
+                  <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
                     {prod.specs || "Garantia Terephones • Testado"}
                   </p>
 
-                  <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/60">
+                  <div className="mt-2 pt-1.5 sm:mt-2.5 sm:pt-2 border-t border-slate-100 dark:border-slate-800/60">
                     <div className="flex items-baseline gap-1">
                       <span className="text-sm sm:text-lg font-black text-blue-600 dark:text-sky-400">
                         {fmt(prod.price)}
                       </span>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">
+                      <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">
                         no PIX
                       </span>
                     </div>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                      ou 12x de {fmt(Math.round((prod.price * 1.15) / 12))} no cartão
+                    <p className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                      ou 12x de {fmt(Math.round((prod.price * 1.15) / 12))}
                     </p>
                   </div>
                 </div>
 
                 {/* Botões de Ação */}
-                <div className="mt-3 grid grid-cols-2 gap-1.5 pt-2">
+                <div className="mt-2.5 sm:mt-3 grid grid-cols-2 gap-1.5 pt-1.5 sm:pt-2">
                   <Link
                     to="/chat"
-                    className="w-full py-1.5 sm:py-2 px-2 rounded-xl text-[11px] sm:text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-1 shadow-sm transition"
+                    search={{ produto: prod.name }}
+                    onClick={() => handleOrderInChat(prod)}
+                    className="w-full py-1.5 sm:py-2 px-1 sm:px-2 rounded-xl text-[11px] sm:text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-1 shadow-sm transition"
                   >
                     <MessageCircle className="w-3.5 h-3.5" />
                     <span>Pedir</span>
@@ -366,7 +413,7 @@ function LojaPage() {
 
                   <button
                     onClick={() => handleOpenDetail(prod)}
-                    className="w-full py-1.5 sm:py-2 px-2 rounded-xl text-[11px] sm:text-xs font-bold border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center gap-1 transition cursor-pointer"
+                    className="w-full py-1.5 sm:py-2 px-1 sm:px-2 rounded-xl text-[11px] sm:text-xs font-bold border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center gap-1 transition cursor-pointer"
                   >
                     <Info className="w-3.5 h-3.5" />
                     <span>Info</span>
@@ -377,61 +424,83 @@ function LojaPage() {
           </div>
         )}
 
-        {/* Modo Vitrine Mobile (1 card grande por linha) */}
+        {/* Modo Vitrine Mobile (1 card horizontal compacto por linha) */}
         {viewMode === "showcase" && (
-          <div className="sm:hidden mt-6 space-y-4">
+          <div className="sm:hidden mt-4 space-y-2.5">
             {filtered.map((prod, idx) => (
               <div
                 key={prod.name + idx + "-showcase"}
-                className="rounded-3xl glass p-4 border border-slate-200/80 dark:border-slate-800/80 shadow-md flex flex-col"
+                className="rounded-2xl glass p-2.5 border border-slate-200/80 dark:border-slate-800/80 shadow-xs flex items-center gap-3 transition-all hover:shadow-md"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-extrabold px-3 py-1 rounded-full bg-blue-50 dark:bg-sky-950/60 text-blue-700 dark:text-sky-300 border border-blue-200/60 dark:border-sky-800/40">
-                    {prod.badge}
-                  </span>
-                  <span className="text-xs font-black text-slate-500">
-                    {prod.storage}
-                  </span>
-                </div>
-
-                <div className="h-60 w-full flex items-center justify-center p-4 my-2">
+                {/* Imagem do Aparelho à esquerda */}
+                <div className="relative w-24 h-24 shrink-0 rounded-xl bg-slate-100/60 dark:bg-slate-900/60 p-1.5 flex items-center justify-center border border-slate-200/50 dark:border-slate-800/50">
                   <img
                     src={prod.img}
                     alt={prod.name}
-                    className="max-h-full max-w-full object-contain drop-shadow-2xl"
+                    loading="lazy"
+                    className="max-h-full max-w-full object-contain drop-shadow-md"
                   />
                 </div>
 
-                <h3 className="text-base font-black text-slate-900 dark:text-white">
-                  {prod.name}
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">{prod.specs}</p>
-
-                <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-baseline justify-between">
+                {/* Informações e Botões à direita */}
+                <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
                   <div>
-                    <span className="text-xl font-black text-blue-600 dark:text-sky-400">
-                      {fmt(prod.price)}
-                    </span>
-                    <span className="text-xs font-bold text-slate-400 ml-1">PIX</span>
-                    <p className="text-[11px] text-slate-500">
-                      ou 12x de {fmt(Math.round((prod.price * 1.15) / 12))}
+                    <div className="flex items-center justify-between gap-1 mb-1">
+                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-sky-950/60 text-blue-700 dark:text-sky-300 border border-blue-200/60 dark:border-sky-800/40 truncate">
+                        {prod.badge}
+                      </span>
+                      {prod.quantity && prod.quantity > 1 ? (
+                        <span className="text-[10px] font-black text-blue-600 dark:text-sky-400 shrink-0">
+                          {prod.quantity} un.
+                        </span>
+                      ) : prod.storage ? (
+                        <span className="text-[10px] font-black text-slate-400 shrink-0">
+                          {prod.storage}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate" title={prod.name}>
+                      {prod.name}
+                    </h3>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                      {prod.specs || "Garantia Terephones • Testado"}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleOpenDetail(prod)}
-                      className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 cursor-pointer"
-                    >
-                      <Info className="w-4 h-4" />
-                    </button>
-                    <Link
-                      to="/chat"
-                      className="px-4 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-md"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                      <span>Pedir no Chat</span>
-                    </Link>
+                  <div className="mt-2 pt-1.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-1.5">
+                    <div className="min-w-0">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-sm font-black text-blue-600 dark:text-sky-400">
+                          {fmt(prod.price)}
+                        </span>
+                        <span className="text-[9px] font-bold text-slate-400 uppercase">
+                          PIX
+                        </span>
+                      </div>
+                      <p className="text-[9px] text-slate-500 dark:text-slate-400 truncate">
+                        ou 12x de {fmt(Math.round((prod.price * 1.15) / 12))}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        onClick={() => handleOpenDetail(prod)}
+                        className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                        title="Ver especificações"
+                      >
+                        <Info className="w-3.5 h-3.5" />
+                      </button>
+                      <Link
+                        to="/chat"
+                        search={{ produto: prod.name }}
+                        onClick={() => handleOrderInChat(prod)}
+                        className="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-xs transition"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        <span>Pedir</span>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -473,7 +542,9 @@ function LojaPage() {
       />
 
       <SiteFooter currentTheme={currentTheme} />
-      <WhatsFloat />
+      <div className="hidden sm:block">
+        <WhatsFloat />
+      </div>
       <MobileBottomNav />
     </div>
   );

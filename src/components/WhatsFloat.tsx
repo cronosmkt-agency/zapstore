@@ -1,4 +1,4 @@
-import { MessageCircle } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { WHATSAPP } from "@/data/storeData";
 
 export function WhatsFloat() {
@@ -16,7 +16,7 @@ export function WhatsFloat() {
       title="Falar com a Terephones no WhatsApp: (21) 96463-9999"
     >
       <div className="relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10">
-        <MessageCircle className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-white fill-white" />
+        <WhatsAppIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
         {/* Pulse online badge */}
         <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />

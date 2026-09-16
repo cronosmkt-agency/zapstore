@@ -14,10 +14,10 @@ import {
   ExternalLink,
   Phone,
   ArrowRight,
+  Package,
+  Layers,
 } from "lucide-react";
 import { SiteNavbar } from "@/components/SiteNavbar";
-import { SiteFooter } from "@/components/SiteFooter";
-import { WhatsFloat } from "@/components/WhatsFloat";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { ThemeSelectorModal, type ThemeMode } from "@/components/ThemeSelectorModal";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -26,16 +26,23 @@ import {
   WHATSAPP,
   fmt,
 } from "@/data/storeData";
+import { fetchGoogleSheetInventory } from "@/services/googleSheets";
+import type { ProductItem } from "@/components/ProductDetailModal";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/chat")({
+  validateSearch: (search: Record<string, unknown>): { produto?: string } => {
+    return {
+      produto: typeof search.produto === "string" ? search.produto : undefined,
+    };
+  },
   head: () => ({
     meta: [
       { title: "Chat & Atendimento Online — Terephones Teresópolis" },
       {
         name: "description",
         content:
-          "Tire suas dúvidas ou faça seu pedido de iPhone diretamente pelo Chat oficial da Terephones. Entrega em 2h ou retirada na SejaDelta.",
+          "Tire suas dúvidas ou faça seu pedido de iPhone diretamente pelo Chat oficial da Terephones. Entrega em 1h ou retirada na SejaDelta.",
       },
     ],
   }),
@@ -56,15 +63,19 @@ interface ChatMessage {
     customerName: string;
     customerAddress: string;
   };
-  productPicker?: boolean;
+  productPicker?: {
+    filter?: "Todos" | "Seminovos" | "Novos";
+  } | boolean;
 }
 
 function ChatPage() {
+  const { produto: routeProduto } = Route.useSearch();
   const [currentTheme, setCurrentTheme] = useState<ThemeMode>("white");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Order state machine
   const [orderStep, setOrderStep] = useState<
@@ -80,6 +91,12 @@ function ChatPage() {
   });
 
   const scrollToBottom = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -107,25 +124,105 @@ function ChatPage() {
         minute: "2-digit",
       });
 
+      // Check if user came from "Comprar no Chat" or "Pedir" in store/modal
+      let prefilledProduct: {
+        name: string;
+        price: number;
+        cat?: string;
+        storage?: string;
+        badge?: string;
+        battery?: string;
+      } | null = null;
+      try {
+        const rawOrder = sessionStorage.getItem("terephones_order_product");
+        if (rawOrder) {
+          prefilledProduct = JSON.parse(rawOrder);
+          sessionStorage.removeItem("terephones_order_product");
+        } else {
+          const targetParam =
+            routeProduto ||
+            (typeof window !== "undefined"
+              ? new URLSearchParams(window.location.search).get("produto")
+              : null);
+          if (targetParam) {
+            const match = defaultProducts.find((p) =>
+              p.name.toLowerCase().includes(targetParam.toLowerCase()) ||
+              targetParam.toLowerCase().includes(p.name.toLowerCase())
+            );
+            if (match) {
+              prefilledProduct = {
+                name: match.name,
+                price: match.price,
+                cat: match.cat,
+                badge: match.badge,
+                storage: match.storage,
+                battery: match.battery,
+              };
+            }
+          }
+        }
+      } catch {
+        // ignore
+      }
+
+      if (prefilledProduct) {
+        setDraftOrder((prev) => ({
+          ...prev,
+          model: prefilledProduct.name,
+          price: prefilledProduct.price,
+        }));
+        setOrderStep("picking_delivery");
+
+        const isNovo =
+          prefilledProduct.cat === "Novos" ||
+          prefilledProduct.name.toLowerCase().includes("lacrado") ||
+          (prefilledProduct.badge && prefilledProduct.badge.toLowerCase().includes("lacrado"));
+
+        const condText = isNovo
+          ? "Novo Lacrado de Fábrica com 1 ano Apple"
+          : "Seminovo Impecável com 90 dias de garantia";
+
+        setMessages([
+          {
+            id: "welcome-product-order",
+            sender: "bot",
+            text: `Olá! Seja bem-vindo à Terephones! 🍎\n\nVocê selecionou o **${prefilledProduct.name}** (${condText}) por **${fmt(prefilledProduct.price)}** no PIX ou em até 18x no cartão com garantia.\n\nComo você prefere prosseguir com seu aparelho hoje em Teresópolis?`,
+            time: now,
+            options: [
+              {
+                label: "🚚 Entrega Express na minha porta (até 1h)",
+                action: "set_delivery_express",
+              },
+              {
+                label: "🏢 Retirar pessoalmente na Loja SejaDelta",
+                action: "set_delivery_sejadelta",
+              },
+              {
+                label: "💬 Falar com Vendedor sobre este iPhone",
+                action: "talk_sales_model",
+              },
+              {
+                label: "📱 Escolher Outro Modelo",
+                action: "start_order",
+              },
+            ],
+          },
+        ]);
+        return;
+      }
+
+      // Single initial welcome message
       setMessages([
         {
-          id: "welcome-1",
+          id: "welcome-single",
           sender: "bot",
-          text: "Olá! Seja muito bem-vindo ao Chat Oficial da Terephones em Teresópolis! 👋",
-          time: now,
-        },
-        {
-          id: "welcome-2",
-          sender: "bot",
-          text: "Por aqui você pode tirar dúvidas sobre prazos, retirada na SejaDelta, formas de pagamento ou já fazer o seu pedido direto sem precisar entrar no WhatsApp!",
+          text: "Olá! Seja muito bem-vindo ao Chat Oficial da Terephones em Teresópolis! 👋\n\nPor aqui você pode escolher seu iPhone com entrega express em até 1h na sua porta ou retirada na SejaDelta, tirar dúvidas de garantia e pagamento, ou falar diretamente com a nossa equipe de vendas. Como podemos te ajudar hoje?",
           time: now,
           options: [
-            { label: "🛍️ Quero Fazer um Pedido Agora", action: "start_order" },
-            { label: "⚡ Como funciona a entrega em 2h?", action: "faq_delivery" },
-            { label: "📍 Onde retirar na SejaDelta?", action: "faq_sejadelta" },
-            { label: "💳 Formas de Pagamento & Parcelas", action: "faq_payment" },
-            { label: "🔄 Como funciona a Troca com Troco?", action: "faq_tradein" },
-            { label: "🛡️ Garantia e Procedência", action: "faq_warranty" },
+            { label: "🛍️ Escolher iPhone para Comprar", action: "start_order" },
+            { label: "💬 Falar com um Vendedor", action: "talk_to_sales" },
+            { label: "⚡ Entrega em 1h & Retirada", action: "faq_delivery" },
+            { label: "🔄 Simular Troca com Troco", action: "faq_tradein" },
           ],
         },
       ]);
@@ -144,6 +241,10 @@ function ChatPage() {
     }
     localStorage.setItem("terephones_theme", next);
     window.dispatchEvent(new CustomEvent("theme-changed", { detail: { theme: next } }));
+    toast.success(next === "black-piano" ? "Modo Black ativado" : "Modo Branco ativado", {
+      id: "theme-toggle",
+      duration: 1200,
+    });
   };
 
   const addBotMessage = (
@@ -219,11 +320,44 @@ function ChatPage() {
     const lower = text.toLowerCase();
 
     if (
+      lower.includes("vendedor") ||
+      lower.includes("atendente") ||
+      lower.includes("falar com") ||
+      lower.includes("humano") ||
+      lower.includes("consultor") ||
+      lower.includes("whatsapp") ||
+      lower.includes("zap")
+    ) {
+      if (draftOrder.model) {
+        handleAction("talk_sales_model");
+      } else {
+        handleAction("talk_to_sales");
+      }
+    } else if (
+      lower.includes("seminovo") ||
+      lower.includes("seminovos") ||
+      lower.includes("usado") ||
+      lower.includes("usados")
+    ) {
+      handleAction("filter_seminovos");
+    } else if (
+      lower.includes("lacrado") ||
+      lower.includes("lacrados") ||
+      lower.includes("novo") ||
+      lower.includes("novos")
+    ) {
+      handleAction("filter_novos");
+    } else if (
       lower.includes("pedido") ||
       lower.includes("comprar") ||
       lower.includes("quero") ||
       lower.includes("pedir") ||
-      lower.includes("encomendar")
+      lower.includes("encomendar") ||
+      lower.includes("iphone") ||
+      lower.includes("escolher") ||
+      lower.includes("aparelho") ||
+      lower.includes("modelo") ||
+      lower.includes("estoque")
     ) {
       handleAction("start_order");
     } else if (
@@ -231,7 +365,9 @@ function ChatPage() {
       lower.includes("tempo") ||
       lower.includes("demora") ||
       lower.includes("frete") ||
-      lower.includes("2h")
+      lower.includes("1h") ||
+      lower.includes("2h") ||
+      lower.includes("prazo")
     ) {
       handleAction("faq_delivery");
     } else if (
@@ -239,7 +375,9 @@ function ChatPage() {
       lower.includes("onde") ||
       lower.includes("retirada") ||
       lower.includes("loja") ||
-      lower.includes("endereço")
+      lower.includes("endereço") ||
+      lower.includes("endereco") ||
+      lower.includes("presencial")
     ) {
       handleAction("faq_sejadelta");
     } else if (
@@ -248,29 +386,32 @@ function ChatPage() {
       lower.includes("pix") ||
       lower.includes("cartao") ||
       lower.includes("cartão") ||
-      lower.includes("parcel")
+      lower.includes("parcel") ||
+      lower.includes("juros")
     ) {
       handleAction("faq_payment");
     } else if (
       lower.includes("troca") ||
-      lower.includes("usado") ||
-      lower.includes("trade")
+      lower.includes("trade") ||
+      lower.includes("entrada")
     ) {
       handleAction("faq_tradein");
     } else if (
       lower.includes("garantia") ||
       lower.includes("defeito") ||
-      lower.includes("original")
+      lower.includes("original") ||
+      lower.includes("procedência") ||
+      lower.includes("procedencia")
     ) {
       handleAction("faq_warranty");
     } else {
       addBotMessage(
         "Entendi! Temos 15 iPhones pronta-entrega testados e com garantia hoje em Teresópolis. Como posso te orientar agora?",
         [
-          { label: "🛍️ Ver Aparelhos e Fazer Pedido", action: "start_order" },
-          { label: "⚡ Como funciona a entrega em 2h?", action: "faq_delivery" },
+          { label: "🛍️ Escolher iPhone para Comprar", action: "start_order" },
+          { label: "💬 Falar com um Vendedor", action: "talk_to_sales" },
+          { label: "⚡ Como funciona a entrega em 1h?", action: "faq_delivery" },
           { label: "📍 Onde retirar na SejaDelta?", action: "faq_sejadelta" },
-          { label: "💬 Falar com Atendente no WhatsApp", action: "open_whatsapp" },
         ]
       );
     }
@@ -285,10 +426,73 @@ function ChatPage() {
     if (action === "start_order") {
       setOrderStep("picking_model");
       addBotMessage(
-        "Maravilha! Escolha abaixo qual iPhone você quer pedir hoje a pronta entrega:",
-        undefined,
-        { productPicker: true }
+        "Perfeito! Na Terephones trabalhamos com **iPhones Seminovos Selecionados** (com 90 dias de garantia e bateria testada) e **iPhones Novos Lacrados** (com 1 ano de garantia mundial Apple).\n\nQual categoria você gostaria de ver agora?",
+        [
+          { label: "✨ Ver iPhones Seminovos", action: "filter_seminovos" },
+          { label: "📦 Ver iPhones Novos Lacrados", action: "filter_novos" },
+          { label: "📱 Ver Todos os Modelos (15)", action: "filter_all" },
+          { label: "💬 Falar com um Vendedor", action: "talk_to_sales" },
+        ]
       );
+    } else if (action === "filter_seminovos") {
+      setOrderStep("picking_model");
+      addBotMessage(
+        "Aqui estão os nossos **iPhones Seminovos Selecionados** disponíveis a pronta-entrega em Teresópolis! Todos 100% revisados, com bateria de alta saúde e 90 dias de garantia:\n\nEscolha o seu para pedir ou falar com nosso vendedor:",
+        [
+          { label: "📦 Ver Novos Lacrados", action: "filter_novos" },
+          { label: "📱 Ver Todos os Modelos", action: "filter_all" },
+          { label: "💬 Falar com Vendedor", action: "talk_to_sales" },
+        ],
+        { productPicker: { filter: "Seminovos" } }
+      );
+    } else if (action === "filter_novos") {
+      setOrderStep("picking_model");
+      addBotMessage(
+        "Aqui estão os nossos **iPhones Novos Lacrados** com 1 ano de garantia oficial Apple e entrega express hoje em Teresópolis:\n\nEscolha o seu para pedir ou falar com nosso vendedor:",
+        [
+          { label: "✨ Ver Seminovos", action: "filter_seminovos" },
+          { label: "📱 Ver Todos os Modelos", action: "filter_all" },
+          { label: "💬 Falar com Vendedor", action: "talk_to_sales" },
+        ],
+        { productPicker: { filter: "Novos" } }
+      );
+    } else if (action === "filter_all") {
+      setOrderStep("picking_model");
+      addBotMessage(
+        "Aqui estão todos os nossos **15 iPhones em estoque** a pronta entrega em Teresópolis:\n\nEscolha o seu abaixo:",
+        [
+          { label: "✨ Apenas Seminovos", action: "filter_seminovos" },
+          { label: "📦 Apenas Novos Lacrados", action: "filter_novos" },
+          { label: "💬 Falar com Vendedor", action: "talk_to_sales" },
+        ],
+        { productPicker: { filter: "Todos" } }
+      );
+    } else if (action === "talk_to_sales") {
+      addBotMessage(
+        "Nosso time de vendas em Teresópolis está disponível agora no WhatsApp para te atender de forma exclusiva, enviar fotos reais dos aparelhos ou negociar o seu iPhone usado na troca!",
+        [
+          { label: "📲 Abrir WhatsApp do Vendedor", action: "open_whatsapp_sales" },
+          { label: "🛍️ Escolher iPhone no Chat", action: "start_order" },
+          { label: "⚡ Como funciona a Entrega em 1h?", action: "faq_delivery" },
+        ]
+      );
+    } else if (action === "talk_sales_model") {
+      const model = draftOrder.model || "iPhone selecionado";
+      addBotMessage(
+        `Perfeito! Para conversar agora com nosso vendedor sobre o **${model}**, tirar dúvidas sobre fotos, saúde da bateria ou formas de parcelamento, clique abaixo:`,
+        [
+          { label: "📲 Chamar Vendedor no WhatsApp", action: "open_whatsapp_model" },
+          { label: "🚚 Continuar Pedido com Entrega em 1h", action: "set_delivery_express" },
+          { label: "🏢 Continuar com Retirada SejaDelta", action: "set_delivery_sejadelta" },
+          { label: "📱 Escolher Outro Modelo", action: "start_order" },
+        ]
+      );
+    } else if (action === "open_whatsapp_sales") {
+      const text = "Olá, equipe Terephones! Estou no Chat do site e gostaria de falar com um vendedor sobre os iPhones disponíveis!";
+      window.open(`${WHATSAPP}?text=${encodeURIComponent(text)}`, "_blank");
+    } else if (action === "open_whatsapp_model") {
+      const text = `Olá, equipe Terephones! Estou no Chat do site e gostaria de conversar com um vendedor sobre o *${draftOrder.model}* (${fmt(draftOrder.price)}). Poderiam me passar mais informações?`;
+      window.open(`${WHATSAPP}?text=${encodeURIComponent(text)}`, "_blank");
     } else if (action === "select_product") {
       const prod = payload as typeof defaultProducts[0];
       setDraftOrder((prev) => ({
@@ -298,23 +502,30 @@ function ChatPage() {
       }));
       setOrderStep("picking_delivery");
 
+      const isNovo = prod.cat === "Novos" || prod.name.toLowerCase().includes("lacrado");
+      const cond = isNovo ? "Novo Lacrado com 1 ano Apple" : "Seminovo Impecável com 90 dias de garantia";
+
       addBotMessage(
-        `Ótima escolha! O ${prod.name} sai por ${fmt(prod.price)} no PIX com garantia e nota.\n\nComo você prefere receber seu aparelho em Teresópolis?`,
+        `Ótima escolha! O **${prod.name}** (${cond}) sai por **${fmt(prod.price)}** no PIX ou parcelado em até 18x no cartão.\n\nComo você prefere receber seu aparelho hoje em Teresópolis?`,
         [
           {
-            label: "🚚 Entrega Express na minha porta (até 2h)",
+            label: "🚚 Entrega Express na minha porta (até 1h)",
             action: "set_delivery_express",
           },
           {
-            label: "🏢 Retirar pessoalmente na SejaDelta",
+            label: "🏢 Retirar pessoalmente na Loja SejaDelta",
             action: "set_delivery_sejadelta",
+          },
+          {
+            label: "💬 Falar com Vendedor sobre este iPhone",
+            action: "talk_sales_model",
           },
         ]
       );
     } else if (action === "set_delivery_express" || action === "set_delivery_sejadelta") {
       const deliveryMode =
         action === "set_delivery_express"
-          ? "Entrega Express em Domicílio (até 2h)"
+          ? "Entrega Express em Domicílio (até 1h)"
           : "Retirada Presencial na Loja SejaDelta";
 
       setDraftOrder((prev) => ({
@@ -358,7 +569,7 @@ function ChatPage() {
       window.open(WHATSAPP, "_blank");
     } else if (action === "faq_delivery") {
       addBotMessage(
-        "⚡ *Entrega Express em até 2 Horas:*\n\nNosso motoboy ou motorista oficial leva o iPhone lacrado ou seminovo embalado com termo de garantia diretamente até a sua residência ou trabalho em qualquer bairro de Teresópolis.\n\nVocê liga, testa todas as funções (câmera, Face ID, tela, bateria) e só faz o pagamento quando estiver 100% satisfeito!",
+        "⚡ *Entrega Express em até 1 Hora:*\n\nNosso motoboy ou motorista oficial leva o iPhone lacrado ou seminovo embalado com termo de garantia diretamente até a sua residência ou trabalho em qualquer bairro de Teresópolis.\n\nVocê liga, testa todas as funções (câmera, Face ID, tela, bateria) e só faz o pagamento quando estiver 100% satisfeito!",
         [
           { label: "🛍️ Fazer Pedido com Entrega Express", action: "start_order" },
           { label: "📍 Prefiro Retirar na SejaDelta", action: "faq_sejadelta" },
@@ -393,12 +604,12 @@ function ChatPage() {
         "🛡️ *Garantia & Procedência Terephones:*\n\n- **iPhones Novos Lacrados:** 1 Ano de Garantia Mundial Oficial da Apple.\n- **iPhones Seminovos:** 90 Dias de Garantia total com certificado emitido pela Terephones, bateria original aprovada e aparelhos 100% livres de bloqueios de iCloud.",
         [
           { label: "🛍️ Ver Aparelhos em Estoque", action: "start_order" },
-          { label: "⚡ Como funciona a entrega em 2h?", action: "faq_delivery" },
+          { label: "⚡ Como funciona a entrega em 1h?", action: "faq_delivery" },
         ]
       );
     } else if (action === "show_faq") {
       addBotMessage("Escolha abaixo o que gostaria de saber:", [
-        { label: "⚡ Entrega em 2h", action: "faq_delivery" },
+        { label: "⚡ Entrega em 1h", action: "faq_delivery" },
         { label: "📍 Retirada SejaDelta", action: "faq_sejadelta" },
         { label: "💳 Pagamento", action: "faq_payment" },
         { label: "🔄 Troca de Usado", action: "faq_tradein" },
@@ -408,44 +619,63 @@ function ChatPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground flex flex-col">
+    <div className="fixed inset-0 h-[100dvh] max-h-[100dvh] w-screen overflow-hidden bg-background text-foreground flex flex-col">
       <ThemeSelectorModal currentTheme={currentTheme} onThemeChange={setCurrentTheme} />
       <SiteNavbar currentTheme={currentTheme} toggleTheme={toggleTheme} />
 
-      <main className="pt-24 sm:pt-32 pb-24 sm:pb-12 px-3 sm:px-6 max-w-4xl mx-auto w-full flex-1 flex flex-col">
+      <main className="flex-1 min-h-0 w-full max-w-4xl mx-auto flex flex-col pt-[78px] sm:pt-[86px] pb-[76px] sm:pb-3 px-2 sm:px-4">
         {/* Chat Window Container */}
-        <div className="flex-1 flex flex-col rounded-3xl glass border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden min-h-[560px]">
+        <div className="flex-1 min-h-0 flex flex-col rounded-2xl sm:rounded-3xl glass border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl">
           {/* Top Bar do Atendimento */}
-          <div className="px-4 sm:px-6 py-3.5 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-md">
-                  <BrandLogo height={24} showText={false} />
+          <div className="shrink-0 px-3.5 sm:px-6 py-2.5 sm:py-3 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md flex items-center justify-between z-10">
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              <div className="relative shrink-0">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-md">
+                  <BrandLogo height={22} showText={false} />
                 </div>
-                <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" />
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900 shadow-[0_0_6px_#10b981]" />
               </div>
-              <div>
-                <h2 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-1.5">
-                  <span>Atendimento Terephones</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 dark:bg-sky-950 text-blue-700 dark:text-sky-300 font-bold">
-                    Oficial
-                  </span>
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                  <span>TerePhones</span>
+                  <span
+                    className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]"
+                    title="Online"
+                  />
                 </h2>
-                <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>Online agora • Resposta automática imediata</span>
-                </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
               <button
                 onClick={() => {
-                  setMessages([]);
+                  setDraftOrder({
+                    model: "",
+                    price: 0,
+                    delivery: "",
+                    payment: "",
+                    customerName: "",
+                    customerAddress: "",
+                  });
                   setOrderStep("idle");
-                  setTimeout(() => {
-                    handleAction("show_faq");
-                  }, 100);
+                  const now = new Date().toLocaleTimeString("pt-BR", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
+                  setMessages([
+                    {
+                      id: `welcome-restart-${Date.now()}`,
+                      sender: "bot",
+                      text: "Olá! Seja muito bem-vindo ao Chat Oficial da Terephones em Teresópolis! 👋\n\nPor aqui você pode escolher seu iPhone com entrega express em até 1h na sua porta ou retirada na SejaDelta, tirar dúvidas de garantia e pagamento, ou falar diretamente com a nossa equipe de vendas. Como podemos te ajudar hoje?",
+                      time: now,
+                      options: [
+                        { label: "🛍️ Escolher iPhone para Comprar", action: "start_order" },
+                        { label: "💬 Falar com um Vendedor", action: "talk_to_sales" },
+                        { label: "⚡ Entrega em 1h & Retirada", action: "faq_delivery" },
+                        { label: "🔄 Simular Troca com Troco", action: "faq_tradein" },
+                      ],
+                    },
+                  ]);
                 }}
                 className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-xs transition cursor-pointer"
                 title="Reiniciar conversa"
@@ -465,7 +695,7 @@ function ChatPage() {
           </div>
 
           {/* Messages Scroll Area */}
-          <div className="flex-1 p-3 sm:p-6 overflow-y-auto space-y-4 bg-slate-50/50 dark:bg-slate-950/30">
+          <div ref={scrollContainerRef} className="flex-1 min-h-0 p-3 sm:p-5 overflow-y-auto space-y-3.5 bg-slate-50/40 dark:bg-slate-950/30 chat-messages-scroll overscroll-contain">
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -475,13 +705,17 @@ function ChatPage() {
               >
                 {/* Bubble */}
                 <div
-                  className={`max-w-[88%] sm:max-w-[75%] rounded-2xl px-4 py-3 text-xs sm:text-sm leading-relaxed whitespace-pre-line shadow-xs ${
+                  className={`${
+                    msg.productPicker
+                      ? "w-full max-w-[95%] sm:max-w-[85%]"
+                      : "max-w-[88%] sm:max-w-[75%]"
+                  } rounded-2xl px-3.5 sm:px-4 py-3 text-xs sm:text-sm leading-relaxed shadow-xs ${
                     msg.sender === "user"
                       ? "bg-blue-600 text-white font-medium rounded-tr-xs"
                       : "bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-tl-xs"
                   }`}
                 >
-                  {msg.text}
+                  <FormattedMessageText text={msg.text} isUser={msg.sender === "user"} />
 
                   {/* Card de Pedido Confirmado */}
                   {msg.orderCard && (
@@ -520,36 +754,16 @@ function ChatPage() {
                     </div>
                   )}
 
-                  {/* Seletor Visual de iPhones em Estoque */}
+                  {/* Seletor Visual de iPhones em Estoque com Abas Seminovos vs Novos */}
                   {msg.productPicker && (
-                    <div className="mt-3 pt-2 border-t border-slate-200/60 dark:border-slate-800 max-h-72 overflow-y-auto space-y-2 pr-1">
-                      {defaultProducts.map((prod) => (
-                        <div
-                          key={prod.name}
-                          onClick={() => handleAction("select_product", prod)}
-                          className="flex items-center justify-between gap-2 p-2 rounded-xl glass hover:bg-blue-50 dark:hover:bg-slate-800 transition cursor-pointer border border-slate-200 dark:border-slate-800"
-                        >
-                          <div className="flex items-center gap-2 min-w-0">
-                            <img
-                              src={prod.img}
-                              alt={prod.name}
-                              className="w-8 h-10 object-contain shrink-0"
-                            />
-                            <div className="min-w-0 text-left">
-                              <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                                {prod.name}
-                              </p>
-                              <span className="text-[10px] text-blue-600 dark:text-sky-400 font-extrabold">
-                                {fmt(prod.price)}
-                              </span>
-                            </div>
-                          </div>
-                          <button className="px-2.5 py-1 rounded-lg bg-blue-600 text-white text-[10px] font-bold shrink-0">
-                            Escolher
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                    <ChatProductPicker
+                      initialFilter={
+                        typeof msg.productPicker === "object" && msg.productPicker.filter
+                          ? msg.productPicker.filter
+                          : "Todos"
+                      }
+                      onSelectProduct={(prod) => handleAction("select_product", prod)}
+                    />
                   )}
 
                   <div
@@ -590,8 +804,8 @@ function ChatPage() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input Box */}
-          <div className="p-3 sm:p-4 border-t border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
+          {/* Input Box - Permanently Docked at Bottom */}
+          <div className="shrink-0 p-2.5 sm:p-3.5 border-t border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md z-10">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -608,13 +822,13 @@ function ChatPage() {
                 }
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                className="flex-1 px-4 py-2.5 rounded-2xl glass border border-slate-200 dark:border-slate-700 text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 transition"
+                className="flex-1 px-4 py-2.5 rounded-2xl glass border border-slate-200 dark:border-slate-700 text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 transition text-slate-900 dark:text-white"
               />
 
               <button
                 type="submit"
                 disabled={!inputValue.trim()}
-                className="p-2.5 sm:px-4 sm:py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer shadow-md"
+                className="p-2.5 sm:px-4 sm:py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer shadow-md shrink-0"
               >
                 <Send className="w-4 h-4" />
                 <span className="hidden sm:inline">Enviar</span>
@@ -624,9 +838,177 @@ function ChatPage() {
         </div>
       </main>
 
-      <SiteFooter currentTheme={currentTheme} />
-      <WhatsFloat />
       <MobileBottomNav />
+    </div>
+  );
+}
+
+/**
+ * Formats chat message text, converting **bold** and *bold* into bold elements
+ * without displaying the asterisks as plain text, and keeping line spacing clean.
+ */
+function FormattedMessageText({
+  text,
+  isUser = false,
+}: {
+  text: string;
+  isUser?: boolean;
+}) {
+  const lines = text.split("\n");
+
+  return (
+    <div className="space-y-1">
+      {lines.map((line, lineIdx) => {
+        if (!line.trim()) {
+          return <div key={lineIdx} className="h-2" />;
+        }
+
+        const parts: (string | React.ReactNode)[] = [];
+        const regex = /(\*\*([^*]+)\*\*|\*([^*]+)\*)/g;
+        let lastIndex = 0;
+        let match: RegExpExecArray | null;
+
+        while ((match = regex.exec(line)) !== null) {
+          if (match.index > lastIndex) {
+            parts.push(line.slice(lastIndex, match.index));
+          }
+          const boldText = match[2] || match[3];
+          parts.push(
+            <strong
+              key={`b-${lineIdx}-${match.index}`}
+              className={
+                isUser
+                  ? "font-black text-white"
+                  : "font-black text-slate-900 dark:text-white"
+              }
+            >
+              {boldText}
+            </strong>
+          );
+          lastIndex = regex.lastIndex;
+        }
+
+        if (lastIndex < line.length) {
+          parts.push(line.slice(lastIndex));
+        }
+
+        return (
+          <div key={lineIdx} className="leading-relaxed">
+            {parts}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
+ * Interactive product picker inside chat bubbles, featuring filter tabs
+ * (Todos, Seminovos, Novos Lacrados) and direct selection.
+ */
+function ChatProductPicker({
+  initialFilter = "Todos",
+  onSelectProduct,
+}: {
+  initialFilter?: "Todos" | "Seminovos" | "Novos";
+  onSelectProduct: (prod: (typeof defaultProducts)[0]) => void;
+}) {
+  const [activeTab, setActiveTab] = useState<"Todos" | "Seminovos" | "Novos">(initialFilter);
+
+  const filtered = defaultProducts.filter((p) => {
+    if (activeTab === "Todos") return true;
+    return p.cat === activeTab;
+  });
+
+  return (
+    <div className="mt-3 pt-2.5 border-t border-slate-200/80 dark:border-slate-800">
+      {/* Category Tabs */}
+      <div className="grid grid-cols-3 gap-1 mb-2.5 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200/60 dark:border-slate-700/60">
+        {(["Todos", "Seminovos", "Novos"] as const).map((tab) => {
+          const count = defaultProducts.filter((p) => tab === "Todos" || p.cat === tab).length;
+          const isActive = activeTab === tab;
+          const label = tab === "Seminovos" ? "Seminovos" : tab === "Novos" ? "Lacrados" : "Todos";
+          const icon = tab === "Seminovos" ? "✨" : tab === "Novos" ? "📦" : "📱";
+          return (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setActiveTab(tab)}
+              className={`py-1.5 px-1 rounded-lg text-[10px] sm:text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer select-none whitespace-nowrap ${
+                isActive
+                  ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-sky-400 shadow-xs ring-1 ring-slate-200 dark:ring-slate-700"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              }`}
+            >
+              <span>{icon} {label}</span>
+              <span className="text-[9px] sm:text-[10px] opacity-75 font-semibold">({count})</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Product List */}
+      <div className="max-h-72 overflow-y-auto space-y-2 pr-1 chat-messages-scroll overscroll-contain">
+        {filtered.map((prod, idx) => {
+          const isNovo = prod.cat === "Novos";
+          return (
+            <div
+              key={prod.name + idx}
+              onClick={() => onSelectProduct(prod)}
+              className="flex items-center justify-between gap-2.5 p-2 rounded-xl bg-white/70 dark:bg-slate-800/60 hover:bg-blue-50/80 dark:hover:bg-slate-800 transition cursor-pointer border border-slate-200/80 dark:border-slate-700/70 group shadow-2xs"
+            >
+              <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                <div className="w-10 h-12 flex items-center justify-center shrink-0 bg-slate-50 dark:bg-slate-900/60 rounded-lg p-0.5 border border-slate-200/50 dark:border-slate-800">
+                  <img
+                    src={prod.img}
+                    alt={prod.name}
+                    className="w-full h-full object-contain drop-shadow-xs"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="min-w-0 text-left">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span
+                      className={`text-[9px] font-black px-1.5 py-0.5 rounded-md ${
+                        isNovo
+                          ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                          : "bg-blue-500/15 text-blue-600 dark:text-sky-400 border border-blue-500/20"
+                      }`}
+                    >
+                      {isNovo ? "Lacrado 1 Ano" : "Seminovo 90d"}
+                    </span>
+                    {prod.badge && (
+                      <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold truncate">
+                        {prod.badge}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs font-black text-slate-900 dark:text-white truncate mt-0.5 group-hover:text-blue-600 dark:group-hover:text-sky-400 transition-colors">
+                    {prod.name}
+                  </p>
+                  <div className="text-[11px] font-black text-blue-600 dark:text-sky-400">
+                    {fmt(prod.price)}{" "}
+                    <span className="text-[9px] font-semibold text-slate-500 dark:text-slate-400">
+                      no PIX
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectProduct(prod);
+                }}
+                className="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-[11px] font-black cursor-pointer transition shadow-xs shrink-0"
+              >
+                Escolher
+              </button>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

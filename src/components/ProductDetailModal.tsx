@@ -14,6 +14,7 @@ import {
   CreditCard,
   Zap,
 } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
 export interface ProductItem {
   name: string;
@@ -31,6 +32,8 @@ export interface ProductItem {
   chip?: string;
   boxItems?: string[];
   features?: string[];
+  quantity?: number;
+  imeis?: string[];
 }
 
 interface ProductDetailModalProps {
@@ -66,9 +69,29 @@ export function ProductDetailModal({
   if (!isOpen || !product) return null;
 
   const handleWhatsApp = () => {
-    const text = `Olá, equipe Terephones! Estive vendo a ficha técnica do *${product.name}* (R$ ${product.price.toLocaleString("pt-BR")}) no site e gostaria de confirmar a disponibilidade para entrega hoje em Teresópolis!`;
+    const text = `Olá, equipe Terephones! Estive vendo a ficha técnica do *${product.name}* (${fmt(product.price)}) no site e gostaria de confirmar a disponibilidade para entrega hoje em Teresópolis!`;
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`;
     window.open(url, "_blank");
+  };
+
+  const handleOpenChat = () => {
+    try {
+      sessionStorage.setItem(
+        "terephones_order_product",
+        JSON.stringify({
+          name: product.name,
+          price: product.price,
+          img: product.img,
+          badge: product.badge,
+          storage: product.storage || (product.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() ?? "128GB"),
+          battery: product.battery || "",
+        })
+      );
+    } catch {
+      // ignore
+    }
+    onClose();
+    window.location.href = `/chat?produto=${encodeURIComponent(product.name)}`;
   };
 
   const isNovo = product.cat === "Novos" || product.badge.toLowerCase().includes("lacrado");
@@ -91,12 +114,18 @@ export function ProductDetailModal({
 
   const boxList = product.boxItems && product.boxItems.length > 0 ? product.boxItems : defaultBoxItems;
 
+  const storageDisplay =
+    product.storage || product.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() || "128GB";
+
+  const hasBatteryInBadge =
+    product.badge.toLowerCase().includes("bateria") || product.badge.toLowerCase().includes("bat");
+
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="product-modal-title"
-      className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-6 overflow-y-auto"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 md:p-6 overflow-y-auto"
     >
       {/* Backdrop */}
       <div
@@ -106,20 +135,31 @@ export function ProductDetailModal({
 
       {/* Modal Container */}
       <div
-        className="relative w-[94vw] max-w-2xl my-auto product-modal-container overflow-hidden shadow-2xl z-10 max-h-[92vh] flex flex-col"
+        className="relative w-full max-w-[94vw] sm:max-w-[720px] my-auto product-modal-container overflow-hidden shadow-2xl z-10 max-h-[92vh] sm:max-h-[88vh] flex flex-col rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-white/10"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header bar com botão fechar */}
-        <div className="flex items-center justify-between px-5 sm:px-7 py-3.5 border-b border-slate-200/50 dark:border-white/10 shrink-0">
-          <div className="flex items-center gap-2.5">
+        {/* Header bar com badges e botão fechar */}
+        <div className="flex items-center justify-between px-3.5 sm:px-6 py-2.5 sm:py-3 border-b border-slate-200/60 dark:border-white/10 shrink-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
             <span
-              className={`text-[10px] sm:text-xs uppercase tracking-wider font-extrabold px-3 py-1 rounded-full shadow-sm ${
+              className={`text-[10px] sm:text-xs uppercase tracking-wider font-extrabold px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full shadow-xs ${
                 isNovo ? "product-badge-novo" : "product-badge-seminovo"
               }`}
             >
               {product.badge}
             </span>
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-300">
+            {product.battery && !hasBatteryInBadge && (
+              <span className="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                <Battery className="w-3 h-3 text-emerald-500 shrink-0" />
+                <span>Bateria {product.battery}</span>
+              </span>
+            )}
+            {product.quantity && product.quantity > 1 && (
+              <span className="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center gap-1">
+                <span>📦 {product.quantity} un. em estoque</span>
+              </span>
+            )}
+            <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 hidden xs:inline">
               {product.cat}
             </span>
           </div>
@@ -127,61 +167,74 @@ export function ProductDetailModal({
           <button
             onClick={onClose}
             aria-label="Fechar detalhes"
-            className="p-2 rounded-full text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-slate-800/80 transition-colors cursor-pointer"
+            className="p-1.5 sm:p-2 rounded-full text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto px-4 sm:px-7 py-5 space-y-6">
+        <div className="overflow-y-auto px-3.5 sm:px-6 py-3.5 sm:py-5 space-y-4 sm:space-y-6">
           {/* Top Section: Imagem + Título + Preço */}
-          <div className="grid sm:grid-cols-2 gap-5 items-center">
+          <div className="grid sm:grid-cols-2 gap-3.5 sm:gap-6 items-center">
+            {/* Foto do Aparelho */}
             <div
-              className="relative rounded-2xl p-5 flex items-center justify-center overflow-hidden border border-slate-200/60 dark:border-white/10"
+              className="relative rounded-2xl p-3 sm:p-5 flex items-center justify-center overflow-hidden border border-slate-200/60 dark:border-white/10 bg-slate-50/70 dark:bg-slate-900/50"
               style={{
-                background: "radial-gradient(circle at center, rgba(56, 189, 248, 0.18), rgba(0,0,0,0) 75%)",
-                minHeight: "200px",
+                minHeight: "140px",
               }}
             >
+              <div
+                className="absolute inset-0 pointer-events-none opacity-40 dark:opacity-30"
+                style={{
+                  background: "radial-gradient(circle at center, rgba(56, 189, 248, 0.3), rgba(0,0,0,0) 70%)",
+                }}
+              />
               <img
                 src={product.img}
                 alt={product.name}
-                className="max-h-52 w-auto object-contain transition-transform hover:scale-105 duration-300"
-                style={{ filter: "drop-shadow(0 16px 28px rgba(0,0,0,0.35))" }}
+                className="max-h-32 sm:max-h-48 md:max-h-52 w-auto object-contain transition-transform hover:scale-105 duration-300 relative z-1"
+                style={{ filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.28))" }}
               />
             </div>
 
+            {/* Informações Principais & Preço */}
             <div className="flex flex-col justify-center">
               <h2
                 id="product-modal-title"
-                className="text-2xl sm:text-3xl font-black tracking-tight"
-                style={{ color: "var(--text-primary)" }}
+                className="text-lg sm:text-2xl font-black tracking-tight leading-tight text-slate-900 dark:text-white"
               >
                 {product.name}
               </h2>
 
-              <p className="text-xs sm:text-sm font-semibold mt-1 text-slate-600 dark:text-slate-200">
-                {product.specs || "Disponível para pronta-entrega em Teresópolis / RJ"}
+              <p className="text-xs sm:text-sm font-semibold mt-1 text-slate-600 dark:text-slate-300 flex items-center gap-1.5 flex-wrap">
+                <span>{storageDisplay}</span>
+                <span>•</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold">Pronta Entrega em até 1h</span>
               </p>
 
-              {/* Preço */}
-              <div className="mt-3.5 product-modal-price-box p-4">
-                <div className="price-label text-[11px] uppercase font-extrabold tracking-wider text-slate-500 dark:text-sky-300">
-                  Valor à vista no PIX
+              {/* Preço em Destaque */}
+              <div className="mt-2.5 sm:mt-3 product-modal-price-box p-3 sm:p-4 rounded-xl">
+                <div className="flex items-center justify-between">
+                  <span className="price-label text-[10px] sm:text-[11px] uppercase font-extrabold tracking-wider text-slate-500 dark:text-sky-300">
+                    Valor à vista no PIX
+                  </span>
+                  <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                    DESCONTO PIX
+                  </span>
                 </div>
-                <div className="text-3xl font-black text-gradient-blue mt-0.5">
+                <div className="text-2xl sm:text-3xl font-black text-gradient-blue mt-0.5">
                   {fmt(product.price)}
                 </div>
-                <div className="price-installments mt-1 flex items-center gap-1.5 text-xs text-slate-700 dark:text-slate-200 font-medium">
+                <div className="price-installments mt-1 flex items-center gap-1.5 text-[11px] sm:text-xs text-slate-700 dark:text-slate-200 font-medium">
                   <CreditCard className="w-3.5 h-3.5 text-sky-500 shrink-0" />
                   <span>ou até 12x de {fmt(product.price / 12)} (até 18x no cartão)</span>
                 </div>
               </div>
 
               {/* Trade-in notice */}
-              <div className="mt-2.5 flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 font-bold">
-                <Zap className="w-3.5 h-3.5 shrink-0" />
+              <div className="mt-2 flex items-center gap-1.5 text-[11px] sm:text-xs text-emerald-600 dark:text-emerald-400 font-bold">
+                <Zap className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
                 <span>Aceitamos seu iPhone usado na troca (Trade-In)</span>
               </div>
             </div>
@@ -189,84 +242,84 @@ export function ProductDetailModal({
 
           {/* Ficha Técnica / Especificações em Grid */}
           <div>
-            <h3 className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-slate-800 dark:text-slate-100 mb-3 flex items-center gap-1.5">
+            <h3 className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-slate-800 dark:text-slate-100 mb-2 sm:mb-3 flex items-center gap-1.5">
               <Smartphone className="w-4 h-4 text-sky-400" />
-              Especificações Técnicas do Modelo
+              Especificações Técnicas
             </h3>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-              <div className="product-modal-box p-3">
-                <div className="spec-label flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
+              <div className="product-modal-box p-2.5 sm:p-3">
+                <div className="spec-label flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-300">
                   <Smartphone className="w-3.5 h-3.5 text-sky-400" />
                   Armazenamento
                 </div>
-                <div className="spec-value text-xs sm:text-sm font-extrabold mt-1 text-slate-900 dark:text-white">
-                  {product.storage || "128 GB"}
+                <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white">
+                  {storageDisplay}
                 </div>
               </div>
 
-              <div className="product-modal-box p-3">
-                <div className="spec-label flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
+              <div className="product-modal-box p-2.5 sm:p-3">
+                <div className="spec-label flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-300">
                   <Battery className="w-3.5 h-3.5 text-emerald-400" />
                   Saúde da Bateria
                 </div>
-                <div className="spec-value text-xs sm:text-sm font-extrabold mt-1 text-emerald-600 dark:text-emerald-400">
-                  {product.battery || (isNovo ? "100% (Lacrado Apple)" : "88% a 100% (Alta Performance)")}
+                <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-emerald-600 dark:text-emerald-400">
+                  {product.battery || (isNovo ? "100% (Lacrado)" : "88% a 100% (Original)")}
                 </div>
               </div>
 
-              <div className="product-modal-box p-3">
-                <div className="spec-label flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
+              <div className="product-modal-box p-2.5 sm:p-3">
+                <div className="spec-label flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-300">
                   <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />
                   Garantia
                 </div>
-                <div className="spec-value text-xs sm:text-sm font-extrabold mt-1 text-blue-600 dark:text-sky-300">
-                  {product.warranty || (isNovo ? "1 Ano Mundial Apple" : "90 Dias Garantia Terephones")}
+                <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-blue-600 dark:text-sky-300 truncate">
+                  {product.warranty || (isNovo ? "1 Ano Apple" : "90 Dias Terephones")}
                 </div>
               </div>
 
-              <div className="product-modal-box p-3">
-                <div className="spec-label flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
+              <div className="product-modal-box p-2.5 sm:p-3">
+                <div className="spec-label flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-300">
                   <Smartphone className="w-3.5 h-3.5 text-sky-400" />
                   Tela
                 </div>
-                <div className="spec-value text-xs sm:text-sm font-extrabold mt-1 text-slate-900 dark:text-white truncate">
-                  {product.screen || "Super Retina XDR OLED"}
+                <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white truncate">
+                  {product.screen || "Super Retina XDR"}
                 </div>
               </div>
 
-              <div className="product-modal-box p-3">
-                <div className="spec-label flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
+              <div className="product-modal-box p-2.5 sm:p-3">
+                <div className="spec-label flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-300">
                   <Camera className="w-3.5 h-3.5 text-sky-400" />
                   Câmeras
                 </div>
-                <div className="spec-value text-xs sm:text-sm font-extrabold mt-1 text-slate-900 dark:text-white truncate">
-                  {product.camera || "Sistema Apple c/ Modo Cinema"}
+                <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white truncate">
+                  {product.camera || "Apple Pro / 4K"}
                 </div>
               </div>
 
-              <div className="product-modal-box p-3">
-                <div className="spec-label flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-300">
+              <div className="product-modal-box p-2.5 sm:p-3">
+                <div className="spec-label flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-300">
                   <Cpu className="w-3.5 h-3.5 text-sky-400" />
-                  Processador
+                  Chip
                 </div>
-                <div className="spec-value text-xs sm:text-sm font-extrabold mt-1 text-slate-900 dark:text-white truncate">
-                  {product.chip || "Apple Bionic Alta Velocidade"}
+                <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white truncate">
+                  {product.chip || "Apple Bionic / Pro"}
                 </div>
               </div>
             </div>
           </div>
 
           {/* O que vem na embalagem / Pedido */}
-          <div className="product-modal-box p-4 sm:p-5">
-            <h3 className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-slate-800 dark:text-white mb-2.5 flex items-center gap-2">
+          <div className="product-modal-box p-3.5 sm:p-5">
+            <h3 className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-slate-800 dark:text-white mb-2 sm:mb-2.5 flex items-center gap-2">
               <Gift className="w-4 h-4 text-emerald-400" />
               O que você recebe no seu pedido:
             </h3>
-            <ul className="space-y-2 text-xs sm:text-sm text-slate-700 dark:text-slate-100 font-medium">
+            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-slate-700 dark:text-slate-100 font-medium">
               {boxList.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                <li key={idx} className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 shrink-0 mt-0.5" />
                   <span>{item}</span>
                 </li>
               ))}
@@ -274,46 +327,73 @@ export function ProductDetailModal({
           </div>
 
           {/* Compromissos de Segurança */}
-          <div className="grid sm:grid-cols-3 gap-2.5 text-xs text-slate-700 dark:text-slate-200 font-semibold">
-            <div className="product-modal-box p-3 flex items-center gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-slate-700 dark:text-slate-200 font-semibold">
+            <div className="product-modal-box p-2.5 sm:p-3 flex items-center gap-2">
               <Truck className="w-4 h-4 text-sky-400 shrink-0" />
-              <span>Entrega Express em até 2h em Teresópolis</span>
+              <span>Entrega Express em até 1h em Teresópolis</span>
             </div>
-            <div className="product-modal-box p-3 flex items-center gap-2">
+            <div className="product-modal-box p-2.5 sm:p-3 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>Pague somente na entrega após testar</span>
             </div>
-            <div className="product-modal-box p-3 flex items-center gap-2">
+            <div className="product-modal-box p-2.5 sm:p-3 flex items-center gap-2">
               <Building2 className="w-4 h-4 text-indigo-400 shrink-0" />
-              <span>Retirada presencial na loja SejaDelta</span>
+              <span>Retirada presencial na SejaDelta</span>
             </div>
           </div>
         </div>
 
-        {/* Footer Actions (Responsivo e sem cortar) */}
-        <div className="product-modal-footer px-4 sm:px-7 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
-          <div className="text-center sm:text-left">
-            <div className="footer-helper text-[11px] text-slate-500 dark:text-slate-300">
-              Dúvidas ou quer negociar? Fale direto no WhatsApp:
+        {/* Footer Actions (Responsivo e com Botão de Chat no Site) */}
+        <div className="product-modal-footer px-3.5 sm:px-6 py-2.5 sm:py-3.5 flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-3 shrink-0 border-t border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md">
+          {/* Mobile trust info */}
+          <div className="flex sm:hidden items-center justify-between w-full text-[11px] text-slate-500 dark:text-slate-300">
+            <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold whitespace-nowrap">
+              <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+              <span>Pague só na entrega</span>
             </div>
-            <div className="footer-phone text-xs font-extrabold text-slate-900 dark:text-sky-300">
-              (21) 96463-9999 • Atendimento Imediato
+            <span className="text-slate-300 dark:text-slate-700">•</span>
+            <div className="text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">
+              Zap: <span className="font-extrabold text-slate-900 dark:text-sky-300">(21) 96463-9999</span>
             </div>
           </div>
 
-          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+          {/* Desktop trust info */}
+          <div className="hidden sm:flex items-center gap-2.5 text-xs text-slate-500 dark:text-slate-300 shrink-0">
+            <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold whitespace-nowrap">
+              <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+              <span>Pague após testar na mão</span>
+            </div>
+            <span className="text-slate-300 dark:text-slate-700">•</span>
+            <div className="text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">
+              WhatsApp: <span className="font-extrabold text-slate-900 dark:text-sky-300">(21) 96463-9999</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
+            {/* Botão Comprar pelo Chat no Site */}
             <button
-              onClick={onClose}
-              className="px-4 py-2.5 rounded-full text-xs font-bold border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer text-center"
+              onClick={handleOpenChat}
+              className="btn-chat-modal px-3.5 sm:px-4 py-2.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md transition-all active:scale-95 text-white whitespace-nowrap"
             >
-              Fechar
+              <MessageCircle className="w-4 h-4 shrink-0 text-white" />
+              <span>Comprar no Chat</span>
             </button>
+
+            {/* Botão Pedir no WhatsApp */}
             <button
               onClick={handleWhatsApp}
-              className="btn-whatsapp w-full sm:w-auto px-5 py-3 sm:py-2.5 text-xs sm:text-sm flex items-center justify-center gap-2 font-bold cursor-pointer shadow-lg shrink-0"
+              className="btn-whatsapp px-3.5 sm:px-4 py-2.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md transition-all active:scale-95 text-white whitespace-nowrap"
             >
-              <MessageCircle className="w-4 h-4 fill-white shrink-0" />
-              <span className="whitespace-nowrap">Comprar pelo WhatsApp</span>
+              <WhatsAppIcon className="w-4 h-4 shrink-0 text-white" />
+              <span>Pedir no Zap</span>
+            </button>
+
+            {/* Botão Fechar visível no Desktop */}
+            <button
+              onClick={onClose}
+              className="hidden sm:inline-flex px-3.5 py-2 rounded-full text-xs font-bold border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer text-center"
+            >
+              Fechar
             </button>
           </div>
         </div>
@@ -322,3 +402,4 @@ export function ProductDetailModal({
   );
 }
 export default ProductDetailModal;
+

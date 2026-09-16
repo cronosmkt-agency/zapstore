@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { BrandLogo } from "./BrandLogo";
 
@@ -6,6 +7,8 @@ export function DeliveryPopup() {
   const [visible, setVisible] = useState(false);
   const [closed, setClosed] = useState(false);
   const [afterHours, setAfterHours] = useState(false);
+  const routerState = useRouterState();
+  const currentPath = routerState?.location?.pathname;
 
   useEffect(() => {
     const now = new Date();
@@ -21,9 +24,9 @@ export function DeliveryPopup() {
     };
   }, []);
 
-  if (!visible || closed) return null;
+  if (currentPath === "/chat" || !visible || closed) return null;
 
-  const title = afterHours ? "🌙 Agende seu iPhone" : "⚡ Entrega Express em até 2h";
+  const title = afterHours ? "🌙 Agende seu iPhone" : "⚡ Entrega Express em até 1h";
   const subtitle = afterHours
     ? "Agende agora ou retire amanhã na SejaDelta!"
     : "Receba na porta ou retire na SejaDelta.";

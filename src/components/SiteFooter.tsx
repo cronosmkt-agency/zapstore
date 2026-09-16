@@ -77,7 +77,7 @@ export function SiteFooter({ currentTheme }: { currentTheme?: ThemeMode }) {
                   className="transition hover:text-blue-600"
                   style={{ color: "var(--text-secondary)" }}
                 >
-                  Entrega Express em 2h
+                  Entrega Express em 1h
                 </a>
               </li>
               <li>

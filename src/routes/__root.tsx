@@ -81,10 +81,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Terephones — iPhones Novos & Seminovos em Teresópolis" },
-      { name: "description", content: "Terephones: iPhones novos e seminovos em Teresópolis/RJ. Entrega Express em até 2h na sua porta ou Retirada na Loja Física Parceira SejaDelta. Garantia de até 1 ano." },
+      { name: "description", content: "Terephones: iPhones novos e seminovos em Teresópolis/RJ. Entrega Express em até 1h na sua porta ou Retirada na Loja Física Parceira SejaDelta. Garantia de até 1 ano." },
       { name: "author", content: "Terephones" },
       { property: "og:title", content: "Terephones — iPhones Novos & Seminovos em Teresópolis" },
-      { property: "og:description", content: "Entrega no mesmo dia em até 2h ou retire presencialmente na SejaDelta. Seu novo iPhone em Teresópolis com procedência e garantia total." },
+      { property: "og:description", content: "Entrega no mesmo dia em até 1h ou retire presencialmente na SejaDelta. Seu novo iPhone em Teresópolis com procedência e garantia total." },
       { property: "og:image", content: "https://ik.imagekit.io/zinma/tr:w-1200,f-auto,q-85/TerePhones-Logo.png" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -175,7 +175,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <CursorEffects />
       <DeliveryPopup />
-      <Toaster position="top-center" richColors />
+      <Toaster position="top-center" offset="84px" duration={1400} richColors />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>

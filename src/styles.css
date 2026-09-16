@@ -250,6 +250,24 @@ html.theme-black-piano, html.theme-black-piano body {
   transform: translateY(-1px);
 }
 
+/* ============ Full Viewport Hero Fold ============ */
+.hero-section-fold {
+  min-height: calc(100vh - 3.75rem);
+  min-height: calc(100dvh - 3.75rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+  .hero-section-fold {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+}
+
 /* ============ Section & Brand Pills ============ */
 .section-pill {
   display: inline-flex;
@@ -305,6 +323,19 @@ html.theme-black-piano, html.theme-black-piano body {
 .product-modal-footer {
   background: #f8fafc;
   border-top: 1px solid #e2e8f0;
+}
+
+.btn-chat-modal {
+  background: linear-gradient(135deg, #0284c7 0%, #1d4ed8 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-chat-modal:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.45);
 }
 
 /* ============ Product Card ============ */
@@ -565,25 +596,37 @@ html.theme-black-piano, html.theme-black-piano body {
 }
 .btn-pedir-agora:active { transform: translateY(0); }
 
-/* ============ Mobile pill navbar ============ */
+/* ============ Pill navbar (Mobile & Desktop) ============ */
 .nav-pill {
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(var(--blue-rgb), 0.22);
+  box-shadow: 0 6px 25px rgba(var(--blue-rgb), 0.12), inset 0 1px 0 rgba(255,255,255,0.9);
+  transition: background .3s ease, box-shadow .3s ease, transform .3s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.nav-pill-mobile {
   position: fixed;
   top: 16px;
   left: 16px;
   right: 16px;
   z-index: 50;
-  border-radius: 50px;
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(24px);
-  border: 1px solid rgba(var(--blue-rgb), 0.25);
-  box-shadow: 0 4px 20px rgba(var(--blue-rgb), 0.15), inset 0 1px 0 rgba(255,255,255,0.9);
-  transition: background .3s ease, box-shadow .3s ease;
-  overflow: hidden;
 }
+
+.nav-pill-desk {
+  position: relative;
+  box-shadow: 0 8px 30px rgba(var(--blue-rgb), 0.14), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
 .nav-pill.scrolled {
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 8px 30px rgba(var(--blue-rgb), 0.18), inset 0 1px 0 rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10px 36px rgba(var(--blue-rgb), 0.18), inset 0 1px 0 rgba(255,255,255,0.95);
 }
+
 .nav-pill::before {
   content: "";
   position: absolute;
@@ -1012,5 +1055,73 @@ html.theme-black-piano body {
 .theme-black-piano .cursor-dot {
   background: rgba(56, 189, 248, 0.85) !important;
   box-shadow: 0 0 12px rgba(56, 189, 248, 0.8), 0 0 24px rgba(56, 189, 248, 0.4) !important;
+}
+
+/* ============ Custom Chat Scrollbar ============ */
+.chat-messages-scroll {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.7) rgba(241, 245, 249, 0.5);
+}
+
+.chat-messages-scroll::-webkit-scrollbar {
+  width: 7px;
+}
+
+.chat-messages-scroll::-webkit-scrollbar-track {
+  background: rgba(226, 232, 240, 0.4);
+  border-radius: 9999px;
+  margin: 6px 0;
+}
+
+.chat-messages-scroll::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.7);
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+
+.chat-messages-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.95);
+}
+
+.theme-black-piano .chat-messages-scroll {
+  scrollbar-color: rgba(100, 116, 139, 0.75) rgba(15, 23, 42, 0.5);
+}
+
+.theme-black-piano .chat-messages-scroll::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+}
+
+.theme-black-piano .chat-messages-scroll::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.7);
+}
+
+.theme-black-piano .chat-messages-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.85);
+}
+
+/* ============ Sonner Notifications (Below Header Pill & Fast) ============ */
+[data-sonner-toaster][data-y-position="top"] {
+  top: 84px !important;
+  z-index: 99999 !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+[data-sonner-toaster][data-y-position="top"] [data-sonner-toast] {
+  border-radius: 9999px !important;
+  padding: 8px 18px !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+.theme-black-piano [data-sonner-toaster][data-y-position="top"] [data-sonner-toast] {
+  background: rgba(15, 23, 42, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8) !important;
 }
 
