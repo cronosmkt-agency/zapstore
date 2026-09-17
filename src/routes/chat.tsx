@@ -103,7 +103,7 @@ function ChatPage() {
     const s1 = document.createElement("script");
     s1.id = "tawk-script";
     s1.async = true;
-    s1.src = "https://embed.tawk.to/6aac00529d89af3444bee888/1k2nuis6p";
+    s1.src = "https://embed.tawk.to/6aac00529d89af3444bee888/1k2o8b0j4";
     s1.charset = "UTF-8";
     s1.setAttribute("crossorigin", "*");
     const s0 = document.getElementsByTagName("script")[0];
@@ -822,7 +822,7 @@ function ChatPage() {
                 </button>
               ) : (
                 <a
-                  href="https://tawk.to/chat/6aac00529d89af3444bee888/1k2nuis6p"
+                  href="https://tawk.to/chat/6aac00529d89af3444bee888/1k2o8b0j4"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-xs transition cursor-pointer"
@@ -1043,7 +1043,7 @@ function ChatPage() {
               </div>
               <div className="flex items-center gap-2">
                 <a
-                  href="https://tawk.to/chat/6aac00529d89af3444bee888/1k2nuis6p"
+                  href="https://tawk.to/chat/6aac00529d89af3444bee888/1k2o8b0j4"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition shadow-xs"
