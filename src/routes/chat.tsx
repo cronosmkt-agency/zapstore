@@ -677,24 +677,94 @@ function ChatPage() {
     }
   };
 
+  const restartChat = () => {
+    setDraftOrder({
+      model: "",
+      price: 0,
+      delivery: "",
+      payment: "",
+      customerName: "",
+      customerAddress: "",
+    });
+    setOrderStep("idle");
+    const now = new Date().toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    setMessages([
+      {
+        id: `welcome-restart-${Date.now()}`,
+        sender: "bot",
+        text: "Olá! Seja muito bem-vindo ao Chat Oficial da Terephones em Teresópolis! 👋\n\nPor aqui você pode escolher seu iPhone com entrega express em até 1h na sua porta ou retirada na SejaDelta, tirar dúvidas de garantia e pagamento, ou falar diretamente com a nossa equipe de vendas. Como podemos te ajudar hoje?",
+        time: now,
+        options: [
+          { label: "🛍️ Escolher iPhone para Comprar", action: "start_order" },
+          { label: "💬 Falar com um Vendedor", action: "talk_to_sales" },
+          { label: "⚡ Entrega em 1h & Retirada", action: "faq_delivery" },
+          { label: "🔄 Simular Troca com Troco", action: "faq_tradein" },
+        ],
+      },
+    ]);
+  };
+
+  // Mouse Drag-to-Scroll support
+  const isDraggingRef = useRef(false);
+  const startYRef = useRef(0);
+  const scrollTopRef = useRef(0);
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.button !== 0) return;
+    const target = e.target as HTMLElement;
+    if (target.closest("button") || target.closest("a") || target.closest("input")) return;
+
+    const el = scrollContainerRef.current;
+    if (!el) return;
+
+    isDraggingRef.current = true;
+    startYRef.current = e.pageY - el.offsetTop;
+    scrollTopRef.current = el.scrollTop;
+    el.style.cursor = "grabbing";
+    el.style.userSelect = "none";
+
+    const onMouseMove = (ev: MouseEvent) => {
+      if (!isDraggingRef.current || !scrollContainerRef.current) return;
+      const y = ev.pageY - scrollContainerRef.current.offsetTop;
+      const walk = (y - startYRef.current) * 1.3;
+      scrollContainerRef.current.scrollTop = scrollTopRef.current - walk;
+    };
+
+    const onMouseUp = () => {
+      isDraggingRef.current = false;
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.style.cursor = "";
+        scrollContainerRef.current.style.userSelect = "";
+      }
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  };
+
   return (
     <div className="fixed inset-0 h-[100dvh] max-h-[100dvh] w-screen overflow-hidden bg-background text-foreground flex flex-col">
       <ThemeSelectorModal currentTheme={currentTheme} onThemeChange={setCurrentTheme} />
       <SiteNavbar currentTheme={currentTheme} toggleTheme={toggleTheme} />
 
-      <main className="flex-1 min-h-0 w-full max-w-4xl mx-auto flex flex-col pt-[78px] sm:pt-[86px] pb-[76px] sm:pb-3 px-2 sm:px-4">
+      <main className="flex-1 min-h-0 w-full max-w-4xl mx-auto flex flex-col pt-[66px] sm:pt-[86px] pb-[64px] sm:pb-3 px-1 sm:px-4">
         {/* Chat Window Container */}
         <div className="flex-1 min-h-0 flex flex-col rounded-2xl sm:rounded-3xl glass border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl">
           {/* Top Bar do Atendimento */}
-          <div className="shrink-0 px-3.5 sm:px-6 py-2.5 sm:py-3 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md flex items-center justify-between gap-2 z-10">
-            <div className="flex items-center gap-2 sm:gap-3">
+          <div className="shrink-0 px-2.5 sm:px-6 py-2 sm:py-3 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md flex items-center justify-between gap-1.5 z-10">
+            <div className="flex items-center gap-1.5 sm:gap-3">
               <div className="relative shrink-0">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-md">
-                  <BrandLogo height={22} showText={false} />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-md">
+                  <BrandLogo height={18} showText={false} />
                 </div>
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900 shadow-[0_0_6px_#10b981]" />
               </div>
-              <div className="hidden sm:flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-2">
                 <h2 className="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
                   <span>TerePhones</span>
                   <span
@@ -706,17 +776,17 @@ function ChatPage() {
             </div>
 
             {/* Mode Switcher Tabs */}
-            <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-xs font-semibold">
+            <div className="flex items-center p-0.5 sm:p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-xs font-semibold">
               <button
                 type="button"
                 onClick={() => setActiveChatTab("bot")}
-                className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg transition text-xs cursor-pointer ${
+                className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg transition text-[11px] sm:text-xs cursor-pointer ${
                   activeChatTab === "bot"
                     ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-sky-400 shadow-xs font-bold"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
-                <Sparkles className="w-3.5 h-3.5" />
+                <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 <span>Assistente</span>
               </button>
               <button
@@ -727,61 +797,46 @@ function ChatPage() {
                     try { window.Tawk_API.maximize(); } catch {}
                   }
                 }}
-                className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg transition text-xs cursor-pointer ${
+                className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg transition text-[11px] sm:text-xs cursor-pointer ${
                   activeChatTab === "live"
                     ? "bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs font-bold"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Atendente ao Vivo</span>
+                <span>Ao Vivo</span>
               </button>
             </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  setDraftOrder({
-                    model: "",
-                    price: 0,
-                    delivery: "",
-                    payment: "",
-                    customerName: "",
-                    customerAddress: "",
-                  });
-                  setOrderStep("idle");
-                  const now = new Date().toLocaleTimeString("pt-BR", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  });
-                  setMessages([
-                    {
-                      id: `welcome-restart-${Date.now()}`,
-                      sender: "bot",
-                      text: "Olá! Seja muito bem-vindo ao Chat Oficial da Terephones em Teresópolis! 👋\n\nPor aqui você pode escolher seu iPhone com entrega express em até 1h na sua porta ou retirada na SejaDelta, tirar dúvidas de garantia e pagamento, ou falar diretamente com a nossa equipe de vendas. Como podemos te ajudar hoje?",
-                      time: now,
-                      options: [
-                        { label: "🛍️ Escolher iPhone para Comprar", action: "start_order" },
-                        { label: "💬 Falar com um Vendedor", action: "talk_to_sales" },
-                        { label: "⚡ Entrega em 1h & Retirada", action: "faq_delivery" },
-                        { label: "🔄 Simular Troca com Troco", action: "faq_tradein" },
-                      ],
-                    },
-                  ]);
-                }}
-                className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-xs transition cursor-pointer"
-                title="Reiniciar conversa"
-              >
-                <RefreshCw className="w-4 h-4" />
-              </button>
+            <div className="flex items-center gap-1 sm:gap-2">
+              {activeChatTab === "bot" ? (
+                <button
+                  onClick={restartChat}
+                  className="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-xs transition cursor-pointer"
+                  title="Reiniciar conversa"
+                >
+                  <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                </button>
+              ) : (
+                <a
+                  href="https://tawk.to/chat/6aac00529d89af3444bee888/1k2nuis6p"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-xs transition cursor-pointer"
+                  title="Abrir em tela cheia"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                </a>
+              )}
               <a
                 href={WHATSAPP}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-sm"
+                className="flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] sm:text-xs font-bold transition shadow-xs"
+                title="Falar no WhatsApp"
               >
-                <Phone className="w-3.5 h-3.5" />
-                <span>WhatsApp</span>
+                <Phone className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <span className="hidden xs:inline">WhatsApp</span>
               </a>
             </div>
           </div>
@@ -794,7 +849,11 @@ function ChatPage() {
           >
 
           {/* Messages Scroll Area */}
-          <div ref={scrollContainerRef} className="flex-1 min-h-0 p-3 sm:p-5 overflow-y-auto space-y-3.5 bg-slate-50/40 dark:bg-slate-950/30 chat-messages-scroll overscroll-contain">
+          <div
+            ref={scrollContainerRef}
+            onMouseDown={handleMouseDown}
+            className="flex-1 min-h-0 p-3 sm:p-5 overflow-y-auto space-y-3.5 bg-slate-50/40 dark:bg-slate-950/30 chat-messages-scroll overscroll-contain"
+          >
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -945,8 +1004,8 @@ function ChatPage() {
               : "absolute inset-0 opacity-0 pointer-events-none -z-10 flex"
           }`}
         >
-          {/* Live Status Bar */}
-          <div className="shrink-0 px-3.5 sm:px-5 py-2.5 bg-emerald-50 dark:bg-emerald-950/40 border-b border-emerald-200/80 dark:border-emerald-800/50 flex flex-wrap items-center justify-between gap-2 text-xs">
+          {/* Desktop-only subtle notice bar */}
+          <div className="hidden md:flex shrink-0 px-4 py-2 bg-emerald-50 dark:bg-emerald-950/40 border-b border-emerald-200/80 dark:border-emerald-800/50 items-center justify-between gap-2 text-xs">
             <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-medium">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]" />
               <span>
@@ -966,15 +1025,15 @@ function ChatPage() {
             </div>
           </div>
 
-          {/* Container for Tawk.to */}
-          <div className="flex-1 min-h-0 relative w-full h-full bg-white dark:bg-slate-900 flex flex-col">
+          {/* Container for Tawk.to - full bleed 100% height */}
+          <div className="flex-1 min-h-0 relative w-full h-full bg-white dark:bg-slate-900 flex flex-col overflow-hidden">
             <div
               id="tawk_6aac00529d89af3444bee888"
               className="w-full h-full flex-1 z-10"
-              style={{ width: "100%", height: "100%", minHeight: "480px" }}
+              style={{ width: "100%", height: "100%" }}
             />
-            {/* Quick Actions below */}
-            <div className="shrink-0 p-3 bg-slate-50 dark:bg-slate-950/60 border-t border-slate-200/80 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+            {/* Desktop-only subtle footer */}
+            <div className="hidden md:flex shrink-0 p-2.5 bg-slate-50 dark:bg-slate-950/60 border-t border-slate-200/80 dark:border-slate-800 items-center justify-between gap-2 text-xs">
               <div className="flex items-center gap-2 text-slate-500">
                 <ShieldCheck className="w-4 h-4 text-emerald-500" />
                 <span>Atendimento oficial verificado Terephones Teresópolis</span>

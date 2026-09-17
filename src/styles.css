@@ -1062,6 +1062,9 @@ html.theme-black-piano body {
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(148, 163, 184, 0.7) rgba(241, 245, 249, 0.5);
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
 }
 
 .chat-messages-scroll::-webkit-scrollbar {
