@@ -8,7 +8,6 @@ import {
   Cpu,
   Camera,
   Smartphone,
-  MessageCircle,
   Gift,
   CheckCircle2,
   CreditCard,
@@ -68,33 +67,28 @@ export function ProductDetailModal({
 
   if (!isOpen || !product) return null;
 
+  const isNovo = product.cat === "Novos" || product.badge.toLowerCase().includes("lacrado");
+
+  const storageDisplay =
+    product.storage || product.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() || "128GB";
+
   const handleWhatsApp = () => {
-    const text = `Olá, equipe Terephones! Estive vendo a ficha técnica do *${product.name}* (${fmt(product.price)}) no site e gostaria de confirmar a disponibilidade para entrega hoje em Teresópolis!`;
+    const condText = isNovo
+      ? "Novo Lacrado de Fábrica"
+      : `Seminovo Grade A+${product.battery ? ` (Saúde da Bateria: ${product.battery})` : ""}`;
+
+    const text = `Olá, equipe Terephones! Gostaria de pedir este iPhone que vi no site:
+
+📱 *Aparelho:* ${product.name}
+💰 *Valor à vista:* ${fmt(product.price)} (ou até 18x no cartão)
+💾 *Capacidade:* ${storageDisplay}
+✨ *Condição:* ${condText}
+
+Gostaria de confirmar a disponibilidade para entrega hoje em Teresópolis!`;
+
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`;
     window.open(url, "_blank");
   };
-
-  const handleOpenChat = () => {
-    try {
-      sessionStorage.setItem(
-        "terephones_order_product",
-        JSON.stringify({
-          name: product.name,
-          price: product.price,
-          img: product.img,
-          badge: product.badge,
-          storage: product.storage || (product.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() ?? "128GB"),
-          battery: product.battery || "",
-        })
-      );
-    } catch {
-      // ignore
-    }
-    onClose();
-    window.location.href = `/chat?produto=${encodeURIComponent(product.name)}`;
-  };
-
-  const isNovo = product.cat === "Novos" || product.badge.toLowerCase().includes("lacrado");
 
   const defaultBoxItems = isNovo
     ? [
@@ -113,9 +107,6 @@ export function ProductDetailModal({
       ];
 
   const boxList = product.boxItems && product.boxItems.length > 0 ? product.boxItems : defaultBoxItems;
-
-  const storageDisplay =
-    product.storage || product.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() || "128GB";
 
   const hasBatteryInBadge =
     product.badge.toLowerCase().includes("bateria") || product.badge.toLowerCase().includes("bat");
@@ -369,31 +360,22 @@ export function ProductDetailModal({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
-            {/* Botão Comprar pelo Chat no Site */}
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            {/* Botão Fechar / Voltar */}
             <button
-              onClick={handleOpenChat}
-              className="btn-chat-modal px-3.5 sm:px-4 py-2.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md transition-all active:scale-95 text-white whitespace-nowrap"
+              onClick={onClose}
+              className="px-4 py-2.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer text-center"
             >
-              <MessageCircle className="w-4 h-4 shrink-0 text-white" />
-              <span>Comprar no Chat</span>
+              Fechar
             </button>
 
             {/* Botão Pedir no WhatsApp */}
             <button
               onClick={handleWhatsApp}
-              className="btn-whatsapp px-3.5 sm:px-4 py-2.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md transition-all active:scale-95 text-white whitespace-nowrap"
+              className="flex-1 sm:flex-none btn-whatsapp px-5 sm:px-6 py-2.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-md transition-all active:scale-95 text-white whitespace-nowrap"
             >
               <WhatsAppIcon className="w-4 h-4 shrink-0 text-white" />
-              <span>Pedir no Zap</span>
-            </button>
-
-            {/* Botão Fechar visível no Desktop */}
-            <button
-              onClick={onClose}
-              className="hidden sm:inline-flex px-3.5 py-2 rounded-full text-xs font-bold border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer text-center"
-            >
-              Fechar
+              <span>Pedir no WhatsApp</span>
             </button>
           </div>
         </div>

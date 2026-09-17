@@ -313,13 +313,15 @@ function Hero() {
               <span>Ver Catálogo na Loja</span>
             </Link>
 
-            <Link
-              to="/chat"
+            <a
+              href={WHATSAPP}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 py-3 sm:py-3.5 px-6 rounded-full font-bold text-sm bg-emerald-600 hover:bg-emerald-500 text-white shadow-md active:scale-95 transition"
             >
-              <MessageCircle className="w-4 h-4 fill-white" />
-              <span>Tirar Dúvidas & Pedir no Chat</span>
-            </Link>
+              <WhatsAppIcon className="w-4 h-4 fill-white" />
+              <span>Pedir no WhatsApp</span>
+            </a>
           </div>
 
           {/* Micro Trust Indicators */}

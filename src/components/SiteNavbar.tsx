@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { MessageCircle, Sun, MoonStar } from "lucide-react";
+import { Sun, MoonStar } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import type { ThemeMode } from "@/components/ThemeSelectorModal";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
+import { WHATSAPP } from "@/data/storeData";
 
 interface SiteNavbarProps {
   currentTheme: ThemeMode;
@@ -55,7 +57,6 @@ export function SiteNavbar({ currentTheme, toggleTheme }: SiteNavbarProps) {
   const navLinks = [
     { label: "Início", path: "/" },
     { label: "Loja", path: "/loja" },
-    { label: "Chat", path: "/chat", hasDot: true },
   ];
 
   return (
@@ -108,13 +109,15 @@ export function SiteNavbar({ currentTheme, toggleTheme }: SiteNavbarProps) {
               style={{ borderColor: "rgba(var(--blue-rgb),0.18)" }}
             />
 
-            <Link
-              to="/chat"
+            <a
+              href={WHATSAPP}
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-pedir-agora text-xs py-2 px-4 rounded-full flex items-center gap-1.5"
             >
-              <MessageCircle className="w-3.5 h-3.5" />
-              <span>Pedir no Chat</span>
-            </Link>
+              <WhatsAppIcon className="w-3.5 h-3.5" />
+              <span>Pedir no WhatsApp</span>
+            </a>
           </div>
         </nav>
 

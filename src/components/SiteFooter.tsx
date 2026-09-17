@@ -8,6 +8,7 @@ import {
   INSTAGRAM_HANDLE,
 } from "@/data/storeData";
 import { Phone, Instagram, Clock } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
 export function SiteFooter({ currentTheme }: { currentTheme?: ThemeMode }) {
   const isDark = currentTheme === "black-piano";
@@ -63,13 +64,16 @@ export function SiteFooter({ currentTheme }: { currentTheme?: ThemeMode }) {
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/chat"
-                  className="transition hover:text-emerald-500 font-semibold"
+                <a
+                  href={WHATSAPP}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition hover:text-emerald-500 font-semibold flex items-center gap-1.5"
                   style={{ color: "var(--text-secondary)" }}
                 >
-                  Chat de Atendimento & Pedidos
-                </Link>
+                  <WhatsAppIcon className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>Atendimento no WhatsApp</span>
+                </a>
               </li>
               <li>
                 <a

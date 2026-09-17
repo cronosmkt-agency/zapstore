@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import {
   MessageCircle,
@@ -38,6 +38,9 @@ declare global {
 }
 
 export const Route = createFileRoute("/chat")({
+  beforeLoad: () => {
+    throw redirect({ to: "/loja" });
+  },
   validateSearch: (search: Record<string, unknown>): { produto?: string; modo?: string } => {
     return {
       produto: typeof search.produto === "string" ? search.produto : undefined,

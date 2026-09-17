@@ -16,6 +16,7 @@ import {
 import { SiteNavbar } from "@/components/SiteNavbar";
 import { SiteFooter } from "@/components/SiteFooter";
 import { WhatsFloat } from "@/components/WhatsFloat";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { ThemeSelectorModal, type ThemeMode } from "@/components/ThemeSelectorModal";
 import { ProductDetailModal, type ProductItem } from "@/components/ProductDetailModal";
@@ -110,27 +111,23 @@ function LojaPage() {
   };
 
   const handleOrderWhatsApp = (prod: ProductItem) => {
-    const text = `Olá, Terephones! Vi o *${prod.name}* na Loja do site por ${fmt(prod.price)} e gostaria de pedir para entrega/retirada hoje em Teresópolis!`;
-    window.open(`${WHATSAPP}?text=${encodeURIComponent(text)}`, "_blank");
-  };
+    const isNovo = prod.cat === "Novos" || prod.badge.toLowerCase().includes("lacrado");
+    const storageDisplay =
+      prod.storage || prod.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() || "128GB";
+    const condText = isNovo
+      ? "Novo Lacrado de Fábrica"
+      : `Seminovo Grade A+${prod.battery ? ` (Saúde da Bateria: ${prod.battery})` : ""}`;
 
-  const handleOrderInChat = (prod: ProductItem) => {
-    try {
-      sessionStorage.setItem(
-        "terephones_order_product",
-        JSON.stringify({
-          name: prod.name,
-          price: prod.price,
-          img: prod.img,
-          badge: prod.badge,
-          cat: prod.cat,
-          storage: prod.storage || (prod.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() ?? "128GB"),
-          battery: prod.battery || "",
-        })
-      );
-    } catch {
-      // ignore
-    }
+    const text = `Olá, equipe Terephones! Gostaria de pedir este iPhone que vi na Loja:
+
+📱 *Aparelho:* ${prod.name}
+💰 *Valor à vista:* ${fmt(prod.price)} (ou até 18x no cartão)
+💾 *Capacidade:* ${storageDisplay}
+✨ *Condição:* ${condText}
+
+Gostaria de confirmar a disponibilidade para entrega hoje em Teresópolis!`;
+
+    window.open(`https://wa.me/5521964639999?text=${encodeURIComponent(text)}`, "_blank");
   };
 
   // Filter & Search
@@ -401,15 +398,13 @@ function LojaPage() {
 
                 {/* Botões de Ação */}
                 <div className="mt-2.5 sm:mt-3 grid grid-cols-2 gap-1.5 pt-1.5 sm:pt-2">
-                  <Link
-                    to="/chat"
-                    search={{ produto: prod.name }}
-                    onClick={() => handleOrderInChat(prod)}
-                    className="w-full py-1.5 sm:py-2 px-1 sm:px-2 rounded-xl text-[11px] sm:text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-1 shadow-sm transition"
+                  <button
+                    onClick={() => handleOrderWhatsApp(prod)}
+                    className="w-full py-1.5 sm:py-2 px-1 sm:px-2 rounded-xl text-[11px] sm:text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-1 shadow-sm transition active:scale-95 cursor-pointer"
                   >
-                    <MessageCircle className="w-3.5 h-3.5" />
+                    <WhatsAppIcon className="w-3.5 h-3.5 text-white" />
                     <span>Pedir</span>
-                  </Link>
+                  </button>
 
                   <button
                     onClick={() => handleOpenDetail(prod)}
@@ -491,15 +486,13 @@ function LojaPage() {
                       >
                         <Info className="w-3.5 h-3.5" />
                       </button>
-                      <Link
-                        to="/chat"
-                        search={{ produto: prod.name }}
-                        onClick={() => handleOrderInChat(prod)}
-                        className="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-xs transition"
+                      <button
+                        onClick={() => handleOrderWhatsApp(prod)}
+                        className="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] flex items-center gap-1 shadow-xs transition active:scale-95 cursor-pointer"
                       >
-                        <MessageCircle className="w-3.5 h-3.5" />
+                        <WhatsAppIcon className="w-3.5 h-3.5 text-white" />
                         <span>Pedir</span>
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -508,28 +501,30 @@ function LojaPage() {
           </div>
         )}
 
-        {/* Banner de Assistente Online */}
-        <div className="mt-16 rounded-3xl p-6 sm:p-10 glass border border-blue-500/30 shadow-xl relative overflow-hidden text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6">
+        {/* Banner de Atendimento WhatsApp & Dúvidas */}
+        <div className="mt-16 rounded-3xl p-6 sm:p-10 glass border border-emerald-500/30 shadow-xl relative overflow-hidden text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="max-w-xl">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mb-3 border border-emerald-500/20">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Atendimento em Tempo Real</span>
+              <span>Atendimento Direto & Imediato</span>
             </div>
             <h2 className="text-xl sm:text-3xl font-black text-slate-900 dark:text-white">
               Em dúvida sobre qual iPhone escolher?
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-2">
-              Converse com nosso assistente virtual no Chat ou faça seu pedido diretamente por lá sem precisar sair da página.
+              Chame nossa equipe no WhatsApp para tirar dúvidas ou use o botão flutuante de chat no canto da tela. Entregamos em até 1h em Teresópolis!
             </p>
           </div>
 
-          <Link
-            to="/chat"
-            className="shrink-0 px-6 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-sm shadow-lg flex items-center gap-2 hover:scale-105 transition"
+          <a
+            href={WHATSAPP}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm shadow-lg flex items-center gap-2 hover:scale-105 transition"
           >
-            <MessageCircle className="w-5 h-5" />
-            <span>Abrir Chat Terephones</span>
-          </Link>
+            <WhatsAppIcon className="w-5 h-5 text-white" />
+            <span>Falar no WhatsApp</span>
+          </a>
         </div>
       </main>
 
@@ -542,9 +537,7 @@ function LojaPage() {
       />
 
       <SiteFooter currentTheme={currentTheme} />
-      <div className="hidden sm:block">
-        <WhatsFloat />
-      </div>
+      <WhatsFloat />
       <MobileBottomNav />
     </div>
   );
