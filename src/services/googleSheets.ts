@@ -797,20 +797,20 @@ export async function fetchGoogleSheetInventory(sheetUrl: string = DEFAULT_SHEET
 
       const items: ProductItem[] = [];
 
+      // Parse Lacrados first (iPhone 17 and factory sealed models)
+      if (lacRes.status === "fulfilled" && lacRes.value.ok) {
+        const text = await lacRes.value.text();
+        const rows = parseCSV(text);
+        const lacProducts = transformLacradosCsv(rows);
+        items.push(...lacProducts);
+      }
+
       // Parse Seminovos
       if (semRes.status === "fulfilled" && semRes.value.ok) {
         const text = await semRes.value.text();
         const rows = parseCSV(text);
         const semProducts = transformSeminovosCsv(rows);
         items.push(...semProducts);
-      }
-
-      // Parse Lacrados (with duplicates grouped into quantity)
-      if (lacRes.status === "fulfilled" && lacRes.value.ok) {
-        const text = await lacRes.value.text();
-        const rows = parseCSV(text);
-        const lacProducts = transformLacradosCsv(rows);
-        items.push(...lacProducts);
       }
 
       if (items.length > 0) {

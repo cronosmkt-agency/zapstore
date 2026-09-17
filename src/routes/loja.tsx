@@ -131,20 +131,30 @@ Gostaria de confirmar a disponibilidade para entrega hoje em Teresópolis!`;
   };
 
   // Filter & Search
-  const filtered = productList.filter((item) => {
-    const matchCat =
-      activeFilter === "Todos" ||
-      item.cat === activeFilter ||
-      (activeFilter === "Lacrados" && (item.cat === "Novos" || item.cat === "Lacrados")) ||
-      (activeFilter === "Novos" && (item.cat === "Novos" || item.cat === "Lacrados")) ||
-      (activeFilter === "Seminovos" && item.cat === "Seminovos");
-    const matchSearch =
-      searchQuery.trim() === "" ||
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (item.specs && item.specs.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (item.storage && item.storage.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchCat && matchSearch;
-  });
+  const filtered = productList
+    .filter((item) => {
+      const matchCat =
+        activeFilter === "Todos" ||
+        item.cat === activeFilter ||
+        (activeFilter === "Lacrados" && (item.cat === "Novos" || item.cat === "Lacrados")) ||
+        (activeFilter === "Novos" && (item.cat === "Novos" || item.cat === "Lacrados")) ||
+        (activeFilter === "Seminovos" && item.cat === "Seminovos");
+      const matchSearch =
+        searchQuery.trim() === "" ||
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (item.specs && item.specs.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (item.storage && item.storage.toLowerCase().includes(searchQuery.toLowerCase()));
+      return matchCat && matchSearch;
+    })
+    .sort((a, b) => {
+      if (activeFilter === "Todos") {
+        const is17A = a.name.toLowerCase().includes("iphone 17");
+        const is17B = b.name.toLowerCase().includes("iphone 17");
+        if (is17A && !is17B) return -1;
+        if (!is17A && is17B) return 1;
+      }
+      return 0;
+    });
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">

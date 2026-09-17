@@ -364,27 +364,55 @@ function FeaturedProducts({
   products: ProductItem[];
   onSelectProduct: (p: ProductItem) => void;
 }) {
-  // Select 4 strategic best-sellers (entry value, intermediate Pro, modern, flagship)
+  // Select top 4 best-sellers featuring iPhone 17 and iPhone 16
   const featured = (() => {
-    if (!products || products.length === 0) return defaultProducts.slice(0, 4);
+    const list = products && products.length > 0 ? products : defaultProducts;
 
     const findModel = (query: string) =>
-      products.find((p) => p.name.toLowerCase().includes(query.toLowerCase()));
+      list.find((p) => p.name.toLowerCase().includes(query.toLowerCase()));
 
-    const p1 = findModel("iPhone 13 128GB") || products[0];
-    const p2 = findModel("iPhone 14 Pro") || findModel("iPhone 13 Pro") || products[1];
-    const p3 = findModel("iPhone 15") || products[2];
-    const p4 = findModel("iPhone 16 Pro") || products[3];
+    const p1 = findModel("iPhone 17 Pro Max") || list[0];
+    const p2 = findModel("iPhone 17 Pro") || findModel("iPhone 17 256GB") || findModel("iPhone 17") || list[1];
+    const p3 = findModel("iPhone 16 Pro Max") || findModel("iPhone 16 Pro") || list[2];
+    const p4 = findModel("iPhone 16 128GB") || findModel("iPhone 16") || findModel("iPhone 16 Pro") || list[3];
 
-    const list = [p1, p2, p3, p4].filter(Boolean) as ProductItem[];
-    // Remove duplicates if any
-    const unique = Array.from(new Set(list));
-    return unique.length === 4 ? unique : products.slice(0, 4);
+    const chosen: ProductItem[] = [];
+    [p1, p2, p3, p4].forEach((p) => {
+      if (p && !chosen.some((c) => c.name === p.name)) {
+        chosen.push(p);
+      }
+    });
+
+    if (chosen.length < 4) {
+      for (const p of list) {
+        if (!chosen.some((c) => c.name === p.name)) {
+          chosen.push(p);
+        }
+        if (chosen.length === 4) break;
+      }
+    }
+
+    return chosen;
   })();
 
   const handleBuyWhatsApp = (prod: ProductItem) => {
-    const text = `Olá, equipe Terephones! Vi o *${prod.name}* no site por ${fmt(prod.price)} e gostaria de pedir com entrega express em Teresópolis!`;
-    window.open(`${WHATSAPP}?text=${encodeURIComponent(text)}`, "_blank");
+    const isNovo = prod.cat === "Novos" || prod.badge.toLowerCase().includes("lacrado");
+    const storageDisplay =
+      prod.storage || prod.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() || "128GB";
+    const condText = isNovo
+      ? "Novo Lacrado de Fábrica"
+      : `Seminovo Grade A+${prod.battery ? ` (Saúde da Bateria: ${prod.battery})` : ""}`;
+
+    const text = `Olá, equipe Terephones! Gostaria de pedir este iPhone em destaque que vi no site:
+
+📱 *Aparelho:* ${prod.name}
+💰 *Valor à vista:* ${fmt(prod.price)} (ou até 18x no cartão)
+💾 *Capacidade:* ${storageDisplay}
+✨ *Condição:* ${condText}
+
+Gostaria de confirmar a disponibilidade para entrega hoje em Teresópolis!`;
+
+    window.open(`https://wa.me/5521964639999?text=${encodeURIComponent(text)}`, "_blank");
   };
 
   return (
