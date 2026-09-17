@@ -1128,3 +1128,21 @@ html.theme-black-piano body {
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8) !important;
 }
 
+/* ============ Tawk.to Custom Integration ============ */
+/* Hide default minimized Tawk widget launcher */
+.tawk-min-container,
+#tawk-default-container .tawk-min-container,
+div[class*="tawk-min-"] {
+  display: none !important;
+}
+
+/* Ensure maximized Tawk chat modal on mobile has clean spacing above nav */
+@media (max-width: 640px) {
+  .tawk-max-container,
+  #tawk-default-container .tawk-max-container {
+    bottom: calc(4.75rem + env(safe-area-inset-bottom)) !important;
+    max-height: calc(100vh - 5.5rem) !important;
+  }
+}
+
+
