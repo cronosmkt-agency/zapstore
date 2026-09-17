@@ -30,10 +30,18 @@ import { fetchGoogleSheetInventory } from "@/services/googleSheets";
 import type { ProductItem } from "@/components/ProductDetailModal";
 import { toast } from "sonner";
 
+declare global {
+  interface Window {
+    Tawk_API?: any;
+    Tawk_LoadStart?: any;
+  }
+}
+
 export const Route = createFileRoute("/chat")({
-  validateSearch: (search: Record<string, unknown>): { produto?: string } => {
+  validateSearch: (search: Record<string, unknown>): { produto?: string; modo?: string } => {
     return {
       produto: typeof search.produto === "string" ? search.produto : undefined,
+      modo: typeof search.modo === "string" ? search.modo : undefined,
     };
   },
   head: () => ({
@@ -69,13 +77,39 @@ interface ChatMessage {
 }
 
 function ChatPage() {
-  const { produto: routeProduto } = Route.useSearch();
+  const { produto: routeProduto, modo: routeModo } = Route.useSearch();
+  const [activeChatTab, setActiveChatTab] = useState<"bot" | "live">(
+    routeModo === "live" ? "live" : "bot"
+  );
   const [currentTheme, setCurrentTheme] = useState<ThemeMode>("white");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Load Tawk.to Embedded Script
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (document.getElementById("tawk-script")) return;
+
+    window.Tawk_API = window.Tawk_API || {};
+    window.Tawk_LoadStart = new Date();
+    window.Tawk_API.embedded = "tawk_6aac00529d89af3444bee888";
+
+    const s1 = document.createElement("script");
+    s1.id = "tawk-script";
+    s1.async = true;
+    s1.src = "https://embed.tawk.to/6aac00529d89af3444bee888/1k2nuis6p";
+    s1.charset = "UTF-8";
+    s1.setAttribute("crossorigin", "*");
+    const s0 = document.getElementsByTagName("script")[0];
+    if (s0 && s0.parentNode) {
+      s0.parentNode.insertBefore(s1, s0);
+    } else {
+      document.head.appendChild(s1);
+    }
+  }, []);
 
   const [liveProducts, setLiveProducts] = useState<ProductItem[]>(defaultProducts);
 
@@ -479,8 +513,9 @@ function ChatPage() {
       );
     } else if (action === "talk_to_sales") {
       addBotMessage(
-        "Nosso time de vendas em Teresópolis está disponível agora no WhatsApp para te atender de forma exclusiva, enviar fotos reais dos aparelhos ou negociar o seu iPhone usado na troca!",
+        "Nosso time de vendas em Teresópolis está disponível agora! Você pode falar diretamente pelo **Chat ao Vivo** com nosso atendente (as mensagens apitam no celular dele) ou abrir o WhatsApp da loja:",
         [
+          { label: "🟢 Iniciar Chat ao Vivo Agora", action: "open_live_tawk" },
           { label: "📲 Abrir WhatsApp do Vendedor", action: "open_whatsapp_sales" },
           { label: "🛍️ Escolher iPhone no Chat", action: "start_order" },
           { label: "⚡ Como funciona a Entrega em 1h?", action: "faq_delivery" },
@@ -489,14 +524,28 @@ function ChatPage() {
     } else if (action === "talk_sales_model") {
       const model = draftOrder.model || "iPhone selecionado";
       addBotMessage(
-        `Perfeito! Para conversar agora com nosso vendedor sobre o **${model}**, tirar dúvidas sobre fotos, saúde da bateria ou formas de parcelamento, clique abaixo:`,
+        `Perfeito! Para conversar agora com nosso vendedor sobre o **${model}**, tirar dúvidas sobre fotos, saúde da bateria ou formas de parcelamento:`,
         [
+          { label: "🟢 Falar no Chat ao Vivo com Atendente", action: "open_live_tawk" },
           { label: "📲 Chamar Vendedor no WhatsApp", action: "open_whatsapp_model" },
           { label: "🚚 Continuar Pedido com Entrega em 1h", action: "set_delivery_express" },
           { label: "🏢 Continuar com Retirada SejaDelta", action: "set_delivery_sejadelta" },
           { label: "📱 Escolher Outro Modelo", action: "start_order" },
         ]
       );
+    } else if (action === "open_live_tawk") {
+      setActiveChatTab("live");
+      if (typeof window !== "undefined" && window.Tawk_API) {
+        try {
+          if (draftOrder.model) {
+            window.Tawk_API.setAttributes?.({
+              aparelho: draftOrder.model,
+              valor: fmt(draftOrder.price),
+            }, () => {});
+          }
+          window.Tawk_API.maximize?.();
+        } catch {}
+      }
     } else if (action === "open_whatsapp_sales") {
       const text = "Olá, equipe Terephones! Estou no Chat do site e gostaria de falar com um vendedor sobre os iPhones disponíveis!";
       window.open(`${WHATSAPP}?text=${encodeURIComponent(text)}`, "_blank");
@@ -637,15 +686,15 @@ function ChatPage() {
         {/* Chat Window Container */}
         <div className="flex-1 min-h-0 flex flex-col rounded-2xl sm:rounded-3xl glass border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl">
           {/* Top Bar do Atendimento */}
-          <div className="shrink-0 px-3.5 sm:px-6 py-2.5 sm:py-3 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md flex items-center justify-between z-10">
-            <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="shrink-0 px-3.5 sm:px-6 py-2.5 sm:py-3 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md flex items-center justify-between gap-2 z-10">
+            <div className="flex items-center gap-2 sm:gap-3">
               <div className="relative shrink-0">
                 <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-md">
                   <BrandLogo height={22} showText={false} />
                 </div>
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900 shadow-[0_0_6px_#10b981]" />
               </div>
-              <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-2">
                 <h2 className="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
                   <span>TerePhones</span>
                   <span
@@ -654,6 +703,39 @@ function ChatPage() {
                   />
                 </h2>
               </div>
+            </div>
+
+            {/* Mode Switcher Tabs */}
+            <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => setActiveChatTab("bot")}
+                className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg transition text-xs cursor-pointer ${
+                  activeChatTab === "bot"
+                    ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-sky-400 shadow-xs font-bold"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Assistente</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveChatTab("live");
+                  if (typeof window !== "undefined" && window.Tawk_API?.maximize) {
+                    try { window.Tawk_API.maximize(); } catch {}
+                  }
+                }}
+                className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg transition text-xs cursor-pointer ${
+                  activeChatTab === "live"
+                    ? "bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs font-bold"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Atendente ao Vivo</span>
+              </button>
             </div>
 
             <div className="flex items-center gap-2">
@@ -703,6 +785,13 @@ function ChatPage() {
               </a>
             </div>
           </div>
+
+          {/* Bot View Container */}
+          <div
+            className={`flex-1 min-h-0 flex flex-col ${
+              activeChatTab === "bot" ? "relative" : "hidden"
+            }`}
+          >
 
           {/* Messages Scroll Area */}
           <div ref={scrollContainerRef} className="flex-1 min-h-0 p-3 sm:p-5 overflow-y-auto space-y-3.5 bg-slate-50/40 dark:bg-slate-950/30 chat-messages-scroll overscroll-contain">
@@ -847,7 +936,65 @@ function ChatPage() {
             </form>
           </div>
         </div>
-      </main>
+
+        {/* Live Tawk.to View Container */}
+        <div
+          className={`flex-1 min-h-0 flex flex-col transition-opacity duration-200 ${
+            activeChatTab === "live"
+              ? "relative z-10 opacity-100 flex"
+              : "absolute inset-0 opacity-0 pointer-events-none -z-10 flex"
+          }`}
+        >
+          {/* Live Status Bar */}
+          <div className="shrink-0 px-3.5 sm:px-5 py-2.5 bg-emerald-50 dark:bg-emerald-950/40 border-b border-emerald-200/80 dark:border-emerald-800/50 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-medium">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]" />
+              <span>
+                <strong>Atendimento em Tempo Real:</strong> Notificações chegam diretamente no celular da nossa equipe em Teresópolis!
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <a
+                href={WHATSAPP}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400 hover:underline font-bold"
+              >
+                <Phone className="w-3 h-3" />
+                <span>Prefere WhatsApp?</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Container for Tawk.to */}
+          <div className="flex-1 min-h-0 relative w-full h-full bg-white dark:bg-slate-900 flex flex-col">
+            <div
+              id="tawk_6aac00529d89af3444bee888"
+              className="w-full h-full flex-1 z-10"
+              style={{ width: "100%", height: "100%", minHeight: "480px" }}
+            />
+            {/* Quick Actions below */}
+            <div className="shrink-0 p-3 bg-slate-50 dark:bg-slate-950/60 border-t border-slate-200/80 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-2 text-slate-500">
+                <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                <span>Atendimento oficial verificado Terephones Teresópolis</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href="https://tawk.to/chat/6aac00529d89af3444bee888/1k2nuis6p"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition shadow-xs"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Abrir em Tela Cheia</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
 
       <MobileBottomNav />
     </div>
