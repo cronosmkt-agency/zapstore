@@ -471,6 +471,9 @@ export function parseCSV(text: string): string[][] {
 /**
  * Cleans and standardizes raw iPhone model name from spreadsheet
  */
+/**
+ * Cleans and standardizes raw iPhone model name from spreadsheet
+ */
 export function cleanModelName(rawModel: string): string {
   let name = rawModel
     .replace(/\s+/g, " ")
@@ -486,7 +489,6 @@ export function cleanModelName(rawModel: string): string {
     .split(" ")
     .map((w) => {
       const lower = w.toLowerCase();
-      if (["pro", "max", "plus"].includes(lower)) return w.toUpperCase();
       if (/^\d+gb$/i.test(lower) || /^\d+tb$/i.test(lower)) return lower.toUpperCase();
       if (lower === "gb" || lower === "tb") return lower.toUpperCase();
       if (lower === "iphone") return "iPhone";
@@ -501,6 +503,18 @@ export function cleanModelName(rawModel: string): string {
   }
 
   return name;
+}
+
+/**
+ * Extracts normalized storage string (e.g. "256 GB") from raw model string
+ */
+export function parseStorage(rawModel: string): string {
+  const match = rawModel.match(/(\d+\s*gb|\d+\s*tb|\d+\s*b)/i);
+  if (!match) return "128 GB";
+  const s = match[1].toUpperCase().replace(/\s+/g, "");
+  if (s.endsWith("GB") || s.endsWith("TB")) return s.replace(/(GB|TB)/, " $1");
+  if (s.endsWith("B")) return s.slice(0, -1) + " GB";
+  return s + " GB";
 }
 
 /**
@@ -572,8 +586,7 @@ export function transformSeminovosCsv(rows: string[][]): ProductItem[] {
     }
 
     const baseName = cleanModelName(rawModel);
-    const storageMatch = rawModel.match(/(\d+\s*GB|\d+\s*TB|\d+\s*B)/i);
-    const storage = storageMatch ? storageMatch[1].toUpperCase().replace(/B$/, "GB") : "128 GB";
+    const storage = parseStorage(rawModel);
 
     // Deduplicate title if identical model and battery exist
     const key = `${baseName}_${badgeText}`;
@@ -683,8 +696,7 @@ export function transformLacradosCsv(rows: string[][]): ProductItem[] {
 
   for (const group of groupMap.values()) {
     const count = group.imeis.length > 0 ? group.imeis.length : 1;
-    const storageMatch = group.rawModel.match(/(\d+\s*GB|\d+\s*TB|\d+\s*B)/i);
-    const storage = storageMatch ? storageMatch[1].toUpperCase().replace(/B$/, "GB") : "128 GB";
+    const storage = parseStorage(group.rawModel);
 
     const badgeText = count > 1 ? `📦 ${count} un. Lacradas` : "Novo Lacrado Apple";
     const specs = getSpecsByModel(group.name, storage, "100% de Fábrica");

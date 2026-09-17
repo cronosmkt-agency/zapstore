@@ -77,6 +77,8 @@ function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  const [liveProducts, setLiveProducts] = useState<ProductItem[]>(defaultProducts);
+
   // Order state machine
   const [orderStep, setOrderStep] = useState<
     "idle" | "picking_model" | "picking_delivery" | "picking_payment" | "typing_info" | "finished"
@@ -117,6 +119,14 @@ function ChatPage() {
           root.classList.add("theme-white");
         }
       }
+      // Sync Google Sheets inventory for Chat
+      fetchGoogleSheetInventory()
+        .then((items) => {
+          if (items && items.length > 0) {
+            setLiveProducts(items);
+          }
+        })
+        .catch(() => {});
 
       // Initial messages
       const now = new Date().toLocaleTimeString("pt-BR", {
@@ -762,6 +772,7 @@ function ChatPage() {
                           ? msg.productPicker.filter
                           : "Todos"
                       }
+                      products={liveProducts}
                       onSelectProduct={(prod) => handleAction("select_product", prod)}
                     />
                   )}
@@ -908,15 +919,18 @@ function FormattedMessageText({
  */
 function ChatProductPicker({
   initialFilter = "Todos",
+  products = defaultProducts,
   onSelectProduct,
 }: {
   initialFilter?: "Todos" | "Seminovos" | "Novos";
-  onSelectProduct: (prod: (typeof defaultProducts)[0]) => void;
+  products?: ProductItem[];
+  onSelectProduct: (prod: ProductItem) => void;
 }) {
   const [activeTab, setActiveTab] = useState<"Todos" | "Seminovos" | "Novos">(initialFilter);
 
-  const filtered = defaultProducts.filter((p) => {
+  const filtered = products.filter((p) => {
     if (activeTab === "Todos") return true;
+    if (activeTab === "Novos") return p.cat === "Novos" || p.cat === "Lacrados";
     return p.cat === activeTab;
   });
 
@@ -925,7 +939,11 @@ function ChatProductPicker({
       {/* Category Tabs */}
       <div className="grid grid-cols-3 gap-1 mb-2.5 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200/60 dark:border-slate-700/60">
         {(["Todos", "Seminovos", "Novos"] as const).map((tab) => {
-          const count = defaultProducts.filter((p) => tab === "Todos" || p.cat === tab).length;
+          const count = products.filter((p) => {
+            if (tab === "Todos") return true;
+            if (tab === "Novos") return p.cat === "Novos" || p.cat === "Lacrados";
+            return p.cat === tab;
+          }).length;
           const isActive = activeTab === tab;
           const label = tab === "Seminovos" ? "Seminovos" : tab === "Novos" ? "Lacrados" : "Todos";
           const icon = tab === "Seminovos" ? "✨" : tab === "Novos" ? "📦" : "📱";
@@ -950,7 +968,7 @@ function ChatProductPicker({
       {/* Product List */}
       <div className="max-h-72 overflow-y-auto space-y-2 pr-1 chat-messages-scroll overscroll-contain">
         {filtered.map((prod, idx) => {
-          const isNovo = prod.cat === "Novos";
+          const isNovo = prod.cat === "Novos" || prod.cat === "Lacrados";
           return (
             <div
               key={prod.name + idx}
@@ -975,7 +993,7 @@ function ChatProductPicker({
                           : "bg-blue-500/15 text-blue-600 dark:text-sky-400 border border-blue-500/20"
                       }`}
                     >
-                      {isNovo ? "Lacrado 1 Ano" : "Seminovo 90d"}
+                      {isNovo ? (prod.quantity && prod.quantity > 1 ? `Lacrado • ${prod.quantity} un.` : "Lacrado 1 Ano") : "Seminovo 90d"}
                     </span>
                     {prod.badge && (
                       <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold truncate">

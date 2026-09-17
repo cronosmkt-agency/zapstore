@@ -197,7 +197,7 @@ function LojaPage() {
               const count =
                 fl === "Todos"
                   ? productList.length
-                  : fl === "Lacrados" || fl === "Novos"
+                  : fl === "Lacrados"
                   ? productList.filter((p) => p.cat === "Novos" || p.cat === "Lacrados").length
                   : productList.filter((p) => p.cat === fl).length;
               const isActive = activeFilter === fl;
@@ -284,7 +284,7 @@ function LojaPage() {
               const count =
                 fl === "Todos"
                   ? productList.length
-                  : fl === "Lacrados" || fl === "Novos"
+                  : fl === "Lacrados"
                   ? productList.filter((p) => p.cat === "Novos" || p.cat === "Lacrados").length
                   : productList.filter((p) => p.cat === fl).length;
               const isActive = activeFilter === fl;
