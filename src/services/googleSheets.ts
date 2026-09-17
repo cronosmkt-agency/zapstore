@@ -1,4 +1,16 @@
 import type { ProductItem } from "@/components/ProductDetailModal";
+import iphone17ProMaxBlue from "@/assets/devices/iphone-17-pro-max-blue.webp";
+import iphone17ProMaxSilver from "@/assets/devices/iphone-17-pro-max-silver.webp";
+import iphone17ProMaxOrange from "@/assets/devices/iphone-17-pro-max-orange.webp";
+import iphone17ProSilver from "@/assets/devices/iphone-17-pro-silver.webp";
+import iphone17ProBlue from "@/assets/devices/iphone-17-pro-blue.webp";
+import iphone17White from "@/assets/devices/iphone-17-white.webp";
+import iphone17Black from "@/assets/devices/iphone-17-black.webp";
+import iphone17Blue from "@/assets/devices/iphone-17-blue.webp";
+import iphone17Green from "@/assets/devices/iphone-17-green.webp";
+import iphone17Purple from "@/assets/devices/iphone-17-purple.webp";
+import iphone17eWhite from "@/assets/devices/iphone-17e-white.webp";
+import iphone16Black from "@/assets/devices/iphone-16-black.webp";
 import iphone16ProMaxDesert from "@/assets/devices/iphone-16-pro-max-desert.webp";
 import iphone16ProMaxNatural from "@/assets/devices/iphone-16-pro-max-natural.webp";
 import iphone16ProDesert from "@/assets/devices/iphone-16-pro-desert.webp";
@@ -15,6 +27,18 @@ import iphone13Black from "@/assets/devices/iphone-13-black.webp";
 import iphone12ProMaxBlue from "@/assets/devices/iphone-12-pro-max-blue.webp";
 
 export const DEVICE_IMAGES = {
+  iphone17ProMaxBlue,
+  iphone17ProMaxSilver,
+  iphone17ProMaxOrange,
+  iphone17ProSilver,
+  iphone17ProBlue,
+  iphone17White,
+  iphone17Black,
+  iphone17Blue,
+  iphone17Green,
+  iphone17Purple,
+  iphone17eWhite,
+  iphone16Black,
   iphone16ProMaxDesert,
   iphone16ProMaxNatural,
   iphone16ProDesert,
@@ -51,42 +75,48 @@ export function getProductImageByModel(name: string): string {
   // iPhone 17 Pro Max
   if (n.includes("17 pro max")) {
     if (n.includes("azul") || n.includes("blue")) {
-      return iphone15ProBlue;
+      return iphone17ProMaxBlue;
     }
     if (n.includes("prata") || n.includes("silver") || n.includes("branco") || n.includes("white")) {
-      return iphone16ProWhite;
+      return iphone17ProMaxSilver;
     }
-    if (n.includes("laranja") || n.includes("orange")) {
-      return iphone16ProMaxDesert;
+    if (n.includes("laranja") || n.includes("orange") || n.includes("cosmico") || n.includes("cósmico")) {
+      return iphone17ProMaxOrange;
     }
-    return iphone16ProMaxDesert;
+    return iphone17ProMaxSilver;
   }
 
   // iPhone 17 Pro
   if (n.includes("17 pro")) {
     if (n.includes("azul") || n.includes("blue")) {
-      return iphone15ProBlue;
+      return iphone17ProBlue;
     }
     if (n.includes("prata") || n.includes("silver") || n.includes("branco") || n.includes("white")) {
-      return iphone16ProWhite;
+      return iphone17ProSilver;
     }
-    return iphone16ProDesert;
+    return iphone17ProSilver;
   }
 
   // iPhone 17e
   if (n.includes("17e")) {
-    return iphone16eWhite;
+    return iphone17eWhite;
   }
 
   // iPhone 17 base / plus
   if (n.includes("17")) {
     if (n.includes("preto") || n.includes("black")) {
-      return iphone15Black;
+      return iphone17Black;
     }
     if (n.includes("azul") || n.includes("blue")) {
-      return iphone15ProBlue;
+      return iphone17Blue;
     }
-    return iphone16White;
+    if (n.includes("verde") || n.includes("green")) {
+      return iphone17Green;
+    }
+    if (n.includes("lilas") || n.includes("lilás") || n.includes("purple")) {
+      return iphone17Purple;
+    }
+    return iphone17White;
   }
 
   // iPhone 16 Pro Max
@@ -119,7 +149,7 @@ export function getProductImageByModel(name: string): string {
   // iPhone 16 base / plus
   if (n.includes("16")) {
     if (n.includes("preto") || n.includes("black")) {
-      return iphone15Black;
+      return iphone16Black;
     }
     return iphone16White;
   }
