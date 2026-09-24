@@ -20,13 +20,6 @@ export const fmt = (n: number) =>
 
 export const filters = ["Todos", "Seminovos", "Lacrados"] as const;
 
-export const comboUpsell = {
-  title: "Kit Essencial Proteção Total",
-  desc: "Capa MagSafe Antichoque + Película 3D Privacidade + Carregador Turbo 20W USB-C homologado",
-  originalPrice: 180,
-  promoPrice: 99,
-};
-
 export const differentials = [
   {
     icon: Truck,

@@ -24,7 +24,6 @@ import { fetchGoogleSheetInventory } from "@/services/googleSheets";
 import {
   defaultProducts,
   filters,
-  comboUpsell,
   fmt,
   WHATSAPP,
 } from "@/data/storeData";

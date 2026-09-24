@@ -27,7 +27,6 @@ import {
 } from "@/services/googleSheets";
 import {
   defaultProducts,
-  comboUpsell,
   fmt,
   WHATSAPP,
   PHONE_DISPLAY,
@@ -535,11 +534,6 @@ Gostaria de confirmar a disponibilidade para entrega hoje em Teresópolis!`;
    3. TRUST & HYBRID MODEL (Unified Value Proposition Without Redundancy)
    ========================================================================= */
 function TrustAndHybrid() {
-  const handleComboWhatsApp = () => {
-    const text = `Olá, Terephones! Gostaria de garantir a oferta especial do *Kit Proteção Total (Capa MagSafe + Película 3D + Fonte 20W)* por R$ 99 com meu pedido!`;
-    window.open(`${WHATSAPP}?text=${encodeURIComponent(text)}`, "_blank");
-  };
-
   const pillars = [
     {
       icon: Truck,
@@ -602,39 +596,6 @@ function TrustAndHybrid() {
               </div>
             );
           })}
-        </div>
-
-        {/* Combo Blindagem Total Offer Banner */}
-        <div className="mt-8 glass-card p-5 sm:p-7 rounded-2xl border border-emerald-500/30 flex flex-col md:flex-row items-center justify-between gap-5">
-          <div className="text-center md:text-left">
-            <span className="inline-block px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 mb-2">
-              Oferta Especial de Acessórios
-            </span>
-            <h4 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-              {comboUpsell.title}
-            </h4>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-xl">
-              {comboUpsell.desc}. Saia com seu aparelho 100% blindado desde o primeiro instante!
-            </p>
-          </div>
-
-          <div className="flex items-center gap-4 shrink-0">
-            <div className="text-right">
-              <span className="text-xs line-through text-slate-400 block">
-                {fmt(comboUpsell.originalPrice)}
-              </span>
-              <span className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
-                {fmt(comboUpsell.promoPrice)}
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={handleComboWhatsApp}
-              className="btn-primary-glow text-xs sm:text-sm py-2.5 px-5 rounded-full font-bold text-white shadow-md active:scale-95 transition cursor-pointer"
-            >
-              Garantir Combo
-            </button>
-          </div>
         </div>
       </div>
     </section>
