@@ -33,6 +33,8 @@ export interface ProductItem {
   features?: string[];
   quantity?: number;
   imeis?: string[];
+  is_featured?: boolean;
+  description?: string;
 }
 
 interface ProductDetailModalProps {
@@ -40,6 +42,7 @@ interface ProductDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   whatsappNumber?: string;
+  storeName?: string;
 }
 
 const fmt = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -49,6 +52,7 @@ export function ProductDetailModal({
   isOpen,
   onClose,
   whatsappNumber = "5521964639999",
+  storeName = "Terephones",
 }: ProductDetailModalProps) {
   useEffect(() => {
     if (!isOpen) return;
@@ -67,24 +71,44 @@ export function ProductDetailModal({
 
   if (!isOpen || !product) return null;
 
-  const isNovo = product.cat === "Novos" || product.badge.toLowerCase().includes("lacrado");
+  const isNovo =
+    (product.cat || "").toLowerCase().includes("novo") ||
+    (product.cat || "").toLowerCase().includes("lacrad") ||
+    (product.badge || "").toLowerCase().includes("lacrad") ||
+    (product.badge || "").toLowerCase().includes("novo") ||
+    (product.name || "").toLowerCase().includes("lacrad") ||
+    (product.condition || "").toLowerCase().includes("lacrad") ||
+    (product.condition || "").toLowerCase().includes("novo");
+
+  const isIphoneStore =
+    storeName.toLowerCase().includes("terephones") ||
+    (product.cat || "").toLowerCase().includes("lacrad") ||
+    (product.cat || "").toLowerCase().includes("seminov");
 
   const storageDisplay =
     product.storage || product.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() || "128GB";
 
   const handleWhatsApp = () => {
     const condText = isNovo
-      ? "Novo Lacrado de Fábrica"
+      ? "Novo Lacrado de Fábrica Apple"
       : `Seminovo Grade A+${product.battery ? ` (Saúde da Bateria: ${product.battery})` : ""}`;
 
-    const text = `Olá, equipe Terephones! Gostaria de pedir este iPhone que vi no site:
+    const text = isIphoneStore
+      ? `Olá, equipe ${storeName}! Gostaria de pedir este item que vi no catálogo:
 
 📱 *Aparelho:* ${product.name}
 💰 *Valor à vista:* ${fmt(product.price)} (ou até 18x no cartão)
 💾 *Capacidade:* ${storageDisplay}
 ✨ *Condição:* ${condText}
 
-Gostaria de confirmar a disponibilidade para entrega hoje em Teresópolis!`;
+Gostaria de confirmar a disponibilidade para entrega hoje!`
+      : `Olá, equipe ${storeName}! Gostaria de mais informações e pedir este produto que vi no catálogo:
+
+📦 *Produto:* ${product.name}
+💰 *Valor:* ${fmt(product.price)}
+🏷️ *Categoria:* ${product.cat || "Geral"}
+
+Gostaria de confirmar a disponibilidade!`;
 
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`;
     window.open(url, "_blank");
@@ -95,21 +119,32 @@ Gostaria de confirmar a disponibilidade para entrega hoje em Teresópolis!`;
         "Aparelho iPhone Novo Lacrado de Fábrica",
         "Cabo original Apple USB-C / Lightning trançado",
         "Documentação oficial & chave de chip",
-        "Brinde Terephones: Película 3D de alta proteção instalada",
-        "Brinde Terephones: Capa protetora anti-impacto MagSafe",
+        `Brinde ${storeName}: Película 3D de alta proteção instalada`,
+        `Brinde ${storeName}: Capa protetora anti-impacto MagSafe`,
       ]
     : [
         "Aparelho iPhone Seminovo Grade A+ Impecável",
         "Cabo de carregamento Turbo homologado",
         "Certificado de revisão técnica em 25+ itens",
-        "Brinde Terephones: Película 3D instalada na hora",
-        "Brinde Terephones: Capa protetora anti-impacto MagSafe",
+        `Brinde ${storeName}: Película 3D instalada na hora`,
+        `Brinde ${storeName}: Capa protetora anti-impacto MagSafe`,
       ];
 
   const boxList = product.boxItems && product.boxItems.length > 0 ? product.boxItems : defaultBoxItems;
 
+  const badgeHasQty = Boolean(
+    product.badge && (/\d+\s*un/i.test(product.badge) || /estoque/i.test(product.badge))
+  );
+
   const hasBatteryInBadge =
     product.badge.toLowerCase().includes("bateria") || product.badge.toLowerCase().includes("bat");
+
+  // Format battery text avoiding duplication like "Bateria 100% Bateria"
+  const formattedBattery = product.battery
+    ? product.battery.toLowerCase().startsWith("bateria")
+      ? product.battery
+      : `Bateria ${product.battery.replace(/^bateria\s*/i, "")}`
+    : null;
 
   return (
     <div
@@ -139,19 +174,19 @@ Gostaria de confirmar a disponibilidade para entrega hoje em Teresópolis!`;
             >
               {product.badge}
             </span>
-            {product.battery && !hasBatteryInBadge && (
+            {formattedBattery && !hasBatteryInBadge && (
               <span className="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
                 <Battery className="w-3 h-3 text-emerald-500 shrink-0" />
-                <span>Bateria {product.battery}</span>
+                <span>{formattedBattery}</span>
               </span>
             )}
-            {product.quantity && product.quantity > 1 && (
+            {product.quantity && product.quantity > 1 && !badgeHasQty && (
               <span className="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center gap-1">
                 <span>📦 {product.quantity} un. em estoque</span>
               </span>
             )}
             <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 hidden xs:inline">
-              {product.cat}
+              {isNovo ? "Novo Lacrado" : (product.cat || "Seminovo")}
             </span>
           </div>
 
@@ -165,7 +200,7 @@ Gostaria de confirmar a disponibilidade para entrega hoje em Teresópolis!`;
         </div>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto px-3.5 sm:px-6 py-3.5 sm:py-5 space-y-4 sm:space-y-6">
+        <div className="overflow-y-auto overscroll-contain px-3.5 sm:px-6 py-3.5 sm:py-5 space-y-4 sm:space-y-6 [scrollbar-width:thin] [scrollbar-color:rgba(156,163,175,0.4)_transparent]">
           {/* Top Section: Imagem + Título + Preço */}
           <div className="grid sm:grid-cols-2 gap-3.5 sm:gap-6 items-center">
             {/* Foto do Aparelho */}
@@ -224,112 +259,139 @@ Gostaria de confirmar a disponibilidade para entrega hoje em Teresópolis!`;
               </div>
 
               {/* Trade-in notice */}
-              <div className="mt-2 flex items-center gap-1.5 text-[11px] sm:text-xs text-emerald-600 dark:text-emerald-400 font-bold">
-                <Zap className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
-                <span>Aceitamos seu iPhone usado na troca (Trade-In)</span>
-              </div>
+              {isIphoneStore && (
+                <div className="mt-2 flex items-center gap-1.5 text-[11px] sm:text-xs text-emerald-600 dark:text-emerald-400 font-bold">
+                  <Zap className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
+                  <span>Aceitamos seu iPhone usado na troca (Trade-In)</span>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Ficha Técnica / Especificações em Grid */}
-          <div>
-            <h3 className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-slate-800 dark:text-slate-100 mb-2 sm:mb-3 flex items-center gap-1.5">
-              <Smartphone className="w-4 h-4 text-sky-400" />
-              Especificações Técnicas
-            </h3>
+          {isIphoneStore ? (
+            <div>
+              <h3 className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-slate-800 dark:text-slate-100 mb-2 sm:mb-3 flex items-center gap-1.5">
+                <Smartphone className="w-4 h-4 text-sky-400" />
+                Especificações Técnicas
+              </h3>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
-              <div className="product-modal-box p-2.5 sm:p-3">
-                <div className="spec-label flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-300">
-                  <Smartphone className="w-3.5 h-3.5 text-sky-400" />
-                  Armazenamento
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
+                <div className="product-modal-box p-2.5 sm:p-3">
+                  <div className="spec-label flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-300">
+                    <Smartphone className="w-3.5 h-3.5 text-sky-400" />
+                    Armazenamento
+                  </div>
+                  <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white">
+                    {storageDisplay}
+                  </div>
                 </div>
-                <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white">
-                  {storageDisplay}
-                </div>
-              </div>
 
-              <div className="product-modal-box p-2.5 sm:p-3">
-                <div className="spec-label flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-300">
-                  <Battery className="w-3.5 h-3.5 text-emerald-400" />
-                  Saúde da Bateria
+                <div className="product-modal-box p-2.5 sm:p-3">
+                  <div className="spec-label flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-300">
+                    <Battery className="w-3.5 h-3.5 text-emerald-400" />
+                    Saúde da Bateria
+                  </div>
+                  <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-emerald-600 dark:text-emerald-400">
+                    {product.battery || (isNovo ? "100% (Lacrado)" : "88% a 100% (Original)")}
+                  </div>
                 </div>
-                <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-emerald-600 dark:text-emerald-400">
-                  {product.battery || (isNovo ? "100% (Lacrado)" : "88% a 100% (Original)")}
-                </div>
-              </div>
 
-              <div className="product-modal-box p-2.5 sm:p-3">
-                <div className="spec-label flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-300">
-                  <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />
-                  Garantia
+                <div className="product-modal-box p-2.5 sm:p-3">
+                  <div className="spec-label flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-300">
+                    <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />
+                    Garantia
+                  </div>
+                  <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-blue-600 dark:text-sky-300 truncate">
+                    {product.warranty || (isNovo ? "1 Ano Apple" : "90 Dias Terephones")}
+                  </div>
                 </div>
-                <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-blue-600 dark:text-sky-300 truncate">
-                  {product.warranty || (isNovo ? "1 Ano Apple" : "90 Dias Terephones")}
-                </div>
-              </div>
 
-              <div className="product-modal-box p-2.5 sm:p-3">
-                <div className="spec-label flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-300">
-                  <Smartphone className="w-3.5 h-3.5 text-sky-400" />
-                  Tela
+                <div className="product-modal-box p-2.5 sm:p-3">
+                  <div className="spec-label flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-300">
+                    <Smartphone className="w-3.5 h-3.5 text-sky-400" />
+                    Tela
+                  </div>
+                  <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white truncate">
+                    {product.screen || "Super Retina XDR"}
+                  </div>
                 </div>
-                <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white truncate">
-                  {product.screen || "Super Retina XDR"}
-                </div>
-              </div>
 
-              <div className="product-modal-box p-2.5 sm:p-3">
-                <div className="spec-label flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-300">
-                  <Camera className="w-3.5 h-3.5 text-sky-400" />
-                  Câmeras
+                <div className="product-modal-box p-2.5 sm:p-3">
+                  <div className="spec-label flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-300">
+                    <Camera className="w-3.5 h-3.5 text-sky-400" />
+                    Câmeras
+                  </div>
+                  <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white truncate">
+                    {product.camera || "Apple Pro / 4K"}
+                  </div>
                 </div>
-                <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white truncate">
-                  {product.camera || "Apple Pro / 4K"}
-                </div>
-              </div>
 
-              <div className="product-modal-box p-2.5 sm:p-3">
-                <div className="spec-label flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-300">
-                  <Cpu className="w-3.5 h-3.5 text-sky-400" />
-                  Chip
-                </div>
-                <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white truncate">
-                  {product.chip || "Apple Bionic / Pro"}
+                <div className="product-modal-box p-2.5 sm:p-3">
+                  <div className="spec-label flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-300">
+                    <Cpu className="w-3.5 h-3.5 text-sky-400" />
+                    Chip
+                  </div>
+                  <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white truncate">
+                    {product.chip || "Apple Bionic / Pro"}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          ) : (
+            product.specs ? (
+              <div>
+                <h3 className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-slate-800 dark:text-slate-100 mb-2 sm:mb-3 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-sky-400" />
+                  Destaques & Ficha Técnica
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
+                  {product.specs.split(" • ").map((spec, i) => (
+                    <div key={i} className="product-modal-box p-2.5 sm:p-3">
+                      <div className="text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-400">
+                        Item {i + 1}
+                      </div>
+                      <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white mt-0.5">
+                        {spec}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null
+          )}
 
-          {/* O que vem na embalagem / Pedido */}
-          <div className="product-modal-box p-3.5 sm:p-5">
-            <h3 className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-slate-800 dark:text-white mb-2 sm:mb-2.5 flex items-center gap-2">
-              <Gift className="w-4 h-4 text-emerald-400" />
-              O que você recebe no seu pedido:
-            </h3>
-            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-slate-700 dark:text-slate-100 font-medium">
-              {boxList.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* O que vem na embalagem / Pedido (Apenas se for iPhone ou se houver boxItems explícitos) */}
+          {isIphoneStore ? (
+            <div className="product-modal-box p-3.5 sm:p-5">
+              <h3 className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-slate-800 dark:text-white mb-2 sm:mb-2.5 flex items-center gap-2">
+                <Gift className="w-4 h-4 text-emerald-400" />
+                O que você recebe no seu pedido:
+              </h3>
+              <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-slate-700 dark:text-slate-100 font-medium">
+                {boxList.map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 shrink-0 mt-0.5" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
 
           {/* Compromissos de Segurança */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-slate-700 dark:text-slate-200 font-semibold">
             <div className="product-modal-box p-2.5 sm:p-3 flex items-center gap-2">
               <Truck className="w-4 h-4 text-sky-400 shrink-0" />
-              <span>Entrega Express em até 1h em Teresópolis</span>
+              <span>{isIphoneStore ? "Entrega Express em até 1h em Teresópolis" : "Atendimento Rápido e Seguro via WhatsApp"}</span>
             </div>
             <div className="product-modal-box p-2.5 sm:p-3 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Pague somente na entrega após testar</span>
+              <span>{isIphoneStore ? "Pague somente na entrega após testar" : "Garantia e Procedência Assegurada"}</span>
             </div>
             <div className="product-modal-box p-2.5 sm:p-3 flex items-center gap-2">
               <Building2 className="w-4 h-4 text-indigo-400 shrink-0" />
-              <span>Retirada presencial na SejaDelta</span>
+              <span>{isIphoneStore ? "Retirada presencial na SejaDelta" : "Pagamento Facilitado (Pix ou Cartão)"}</span>
             </div>
           </div>
         </div>

@@ -1,12 +1,15 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Smartphone } from "lucide-react";
 
-export function MobileBottomNav() {
+export function MobileBottomNav({ basePath }: { basePath?: string } = {}) {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
 
-  const isInicio = currentPath === "/";
-  const isLoja = currentPath === "/loja";
+  const homePath = basePath || "/";
+  const lojaPath = basePath ? `${basePath}/loja` : "/loja";
+
+  const isInicio = currentPath === homePath;
+  const isLoja = currentPath === lojaPath;
 
   return (
     <nav
@@ -16,7 +19,7 @@ export function MobileBottomNav() {
       <div className="grid grid-cols-2 max-w-xs mx-auto items-center gap-4">
         {/* Início */}
         <Link
-          to="/"
+          to={homePath}
           className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition-all ${
             isInicio
               ? "text-blue-600 dark:text-sky-400 font-black scale-105"
@@ -33,7 +36,7 @@ export function MobileBottomNav() {
 
         {/* Loja */}
         <Link
-          to="/loja"
+          to={lojaPath}
           className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition-all ${
             isLoja
               ? "text-blue-600 dark:text-sky-400 font-black scale-105"

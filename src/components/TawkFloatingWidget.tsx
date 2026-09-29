@@ -7,7 +7,7 @@ declare global {
   }
 }
 
-export function TawkFloatingWidget() {
+export function TawkFloatingWidget({ propertyId }: { propertyId?: string } = {}) {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -66,10 +66,11 @@ export function TawkFloatingWidget() {
     window.addEventListener("resize", adjustTawkMobilePosition);
 
     if (!document.getElementById("tawk-floating-script")) {
+      const widgetId = propertyId && propertyId.trim() ? propertyId.trim() : "6aac00529d89af3444bee888/1k2o8b0j4";
       const s1 = document.createElement("script");
       s1.id = "tawk-floating-script";
       s1.async = true;
-      s1.src = "https://embed.tawk.to/6aac00529d89af3444bee888/1k2o8b0j4";
+      s1.src = `https://embed.tawk.to/${widgetId}`;
       s1.charset = "UTF-8";
       s1.setAttribute("crossorigin", "*");
 

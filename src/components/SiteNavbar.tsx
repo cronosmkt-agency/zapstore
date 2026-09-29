@@ -9,9 +9,22 @@ import { WHATSAPP } from "@/data/storeData";
 interface SiteNavbarProps {
   currentTheme: ThemeMode;
   toggleTheme: () => void;
+  basePath?: string;
+  storeName?: string;
+  storeLogo?: string;
+  whatsapp?: string;
+  showThemeToggle?: boolean;
 }
 
-export function SiteNavbar({ currentTheme, toggleTheme }: SiteNavbarProps) {
+export function SiteNavbar({
+  currentTheme,
+  toggleTheme,
+  basePath,
+  storeName,
+  storeLogo,
+  whatsapp,
+  showThemeToggle = true,
+}: SiteNavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [afterHours, setAfterHours] = useState(false);
   const [themeNotice, setThemeNotice] = useState<{
@@ -54,9 +67,15 @@ export function SiteNavbar({ currentTheme, toggleTheme }: SiteNavbarProps) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const navLinks = [
-    { label: "Início", path: "/" },
-    { label: "Loja", path: "/loja" },
+  const homePath = basePath || "/";
+  const lojaPath = basePath ? `${basePath}/loja` : "/loja";
+  const whatsUrl = whatsapp
+    ? (whatsapp.startsWith("http") ? whatsapp : `https://wa.me/${whatsapp.replace(/\D/g, "")}`)
+    : WHATSAPP;
+
+  const navLinks: { label: string; path: string; hasDot?: boolean }[] = [
+    { label: "Início", path: homePath },
+    { label: "Loja", path: lojaPath },
   ];
 
   return (
@@ -68,8 +87,23 @@ export function SiteNavbar({ currentTheme, toggleTheme }: SiteNavbarProps) {
             scrolled ? "scrolled" : ""
           } flex items-center justify-between px-6 py-2 w-full max-w-5xl xl:max-w-6xl transition-all duration-300`}
         >
-          <Link to="/" className="shrink-0 logo-desk flex items-center">
-            <BrandLogo height={38} showText={true} dark={isDark} />
+          <Link to={homePath} className="shrink-0 logo-desk flex items-center">
+            {storeLogo ? (
+              <div className="flex items-center gap-2.5">
+                <img
+                  src={storeLogo}
+                  alt={storeName || "Logo"}
+                  className="h-9 w-auto max-w-[140px] object-contain rounded-md"
+                />
+                {storeName && (
+                  <span className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">
+                    {storeName}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <BrandLogo height={38} showText={true} dark={isDark} />
+            )}
           </Link>
 
           <div className="flex items-center justify-center gap-1.5">
@@ -96,7 +130,9 @@ export function SiteNavbar({ currentTheme, toggleTheme }: SiteNavbarProps) {
 
           <div className="flex items-center gap-3 justify-end">
             {/* Neumorphic Day/Night Sliding Switch */}
-            <ThemeToggleSwitch isDark={isDark} toggleTheme={handleToggleTheme} />
+            {showThemeToggle && (
+              <ThemeToggleSwitch isDark={isDark} toggleTheme={handleToggleTheme} />
+            )}
 
             <div className="badge-aberto text-xs py-1 px-3">
               {afterHours
@@ -110,7 +146,7 @@ export function SiteNavbar({ currentTheme, toggleTheme }: SiteNavbarProps) {
             />
 
             <a
-              href={WHATSAPP}
+              href={whatsUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-pedir-agora text-xs py-2 px-4 rounded-full flex items-center gap-1.5"
@@ -151,17 +187,34 @@ export function SiteNavbar({ currentTheme, toggleTheme }: SiteNavbarProps) {
         <nav className={`pointer-events-auto w-full nav-pill ${scrolled ? "scrolled" : ""}`}>
           <div className="flex items-center justify-between h-14 px-4 sm:px-5">
             <Link
-              to="/"
+              to={homePath}
               className="flex items-center transition-opacity hover:opacity-90 active:scale-95"
-              aria-label="Página Inicial Terephones"
+              aria-label={`Página Inicial ${storeName || "Terephones"}`}
             >
-              <BrandLogo height={34} showText={true} dark={isDark} />
+              {storeLogo ? (
+                <div className="flex items-center gap-2">
+                  <img
+                    src={storeLogo}
+                    alt={storeName || "Logo"}
+                    className="h-8 w-auto max-w-[120px] object-contain rounded-md"
+                  />
+                  {storeName && (
+                    <span className="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white truncate max-w-[120px]">
+                      {storeName}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <BrandLogo height={34} showText={true} dark={isDark} />
+              )}
             </Link>
 
             {/* Neumorphic Day/Night Sliding Switch for mobile */}
-            <div className="scale-90 origin-right">
-              <ThemeToggleSwitch isDark={isDark} toggleTheme={handleToggleTheme} />
-            </div>
+            {showThemeToggle && (
+              <div className="scale-90 origin-right">
+                <ThemeToggleSwitch isDark={isDark} toggleTheme={handleToggleTheme} />
+              </div>
+            )}
           </div>
         </nav>
 

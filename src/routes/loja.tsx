@@ -110,11 +110,16 @@ function LojaPage() {
   };
 
   const handleOrderWhatsApp = (prod: ProductItem) => {
-    const isNovo = prod.cat === "Novos" || prod.badge.toLowerCase().includes("lacrado");
+    const isNovo =
+      prod.cat === "Novos" ||
+      prod.cat === "Lacrados" ||
+      prod.badge.toLowerCase().includes("lacrad") ||
+      prod.badge.toLowerCase().includes("novo") ||
+      prod.name.toLowerCase().includes("lacrad");
     const storageDisplay =
       prod.storage || prod.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() || "128GB";
     const condText = isNovo
-      ? "Novo Lacrado de Fábrica"
+      ? "Novo Lacrado de Fábrica Apple"
       : `Seminovo Grade A+${prod.battery ? ` (Saúde da Bateria: ${prod.battery})` : ""}`;
 
     const text = `Olá, equipe Terephones! Gostaria de pedir este iPhone que vi na Loja:

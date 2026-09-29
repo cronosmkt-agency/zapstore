@@ -7,11 +7,50 @@ import {
   INSTAGRAM_URL,
   INSTAGRAM_HANDLE,
 } from "@/data/storeData";
-import { Phone, Instagram, Clock } from "lucide-react";
+import { Phone, Instagram, Clock, MapPin } from "lucide-react";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
-export function SiteFooter({ currentTheme }: { currentTheme?: ThemeMode }) {
+export interface SiteFooterProps {
+  currentTheme?: ThemeMode;
+  basePath?: string;
+  storeName?: string;
+  storeLogo?: string;
+  storeTagline?: string;
+  whatsapp?: string;
+  phoneDisplay?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  businessHours?: string;
+  instagramUrl?: string;
+  facebookUrl?: string;
+  tiktokUrl?: string;
+}
+
+export function SiteFooter({
+  currentTheme,
+  basePath,
+  storeName,
+  storeLogo,
+  storeTagline,
+  whatsapp,
+  phoneDisplay,
+  address,
+  city,
+  state,
+  businessHours,
+  instagramUrl,
+  facebookUrl,
+  tiktokUrl,
+}: SiteFooterProps = {}) {
   const isDark = currentTheme === "black-piano";
+  const homePath = basePath || "/";
+  const lojaPath = basePath ? `${basePath}/loja` : "/loja";
+  const whatsUrl = whatsapp
+    ? (whatsapp.startsWith("http") ? whatsapp : `https://wa.me/${whatsapp.replace(/\D/g, "")}`)
+    : WHATSAPP;
+  const name = storeName || "Terephones";
+  const phone = phoneDisplay || PHONE_DISPLAY;
 
   return (
     <footer
@@ -26,14 +65,25 @@ export function SiteFooter({ currentTheme }: { currentTheme?: ThemeMode }) {
       <div className="max-w-7xl mx-auto">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <BrandLogo showText={true} dark={isDark} />
+            {storeLogo ? (
+              <div className="flex items-center gap-2.5 mb-3">
+                <img
+                  src={storeLogo}
+                  alt={name}
+                  className="h-9 w-auto max-w-[150px] object-contain rounded-md"
+                />
+                <span className="font-black text-lg tracking-tight text-slate-900 dark:text-white">
+                  {name}
+                </span>
+              </div>
+            ) : (
+              <BrandLogo showText={true} dark={isDark} />
+            )}
             <p
-              className="text-sm mt-4 leading-relaxed"
+              className="text-sm mt-3 leading-relaxed"
               style={{ color: "var(--text-secondary)" }}
             >
-              A sua melhor experiência na compra de iPhones novos e seminovos em
-              Teresópolis com entrega express no mesmo dia ou retirada na loja
-              parceira SejaDelta.
+              {storeTagline || "A sua melhor experiência de compra com produtos selecionados, pronta entrega e pagamento com total segurança."}
             </p>
           </div>
 
@@ -47,7 +97,7 @@ export function SiteFooter({ currentTheme }: { currentTheme?: ThemeMode }) {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  to="/"
+                  to={homePath}
                   className="transition hover:text-blue-600"
                   style={{ color: "var(--text-secondary)" }}
                 >
@@ -56,7 +106,7 @@ export function SiteFooter({ currentTheme }: { currentTheme?: ThemeMode }) {
               </li>
               <li>
                 <Link
-                  to="/loja"
+                  to={lojaPath}
                   className="transition hover:text-blue-600 font-semibold"
                   style={{ color: "var(--text-secondary)" }}
                 >
@@ -159,14 +209,14 @@ export function SiteFooter({ currentTheme }: { currentTheme?: ThemeMode }) {
               className="font-bold mb-4"
               style={{ color: "var(--text-primary)" }}
             >
-              Atendimento
+              Atendimento & Contato
             </div>
             <div
               className="text-sm space-y-2.5"
               style={{ color: "var(--text-secondary)" }}
             >
               <a
-                href={WHATSAPP}
+                href={whatsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 hover:text-emerald-500 transition font-medium"
@@ -175,41 +225,59 @@ export function SiteFooter({ currentTheme }: { currentTheme?: ThemeMode }) {
                   className="w-4 h-4 shrink-0"
                   style={{ color: "var(--blue-primary)" }}
                 />
-                <span>{PHONE_DISPLAY}</span>
+                <span>{phone}</span>
               </a>
-              <a
-                href={INSTAGRAM_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 hover:text-sky-400 transition"
-              >
-                <Instagram
-                  className="w-4 h-4 shrink-0"
-                  style={{ color: "var(--blue-primary)" }}
-                />{" "}
-                {INSTAGRAM_HANDLE}
-              </a>
-              <div
-                className="flex items-center gap-2 text-xs"
-                style={{ color: "var(--text-muted)" }}
-              >
-                <Clock className="w-3.5 h-3.5 shrink-0" /> Seg a Sáb das 10h às
-                18h
-              </div>
+
+              {instagramUrl && (
+                <a
+                  href={instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 hover:text-sky-400 transition"
+                >
+                  <Instagram
+                    className="w-4 h-4 shrink-0"
+                    style={{ color: "var(--blue-primary)" }}
+                  />
+                  <span>Instagram</span>
+                </a>
+              )}
+
+              {businessHours && (
+                <div
+                  className="flex items-center gap-2 text-xs"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  <Clock className="w-3.5 h-3.5 shrink-0" />
+                  <span>{businessHours}</span>
+                </div>
+              )}
+
+              {address && (
+                <div
+                  className="flex items-start gap-2 text-xs"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                  <span>{address}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        <div className="mt-12 text-center">
-          <a
-            href={INSTAGRAM_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-3xl sm:text-4xl font-black text-gradient-blue hover:opacity-80 transition"
-          >
-            {INSTAGRAM_HANDLE}
-          </a>
-        </div>
+        {instagramUrl && (
+          <div className="mt-12 text-center">
+            <a
+              href={instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-2xl sm:text-3xl font-black text-gradient-blue hover:opacity-80 transition"
+            >
+              {name} no Instagram
+            </a>
+          </div>
+        )}
 
         <div
           className="mt-10 h-px"
@@ -224,11 +292,11 @@ export function SiteFooter({ currentTheme }: { currentTheme?: ThemeMode }) {
           style={{ color: "var(--text-muted)" }}
         >
           <div>
-            © {new Date().getFullYear()} Terephones — Teresópolis, RJ. Todos os
+            © {new Date().getFullYear()} {name} {city ? `— ${city}, ${state || 'Brasil'}` : '— Teresópolis, RJ'}. Todos os
             direitos reservados.
           </div>
           <div>
-            Entrega no mesmo dia • Retirada na loja física parceira SejaDelta
+            Entrega express & suporte oficial via WhatsApp
           </div>
         </div>
       </div>

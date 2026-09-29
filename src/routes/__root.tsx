@@ -14,6 +14,8 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CursorEffects } from "../components/CursorEffects";
 import { Toaster } from "@/components/ui/sonner";
 import { TawkFloatingWidget } from "@/components/TawkFloatingWidget";
+import { AuthProvider } from "@/context/AuthContext";
+import { initDb } from "@/lib/mockDb";
 
 function NotFoundComponent() {
   return (
@@ -141,7 +143,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -171,13 +173,21 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    // Inicializar banco de dados mock na primeira execução
+    if (typeof window !== "undefined") {
+      initDb();
+    }
+  }, []);
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <CursorEffects />
-      <TawkFloatingWidget />
-      <Toaster position="top-center" offset="84px" duration={1400} richColors />
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-    </QueryClientProvider>
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <CursorEffects />
+        <Toaster position="top-center" offset="84px" duration={1400} richColors />
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </QueryClientProvider>
+    </AuthProvider>
   );
 }

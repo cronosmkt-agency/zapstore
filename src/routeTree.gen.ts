@@ -10,13 +10,43 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SlugRouteImport } from './routes/$slug'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ChatRouteImport } from './routes/chat'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as LojaRouteImport } from './routes/loja'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SlugIndexRouteImport } from './routes/$slug/index'
+import { Route as SlugLojaRouteImport } from './routes/$slug/loja'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminConfiguracoesRouteImport } from './routes/admin/configuracoes'
+import { Route as AdminMetricasRouteImport } from './routes/admin/metricas'
+import { Route as AdminPlanosRouteImport } from './routes/admin/planos'
+import { Route as AdminUsuariosRouteImport } from './routes/admin/usuarios'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardAvaliacoesRouteImport } from './routes/dashboard/avaliacoes'
+import { Route as DashboardConfiguracoesRouteImport } from './routes/dashboard/configuracoes'
+import { Route as DashboardPlanosRouteImport } from './routes/dashboard/planos'
+import { Route as DashboardProdutosRouteImport } from './routes/dashboard/produtos'
+import { Route as DashboardProdutosIndexRouteImport } from './routes/dashboard/produtos/index'
+import { Route as DashboardProdutosIdRouteImport } from './routes/dashboard/produtos/$id'
+import { Route as DashboardProdutosNovoRouteImport } from './routes/dashboard/produtos/novo'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugRoute = SlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChatRoute = ChatRouteImport.update({
@@ -24,9 +54,24 @@ const ChatRoute = ChatRouteImport.update({
   path: '/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LojaRoute = LojaRouteImport.update({
   id: '/loja',
   path: '/loja',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -34,38 +79,243 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SlugIndexRoute = SlugIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SlugRoute,
+} as any)
+const SlugLojaRoute = SlugLojaRouteImport.update({
+  id: '/loja',
+  path: '/loja',
+  getParentRoute: () => SlugRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMetricasRoute = AdminMetricasRouteImport.update({
+  id: '/metricas',
+  path: '/metricas',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPlanosRoute = AdminPlanosRouteImport.update({
+  id: '/planos',
+  path: '/planos',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => AdminRoute,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAvaliacoesRoute = DashboardAvaliacoesRouteImport.update({
+  id: '/avaliacoes',
+  path: '/avaliacoes',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardConfiguracoesRoute = DashboardConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardPlanosRoute = DashboardPlanosRouteImport.update({
+  id: '/planos',
+  path: '/planos',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardProdutosRoute = DashboardProdutosRouteImport.update({
+  id: '/produtos',
+  path: '/produtos',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardProdutosIndexRoute = DashboardProdutosIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardProdutosRoute,
+} as any)
+const DashboardProdutosIdRoute = DashboardProdutosIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => DashboardProdutosRoute,
+} as any)
+const DashboardProdutosNovoRoute = DashboardProdutosNovoRouteImport.update({
+  id: '/novo',
+  path: '/novo',
+  getParentRoute: () => DashboardProdutosRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$slug': typeof SlugRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/chat': typeof ChatRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/login': typeof LoginRoute
   '/loja': typeof LojaRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/$slug/loja': typeof SlugLojaRoute
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/metricas': typeof AdminMetricasRoute
+  '/admin/planos': typeof AdminPlanosRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
+  '/dashboard/avaliacoes': typeof DashboardAvaliacoesRoute
+  '/dashboard/configuracoes': typeof DashboardConfiguracoesRoute
+  '/dashboard/planos': typeof DashboardPlanosRoute
+  '/dashboard/produtos': typeof DashboardProdutosRouteWithChildren
+  '/$slug/': typeof SlugIndexRoute
+  '/admin/': typeof AdminIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/produtos/$id': typeof DashboardProdutosIdRoute
+  '/dashboard/produtos/novo': typeof DashboardProdutosNovoRoute
+  '/dashboard/produtos/': typeof DashboardProdutosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/chat': typeof ChatRoute
+  '/login': typeof LoginRoute
   '/loja': typeof LojaRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/$slug/loja': typeof SlugLojaRoute
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/metricas': typeof AdminMetricasRoute
+  '/admin/planos': typeof AdminPlanosRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
+  '/dashboard/avaliacoes': typeof DashboardAvaliacoesRoute
+  '/dashboard/configuracoes': typeof DashboardConfiguracoesRoute
+  '/dashboard/planos': typeof DashboardPlanosRoute
+  '/$slug': typeof SlugIndexRoute
+  '/admin': typeof AdminIndexRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/dashboard/produtos/$id': typeof DashboardProdutosIdRoute
+  '/dashboard/produtos/novo': typeof DashboardProdutosNovoRoute
+  '/dashboard/produtos': typeof DashboardProdutosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$slug': typeof SlugRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/chat': typeof ChatRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/login': typeof LoginRoute
   '/loja': typeof LojaRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/$slug/loja': typeof SlugLojaRoute
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/metricas': typeof AdminMetricasRoute
+  '/admin/planos': typeof AdminPlanosRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
+  '/dashboard/avaliacoes': typeof DashboardAvaliacoesRoute
+  '/dashboard/configuracoes': typeof DashboardConfiguracoesRoute
+  '/dashboard/planos': typeof DashboardPlanosRoute
+  '/dashboard/produtos': typeof DashboardProdutosRouteWithChildren
+  '/$slug/': typeof SlugIndexRoute
+  '/admin/': typeof AdminIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/produtos/$id': typeof DashboardProdutosIdRoute
+  '/dashboard/produtos/novo': typeof DashboardProdutosNovoRoute
+  '/dashboard/produtos/': typeof DashboardProdutosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/chat' | '/loja' | '/sitemap.xml'
+  fullPaths:
+    | '/'
+    | '/$slug'
+    | '/admin'
+    | '/chat'
+    | '/dashboard'
+    | '/login'
+    | '/loja'
+    | '/signup'
+    | '/sitemap.xml'
+    | '/$slug/loja'
+    | '/admin/configuracoes'
+    | '/admin/metricas'
+    | '/admin/planos'
+    | '/admin/usuarios'
+    | '/dashboard/avaliacoes'
+    | '/dashboard/configuracoes'
+    | '/dashboard/planos'
+    | '/dashboard/produtos'
+    | '/$slug/'
+    | '/admin/'
+    | '/dashboard/'
+    | '/dashboard/produtos/$id'
+    | '/dashboard/produtos/novo'
+    | '/dashboard/produtos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chat' | '/loja' | '/sitemap.xml'
-  id: '__root__' | '/' | '/chat' | '/loja' | '/sitemap.xml'
+  to:
+    | '/'
+    | '/chat'
+    | '/login'
+    | '/loja'
+    | '/signup'
+    | '/sitemap.xml'
+    | '/$slug/loja'
+    | '/admin/configuracoes'
+    | '/admin/metricas'
+    | '/admin/planos'
+    | '/admin/usuarios'
+    | '/dashboard/avaliacoes'
+    | '/dashboard/configuracoes'
+    | '/dashboard/planos'
+    | '/$slug'
+    | '/admin'
+    | '/dashboard'
+    | '/dashboard/produtos/$id'
+    | '/dashboard/produtos/novo'
+    | '/dashboard/produtos'
+  id:
+    | '__root__'
+    | '/'
+    | '/$slug'
+    | '/admin'
+    | '/chat'
+    | '/dashboard'
+    | '/login'
+    | '/loja'
+    | '/signup'
+    | '/sitemap.xml'
+    | '/$slug/loja'
+    | '/admin/configuracoes'
+    | '/admin/metricas'
+    | '/admin/planos'
+    | '/admin/usuarios'
+    | '/dashboard/avaliacoes'
+    | '/dashboard/configuracoes'
+    | '/dashboard/planos'
+    | '/dashboard/produtos'
+    | '/$slug/'
+    | '/admin/'
+    | '/dashboard/'
+    | '/dashboard/produtos/$id'
+    | '/dashboard/produtos/novo'
+    | '/dashboard/produtos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SlugRoute: typeof SlugRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
   ChatRoute: typeof ChatRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
+  LoginRoute: typeof LoginRoute
   LojaRoute: typeof LojaRoute
+  SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
@@ -78,11 +328,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$slug': {
+      id: '/$slug'
+      path: '/$slug'
+      fullPath: '/$slug'
+      preLoaderRoute: typeof SlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/chat': {
       id: '/chat'
       path: '/chat'
       fullPath: '/chat'
       preLoaderRoute: typeof ChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/loja': {
@@ -92,6 +370,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LojaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -99,13 +384,188 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$slug/': {
+      id: '/$slug/'
+      path: '/'
+      fullPath: '/$slug/'
+      preLoaderRoute: typeof SlugIndexRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/$slug/loja': {
+      id: '/$slug/loja'
+      path: '/loja'
+      fullPath: '/$slug/loja'
+      preLoaderRoute: typeof SlugLojaRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/configuracoes': {
+      id: '/admin/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof AdminConfiguracoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/metricas': {
+      id: '/admin/metricas'
+      path: '/metricas'
+      fullPath: '/admin/metricas'
+      preLoaderRoute: typeof AdminMetricasRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/planos': {
+      id: '/admin/planos'
+      path: '/planos'
+      fullPath: '/admin/planos'
+      preLoaderRoute: typeof AdminPlanosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/usuarios': {
+      id: '/admin/usuarios'
+      path: '/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof AdminUsuariosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/avaliacoes': {
+      id: '/dashboard/avaliacoes'
+      path: '/avaliacoes'
+      fullPath: '/dashboard/avaliacoes'
+      preLoaderRoute: typeof DashboardAvaliacoesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/configuracoes': {
+      id: '/dashboard/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/dashboard/configuracoes'
+      preLoaderRoute: typeof DashboardConfiguracoesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/planos': {
+      id: '/dashboard/planos'
+      path: '/planos'
+      fullPath: '/dashboard/planos'
+      preLoaderRoute: typeof DashboardPlanosRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/produtos': {
+      id: '/dashboard/produtos'
+      path: '/produtos'
+      fullPath: '/dashboard/produtos'
+      preLoaderRoute: typeof DashboardProdutosRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/produtos/': {
+      id: '/dashboard/produtos/'
+      path: '/'
+      fullPath: '/dashboard/produtos/'
+      preLoaderRoute: typeof DashboardProdutosIndexRouteImport
+      parentRoute: typeof DashboardProdutosRoute
+    }
+    '/dashboard/produtos/$id': {
+      id: '/dashboard/produtos/$id'
+      path: '/$id'
+      fullPath: '/dashboard/produtos/$id'
+      preLoaderRoute: typeof DashboardProdutosIdRouteImport
+      parentRoute: typeof DashboardProdutosRoute
+    }
+    '/dashboard/produtos/novo': {
+      id: '/dashboard/produtos/novo'
+      path: '/novo'
+      fullPath: '/dashboard/produtos/novo'
+      preLoaderRoute: typeof DashboardProdutosNovoRouteImport
+      parentRoute: typeof DashboardProdutosRoute
+    }
   }
 }
 
+interface SlugRouteChildren {
+  SlugLojaRoute: typeof SlugLojaRoute
+  SlugIndexRoute: typeof SlugIndexRoute
+}
+
+const SlugRouteChildren: SlugRouteChildren = {
+  SlugLojaRoute: SlugLojaRoute,
+  SlugIndexRoute: SlugIndexRoute,
+}
+
+const SlugRouteWithChildren = SlugRoute._addFileChildren(SlugRouteChildren)
+
+interface AdminRouteChildren {
+  AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
+  AdminMetricasRoute: typeof AdminMetricasRoute
+  AdminPlanosRoute: typeof AdminPlanosRoute
+  AdminUsuariosRoute: typeof AdminUsuariosRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminConfiguracoesRoute: AdminConfiguracoesRoute,
+  AdminMetricasRoute: AdminMetricasRoute,
+  AdminPlanosRoute: AdminPlanosRoute,
+  AdminUsuariosRoute: AdminUsuariosRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface DashboardProdutosRouteChildren {
+  DashboardProdutosIdRoute: typeof DashboardProdutosIdRoute
+  DashboardProdutosNovoRoute: typeof DashboardProdutosNovoRoute
+  DashboardProdutosIndexRoute: typeof DashboardProdutosIndexRoute
+}
+
+const DashboardProdutosRouteChildren: DashboardProdutosRouteChildren = {
+  DashboardProdutosIdRoute: DashboardProdutosIdRoute,
+  DashboardProdutosNovoRoute: DashboardProdutosNovoRoute,
+  DashboardProdutosIndexRoute: DashboardProdutosIndexRoute,
+}
+
+const DashboardProdutosRouteWithChildren =
+  DashboardProdutosRoute._addFileChildren(DashboardProdutosRouteChildren)
+
+interface DashboardRouteChildren {
+  DashboardAvaliacoesRoute: typeof DashboardAvaliacoesRoute
+  DashboardConfiguracoesRoute: typeof DashboardConfiguracoesRoute
+  DashboardPlanosRoute: typeof DashboardPlanosRoute
+  DashboardProdutosRoute: typeof DashboardProdutosRouteWithChildren
+  DashboardIndexRoute: typeof DashboardIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardAvaliacoesRoute: DashboardAvaliacoesRoute,
+  DashboardConfiguracoesRoute: DashboardConfiguracoesRoute,
+  DashboardPlanosRoute: DashboardPlanosRoute,
+  DashboardProdutosRoute: DashboardProdutosRouteWithChildren,
+  DashboardIndexRoute: DashboardIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SlugRoute: SlugRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
   ChatRoute: ChatRoute,
+  DashboardRoute: DashboardRouteWithChildren,
+  LoginRoute: LoginRoute,
   LojaRoute: LojaRoute,
+  SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport

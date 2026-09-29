@@ -99,6 +99,12 @@ html.theme-black-piano, html.theme-black-piano body {
   &::-webkit-scrollbar { display: none; }
 }
 
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
 
 /* ============ Background orbs (light) ============ */
 .brand-bg {
@@ -1041,6 +1047,145 @@ html.theme-black-piano body {
 .theme-black-piano select option {
   background: #0b0f19 !important;
   color: #f8fafc !important;
+}
+
+/* ============ Black Piano Mode — Full Application Harmony ============ */
+html.theme-black-piano .bg-white {
+  background-color: #0d111c !important;
+}
+
+html.theme-black-piano .bg-slate-50 {
+  background-color: #06080e !important;
+}
+
+html.theme-black-piano .bg-slate-50\/70,
+html.theme-black-piano .bg-slate-50\/80,
+html.theme-black-piano .bg-slate-50\/50,
+html.theme-black-piano .bg-slate-50\/60,
+html.theme-black-piano .bg-slate-50\/40,
+html.theme-black-piano .bg-slate-100 {
+  background-color: #121726 !important;
+}
+
+html.theme-black-piano .bg-slate-200 {
+  background-color: #1a2236 !important;
+}
+
+html.theme-black-piano .border-slate-100,
+html.theme-black-piano .border-slate-200,
+html.theme-black-piano .border-slate-200\/90,
+html.theme-black-piano .border-slate-200\/80,
+html.theme-black-piano .border-slate-200\/70,
+html.theme-black-piano .border-slate-300 {
+  border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+html.theme-black-piano .text-slate-900 {
+  color: #f8fafc !important;
+}
+
+html.theme-black-piano .text-slate-800 {
+  color: #e2e8f0 !important;
+}
+
+html.theme-black-piano .text-slate-700 {
+  color: #cbd5e1 !important;
+}
+
+html.theme-black-piano .text-slate-600 {
+  color: #94a3b8 !important;
+}
+
+html.theme-black-piano .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+html.theme-black-piano .text-slate-400 {
+  color: #64748b !important;
+}
+
+html.theme-black-piano .hover\:bg-slate-50:hover,
+html.theme-black-piano .hover\:bg-slate-100:hover,
+html.theme-black-piano .hover\:bg-slate-100\/70:hover,
+html.theme-black-piano .hover\:bg-slate-100\/80:hover,
+html.theme-black-piano .hover\:bg-slate-200\/60:hover {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Luminous pills and badges in Black Piano */
+html.theme-black-piano .bg-blue-50,
+html.theme-black-piano .bg-blue-50\/60,
+html.theme-black-piano .bg-blue-50\/70,
+html.theme-black-piano .bg-blue-50\/80 {
+  background-color: rgba(14, 165, 233, 0.15) !important;
+}
+
+html.theme-black-piano .text-blue-700,
+html.theme-black-piano .text-blue-600 {
+  color: #38bdf8 !important;
+}
+
+html.theme-black-piano .border-blue-100,
+html.theme-black-piano .border-blue-200,
+html.theme-black-piano .border-blue-200\/80 {
+  border-color: rgba(56, 189, 248, 0.28) !important;
+}
+
+html.theme-black-piano .bg-emerald-50,
+html.theme-black-piano .bg-emerald-50\/60,
+html.theme-black-piano .bg-emerald-50\/70,
+html.theme-black-piano .bg-emerald-50\/80 {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+html.theme-black-piano .text-emerald-700,
+html.theme-black-piano .text-emerald-600 {
+  color: #34d399 !important;
+}
+
+html.theme-black-piano .border-emerald-200,
+html.theme-black-piano .border-emerald-200\/80 {
+  border-color: rgba(16, 185, 129, 0.28) !important;
+}
+
+html.theme-black-piano .bg-rose-50,
+html.theme-black-piano .bg-rose-50\/80 {
+  background-color: rgba(244, 63, 94, 0.15) !important;
+}
+
+html.theme-black-piano .text-rose-700,
+html.theme-black-piano .text-rose-600 {
+  color: #fb7185 !important;
+}
+
+html.theme-black-piano .border-rose-200,
+html.theme-black-piano .border-rose-200\/80 {
+  border-color: rgba(244, 63, 94, 0.28) !important;
+}
+
+/* Modals & Dialogs */
+html.theme-black-piano [role="dialog"],
+html.theme-black-piano .modal-content {
+  background-color: #0c101a !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+}
+
+/* Tables */
+html.theme-black-piano table thead {
+  background-color: #090c14 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html.theme-black-piano table tbody tr {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+html.theme-black-piano table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+html.theme-black-piano .divide-slate-100 > * + * {
+  border-color: rgba(255, 255, 255, 0.06) !important;
 }
 
 .theme-black-piano footer {
