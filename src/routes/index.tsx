@@ -44,6 +44,88 @@ export const Route = createFileRoute("/")({
 
 function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [selectedNiche, setSelectedNiche] = useState<string>("todos");
+
+  const DEMO_STORES = [
+    {
+      id: "terephones",
+      name: "Terephones",
+      niche: "Celulares & Apple",
+      nicheKey: "celulares",
+      slug: "terephones",
+      logo: "https://ik.imagekit.io/zinma/tr:w-300,f-auto,q-85/TerePhones-Logo.png",
+      badge: "Loja Modelo Oficial",
+      badgeColor: "bg-blue-500/15 text-blue-600 border-blue-500/25",
+      description: "Catálogo completo com mais de 17 modelos de iPhones novos e seminovos, especificações técnicas detalhadas, saúde de bateria, garantia mundial Apple e pedido pronto no WhatsApp.",
+      highlight: "iPhones 17 Pro Max, 16 Pro, 15 Pro",
+      theme: "Modo White & Black",
+    },
+    {
+      id: "prime-motors",
+      name: "Prime Motors",
+      niche: "Carros & Veículos",
+      nicheKey: "veiculos",
+      slug: "prime-motors",
+      logo: "/demos/logos/prime-motors.png",
+      badge: "Veículos & Seminovos",
+      badgeColor: "bg-amber-500/15 text-amber-600 border-amber-500/25",
+      description: "Showroom automotivo com fotos de estúdio sem fundo, quilometragem, ano, câmbio, motorização, laudo cautelar e simulação rápida de financiamento.",
+      highlight: "Corolla Cross, Compass, BMW 320i, Hilux",
+      theme: "Modo White",
+    },
+    {
+      id: "nexus-digital",
+      name: "Nexus Digital",
+      niche: "Cursos & Infoprodutos",
+      nicheKey: "digital",
+      slug: "nexus-digital",
+      logo: "/demos/logos/nexus-digital.png",
+      badge: "Infoprodutos & IA",
+      badgeColor: "bg-indigo-500/15 text-indigo-600 border-indigo-500/25",
+      description: "Plataforma de infoprodutos com mockups 3D de alta conversão, formações de tráfego, dashboards no Notion, automações no WhatsApp com IA e mentorias VIP.",
+      highlight: "Cursos, Notion OS & Agentes IA",
+      theme: "Black Piano",
+    },
+    {
+      id: "aura-store",
+      name: "Aura Store",
+      niche: "Moda & Streetwear",
+      nicheKey: "moda",
+      slug: "aura-store",
+      logo: "/demos/logos/aura-store.png",
+      badge: "Moda & Streetwear",
+      badgeColor: "bg-pink-500/15 text-pink-600 border-pink-500/25",
+      description: "E-commerce de moda com packshots de camisetas oversized 280g, moletons heavyweight 400g, calças cargo táticas e bonés com fotos em fundo limpo.",
+      highlight: "Modelagens Oversized & Drop Limitado",
+      theme: "Black Piano",
+    },
+    {
+      id: "burger-craft",
+      name: "Craft Burger",
+      niche: "Gastronomia & Delivery",
+      nicheKey: "gastronomia",
+      slug: "burger-craft",
+      logo: "/demos/logos/craft-burger.png",
+      badge: "Hamburgueria na Brasa",
+      badgeColor: "bg-orange-500/15 text-orange-600 border-orange-500/25",
+      description: "Cardápio gastronômico com fotos apetitosas sem fundo de burgers artesanais na brasa, smash burgers, porções de batata rústica e milkshakes com pedido em 1 clique.",
+      highlight: "Blends 100% Angus & Delivery 35min",
+      theme: "Modo White",
+    },
+    {
+      id: "alpha-imoveis",
+      name: "Alpha Imóveis",
+      niche: "Imobiliária & Alto Padrão",
+      nicheKey: "imoveis",
+      slug: "alpha-imoveis",
+      logo: "/demos/logos/alpha-imoveis.png",
+      badge: "Imóveis de Luxo",
+      badgeColor: "bg-teal-500/15 text-teal-600 border-teal-500/25",
+      description: "Portfólio de imóveis de alto padrão com fotos de casas em condomínio, coberturas vista mar e mansões exclusivas com agendamento de visita VIP.",
+      highlight: "Casas em Condomínio & Coberturas",
+      theme: "Modo White",
+    },
+  ];
 
   // Theme state: 'white' or 'black-piano'
   const [currentTheme, setCurrentTheme] = useState<"white" | "black-piano">("white");
@@ -253,9 +335,7 @@ function LandingPage() {
             </Link>
 
             <a
-              href="/terephones"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#lojas-demo"
               className={`w-full sm:w-auto py-3 sm:py-3.5 px-6 rounded-full font-bold text-sm sm:text-base border shadow-xs transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 ${
                 isDark
                   ? "bg-zinc-900/90 hover:bg-zinc-800 text-zinc-200 border-zinc-700/80"
@@ -263,9 +343,39 @@ function LandingPage() {
               }`}
             >
               <Eye className="w-4 h-4 text-blue-600" />
-              <span>Ver Loja Demo (TerePhones)</span>
-              <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+              <span>Ver 6 Lojas Demos ao Vivo</span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
             </a>
+          </div>
+
+          {/* Quick Niche Pills */}
+          <div className="w-full pt-1 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">
+              Explore por nicho:
+            </span>
+            {[
+              { key: "celulares", label: "📱 iPhones" },
+              { key: "veiculos", label: "🏎️ Carros" },
+              { key: "digital", label: "💻 Cursos/IA" },
+              { key: "moda", label: "👕 Moda" },
+              { key: "gastronomia", label: "🍔 Burgers" },
+              { key: "imoveis", label: "🏡 Imóveis" },
+            ].map((n) => (
+              <a
+                key={n.key}
+                href="#lojas-demo"
+                onClick={() => setSelectedNiche(n.key)}
+                className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border transition-all hover:scale-105 cursor-pointer ${
+                  selectedNiche === n.key
+                    ? "bg-blue-600 text-white border-blue-600 shadow-xs"
+                    : isDark
+                    ? "bg-zinc-900/90 text-zinc-300 border-zinc-800 hover:border-zinc-700"
+                    : "bg-white text-slate-700 border-slate-200 hover:border-blue-400 shadow-xs"
+                }`}
+              >
+                {n.label}
+              </a>
+            ))}
           </div>
 
           {/* 4 Micro Trust Pills (2x2 Grid on Mobile, Flex on Desktop - matching minhaloja layout) */}
@@ -428,139 +538,146 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* ─── 3. LOJAS DEMO (Demonstração ao Vivo) ────────────────── */}
-      <section id="lojas-demo" className="py-12 sm:py-20 px-4 sm:px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center max-w-xl mx-auto mb-8 sm:mb-14 space-y-2">
+      {/* ─── 3. LOJAS DEMO (Demonstração ao Vivo • 6 Nichos) ──────── */}
+      <section id="lojas-demo" className="py-12 sm:py-20 px-4 sm:px-6 scroll-mt-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12 space-y-2">
             <span className="text-xs font-bold text-blue-600 uppercase tracking-wider bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">
-              Demonstração Real
+              Demonstrações Reais • 6 Nichos
             </span>
             <h2
-              className={`text-2xl sm:text-3xl font-black ${
+              className={`text-2xl sm:text-3xl lg:text-4xl font-black ${
                 isDark ? "text-white" : "text-slate-900"
               }`}
             >
               Veja como sua loja vai ficar
             </h2>
             <p className={`text-xs sm:text-sm ${isDark ? "text-zinc-400" : "text-slate-600"}`}>
-              Clique para navegar nas lojas de teste e ver o catálogo pelo computador ou celular.
+              Clique para navegar nas lojas reais de teste com fotos de estúdio sem fundo, especificações adaptadas e pedidos automáticos pelo WhatsApp.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 text-left">
-            {/* Demo 1: Terephones */}
-            <div
-              className={`border rounded-2xl sm:rounded-3xl p-5 sm:p-7 flex flex-col justify-between transition shadow-md ${
-                isDark
-                  ? "bg-zinc-950 border-zinc-800 hover:border-indigo-500/50"
-                  : "bg-white border-slate-200 hover:border-blue-400"
-              }`}
-            >
-              <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <span className="px-2.5 py-0.5 rounded-full bg-blue-500/15 text-blue-600 font-bold text-[10px] sm:text-[11px] border border-blue-500/25">
-                    Loja Modelo Completa
-                  </span>
-                  <span className="text-xs text-slate-400 font-mono">/terephones</span>
-                </div>
-                <h3
-                  className={`text-lg sm:text-xl font-black mb-1.5 ${
-                    isDark ? "text-white" : "text-slate-900"
-                  }`}
-                >
-                  Terephones Teresópolis
-                </h3>
-                <p className={`text-xs sm:text-sm mb-5 leading-relaxed ${isDark ? "text-zinc-400" : "text-slate-600"}`}>
-                  Catálogo real com mais de 17 modelos de iPhones cadastrados, especificações completas, fotos em alta resolução e botão de compra direta.
-                </p>
-              </div>
-
-              <div
-                className={`flex gap-2.5 pt-3.5 border-t ${
-                  isDark ? "border-zinc-800" : "border-slate-100"
+          {/* Interactive Niche Filter Tabs */}
+          <div className="flex items-center justify-center flex-wrap gap-2 mb-8 sm:mb-10">
+            {[
+              { key: "todos", label: "Todas as Lojas (6)" },
+              { key: "celulares", label: "📱 iPhones" },
+              { key: "veiculos", label: "🏎️ Carros" },
+              { key: "digital", label: "💻 Infoprodutos" },
+              { key: "moda", label: "👕 Moda" },
+              { key: "gastronomia", label: "🍔 Burgers" },
+              { key: "imoveis", label: "🏡 Imóveis" },
+            ].map((tab) => (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setSelectedNiche(tab.key)}
+                className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                  selectedNiche === tab.key
+                    ? "bg-blue-600 text-white shadow-md shadow-blue-600/30 scale-105"
+                    : isDark
+                    ? "bg-zinc-900 text-zinc-300 border border-zinc-800 hover:border-zinc-700"
+                    : "bg-white text-slate-700 border border-slate-200 hover:border-blue-300 shadow-xs"
                 }`}
               >
-                <a
-                  href="/terephones"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>Ver Loja</span>
-                </a>
-                <a
-                  href="/terephones/loja"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`flex-1 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition border ${
-                    isDark
-                      ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700"
-                      : "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-200"
-                  }`}
-                >
-                  <ShoppingBag className="w-3.5 h-3.5" />
-                  <span>Ver Catálogo</span>
-                </a>
-              </div>
-            </div>
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
-            {/* Demo 2: Loja Demo (Nicho Livre / Lojista) */}
-            <div
-              className={`border rounded-2xl sm:rounded-3xl p-5 sm:p-7 flex flex-col justify-between transition shadow-md ${
-                isDark
-                  ? "bg-zinc-950 border-zinc-800 hover:border-indigo-500/50"
-                  : "bg-white border-slate-200 hover:border-blue-400"
-              }`}
-            >
-              <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 font-bold text-[10px] sm:text-[11px] border border-emerald-500/25">
-                    Loja de Demonstração
-                  </span>
-                  <span className="text-xs text-slate-400 font-mono">/demo</span>
-                </div>
-                <h3
-                  className={`text-lg sm:text-xl font-black mb-1.5 ${
-                    isDark ? "text-white" : "text-slate-900"
-                  }`}
-                >
-                  Loja Demo Geral
-                </h3>
-                <p className={`text-xs sm:text-sm mb-5 leading-relaxed ${isDark ? "text-zinc-400" : "text-slate-600"}`}>
-                  Exemplo de catálogo pronto para qualquer segmento comercial. Totalmente editável pelo painel do lojista com categorias, fotos e preços dinâmicos.
-                </p>
-              </div>
-
+          {/* Demo Stores Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 text-left">
+            {DEMO_STORES.filter(
+              (s) => selectedNiche === "todos" || s.nicheKey === selectedNiche
+            ).map((store) => (
               <div
-                className={`flex gap-2.5 pt-3.5 border-t ${
-                  isDark ? "border-zinc-800" : "border-slate-100"
+                key={store.id}
+                className={`border rounded-2xl sm:rounded-3xl p-5 sm:p-6 flex flex-col justify-between transition-all duration-200 shadow-md hover:shadow-xl group ${
+                  isDark
+                    ? "bg-zinc-950 border-zinc-800 hover:border-indigo-500/50"
+                    : "bg-white border-slate-200 hover:border-blue-400"
                 }`}
               >
-                <a
-                  href="/demo"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>Ver Loja</span>
-                </a>
-                <a
-                  href="/demo/loja"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`flex-1 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition border ${
-                    isDark
-                      ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700"
-                      : "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-200"
+                <div>
+                  {/* Store Header: Logo + Title + Slug */}
+                  <div className="flex items-start gap-3 mb-3.5">
+                    <img
+                      src={store.logo}
+                      alt={store.name}
+                      className="w-12 h-12 rounded-xl object-contain bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-1 shadow-xs shrink-0 group-hover:scale-105 transition-transform"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-1 mb-0.5">
+                        <span
+                          className={`px-2 py-0.5 rounded-md font-bold text-[10px] uppercase border ${store.badgeColor}`}
+                        >
+                          {store.niche}
+                        </span>
+                        <span className="text-[11px] text-slate-400 font-mono truncate">
+                          /{store.slug}
+                        </span>
+                      </div>
+                      <h3
+                        className={`text-base sm:text-lg font-black truncate ${
+                          isDark ? "text-white" : "text-slate-900"
+                        }`}
+                      >
+                        {store.name}
+                      </h3>
+                    </div>
+                  </div>
+
+                  {/* Highlights tag */}
+                  <div
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold mb-3 ${
+                      isDark ? "bg-zinc-900 text-zinc-300 border border-zinc-800" : "bg-slate-50 text-slate-700 border border-slate-200/80"
+                    }`}
+                  >
+                    <Sparkles className="w-3 h-3 text-blue-500 shrink-0" />
+                    <span className="truncate">{store.highlight}</span>
+                  </div>
+
+                  {/* Description */}
+                  <p
+                    className={`text-xs sm:text-sm mb-4 leading-relaxed line-clamp-3 ${
+                      isDark ? "text-zinc-400" : "text-slate-600"
+                    }`}
+                  >
+                    {store.description}
+                  </p>
+                </div>
+
+                {/* Footer Buttons */}
+                <div
+                  className={`flex gap-2 pt-3 border-t ${
+                    isDark ? "border-zinc-800/80" : "border-slate-100"
                   }`}
                 >
-                  <ShoppingBag className="w-3.5 h-3.5" />
-                  <span>Ver Catálogo</span>
-                </a>
+                  <a
+                    href={`/${store.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Ver Loja</span>
+                  </a>
+                  <a
+                    href={`/${store.slug}/loja`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex-1 py-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition border ${
+                      isDark
+                        ? "bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border-zinc-700"
+                        : "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-200"
+                    }`}
+                  >
+                    <ShoppingBag className="w-3.5 h-3.5" />
+                    <span>Catálogo</span>
+                  </a>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
