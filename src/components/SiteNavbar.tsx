@@ -101,6 +101,15 @@ export function SiteNavbar({
                   </span>
                 )}
               </div>
+            ) : (storeName && !storeName.toLowerCase().includes("terephones")) ? (
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-black text-sm flex items-center justify-center shadow-sm shrink-0">
+                  {storeName.charAt(0).toUpperCase()}
+                </div>
+                <span className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">
+                  {storeName}
+                </span>
+              </div>
             ) : (
               <BrandLogo height={38} showText={true} dark={isDark} />
             )}
@@ -203,6 +212,15 @@ export function SiteNavbar({
                       {storeName}
                     </span>
                   )}
+                </div>
+              ) : (storeName && !storeName.toLowerCase().includes("terephones")) ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">
+                    {storeName.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white truncate max-w-[130px]">
+                    {storeName}
+                  </span>
                 </div>
               ) : (
                 <BrandLogo height={34} showText={true} dark={isDark} />

@@ -80,8 +80,9 @@ function StoreCatalogPage() {
       .filter((c) => c.name.toLowerCase() !== 'todos' && c.slug.toLowerCase() !== 'todos');
     setCategories(cats);
 
-    // Theme initialization
-    const saved = localStorage.getItem('terephones_theme') as ThemeMode | null;
+    // Theme initialization - scoped per store
+    const themeKey = `zapstore_theme_${slug}`;
+    const saved = localStorage.getItem(themeKey) as ThemeMode | null;
     const initialTheme: ThemeMode =
       saved === 'black-piano' || saved === 'white'
         ? saved
@@ -101,6 +102,13 @@ function StoreCatalogPage() {
     setLoading(false);
   }, [slug]);
 
+  // Track store visit
+  useEffect(() => {
+    if (profile?.id) {
+      db.analytics.trackVisit(profile.id);
+    }
+  }, [profile?.id]);
+
   const toggleTheme = () => {
     const next: ThemeMode = currentTheme === 'black-piano' ? 'white' : 'black-piano';
     setCurrentTheme(next);
@@ -111,7 +119,7 @@ function StoreCatalogPage() {
     } else {
       root.classList.add('theme-white');
     }
-    localStorage.setItem('terephones_theme', next);
+    localStorage.setItem(`zapstore_theme_${slug}`, next);
     window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: next } }));
     toast.success(next === 'black-piano' ? 'Modo Black ativado' : 'Modo Branco ativado', {
       id: 'theme-toggle',
@@ -123,15 +131,18 @@ function StoreCatalogPage() {
     if (products.length > 0) {
       return products.map(toProductItem);
     }
-    return defaultProducts;
-  }, [products]);
+    // Only fallback to defaultProducts for the official terephones demo store
+    return slug === 'terephones' ? defaultProducts : [];
+  }, [products, slug]);
 
   const categoryTabs = useMemo(() => {
     const dynamicNames = categories.map((c) => c.name);
-    const fromProducts = products.map((p) => p.category_name).filter(Boolean) as string[];
-    const allUnique = Array.from(new Set([...dynamicNames, ...fromProducts]));
+    const fromProducts = productListItems.map((p) => p.cat).filter(Boolean) as string[];
+    const allUnique = Array.from(new Set([...dynamicNames, ...fromProducts])).filter(
+      (c) => c.toLowerCase() !== 'todos'
+    );
     return ['Todos', ...allUnique];
-  }, [categories, products]);
+  }, [categories, productListItems]);
 
   const filteredProducts = useMemo(() => {
     return productListItems.filter(p => {
@@ -199,8 +210,16 @@ function StoreCatalogPage() {
   const whatsDigits = rawWhatsapp.replace(/\D/g, '');
   const storeName = settings.store_name || 'Terephones';
   const phoneDisplay = settings.phone_display || '(21) 96463-9999';
+  const isIphoneStore =
+    slug === 'terephones' ||
+    storeName.toLowerCase().includes('phone') ||
+    storeName.toLowerCase().includes('apple');
 
   const handleOrderWhatsApp = (prod: ProductItem) => {
+    if (profile?.id) {
+      db.analytics.trackLead(profile.id);
+    }
+
     const isNovo =
       prod.cat === 'Novos' ||
       prod.cat === 'Lacrados' ||
@@ -210,10 +229,10 @@ function StoreCatalogPage() {
     const storageDisplay =
       prod.storage || prod.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() || '128GB';
     const condText = isNovo
-      ? 'Novo Lacrado de Fábrica Apple'
+      ? 'Novo Lacrado de Fábrica'
       : `Seminovo Grade A+${prod.battery ? ` (Saúde da Bateria: ${prod.battery})` : ''}`;
 
-    const isIphone = slug === 'terephones' || prod.cat === 'Lacrados' || prod.cat === 'Seminovos';
+    const isIphone = isIphoneStore || prod.cat === 'Lacrados' || prod.cat === 'Seminovos';
     let text = settings.whatsapp_message_template;
     if (!text) {
       if (isIphone) {
@@ -277,10 +296,10 @@ Gostaria de confirmar a disponibilidade!`;
           Estoque de {storeName}
         </h1>
         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-lg mx-auto mb-4">
-          Aparelhos selecionados, revisados e com entrega express em até 1h. Pague com segurança na entrega.
+          {settings.store_tagline || (isIphoneStore ? 'Aparelhos selecionados, revisados e com entrega express em até 1h. Pague com segurança na entrega.' : 'Confira nosso catálogo de produtos exclusivos e faça seu pedido direto pelo WhatsApp.')}
         </p>
         <div className="inline-block bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-3.5 py-1 rounded-full text-xs font-bold border border-blue-200/70 dark:border-blue-700/50">
-          {filteredProducts.length} modelos disponíveis hoje
+          {filteredProducts.length} itens disponíveis hoje
         </div>
       </div>
 
@@ -311,7 +330,7 @@ Gostaria de confirmar a disponibilidade!`;
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
               <input 
                 type="text" 
-                placeholder="Buscar modelo, cor ou memória..." 
+                placeholder="Buscar produto ou categoria..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-700/80 text-slate-900 dark:text-white rounded-xl py-2 pl-10 pr-4 text-xs font-medium focus:outline-none focus:border-blue-500 transition-colors shadow-xs"
@@ -337,7 +356,29 @@ Gostaria de confirmar a disponibilidade!`;
         </div>
 
         {/* Product Grid / List */}
-        {filteredProducts.length === 0 ? (
+        {productListItems.length === 0 ? (
+          <div className="text-center py-16 px-4 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm max-w-lg mx-auto my-8">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center text-blue-600 dark:text-sky-400">
+              <Sparkles className="w-8 h-8" />
+            </div>
+            <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">
+              Catálogo em Atualização
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-6">
+              A equipe da loja {storeName} está preparando novidades para você. Chame agora no WhatsApp para conferir a disponibilidade ou solicitar um pedido personalizado!
+            </p>
+            <a
+              href={`https://wa.me/${whatsDigits}?text=${encodeURIComponent(`Olá! Gostaria de consultar os produtos e novidades disponíveis na loja ${storeName}.`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => { if (profile?.id) db.analytics.trackLead(profile.id); }}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/20 active:scale-95 transition"
+            >
+              <WhatsAppIcon className="w-4 h-4" />
+              <span>Falar com Atendente no WhatsApp</span>
+            </a>
+          </div>
+        ) : filteredProducts.length === 0 ? (
           <div className="text-center py-20 text-slate-500 dark:text-slate-400 glass-card rounded-2xl">
             <p className="font-semibold">Nenhum produto encontrado para sua busca.</p>
             <button
@@ -351,18 +392,20 @@ Gostaria de confirmar a disponibilidade!`;
           <div className={viewMode === 'grid' ? "grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6" : "flex flex-col gap-3 sm:gap-4"}>
             {filteredProducts.map(product => {
               const isNovo =
-                product.cat === 'Novos' ||
-                product.cat === 'Lacrados' ||
+                product.cat.toLowerCase().includes('novo') ||
+                product.cat.toLowerCase().includes('lacrad') ||
                 product.badge.toLowerCase().includes('lacrad') ||
                 product.badge.toLowerCase().includes('novo') ||
                 product.name.toLowerCase().includes('lacrad');
-              const catLabel = isNovo ? 'Novo Lacrado' : 'Seminovo Premium';
+              const catLabel = isIphoneStore
+                ? (isNovo ? 'Novo Lacrado' : 'Seminovo Premium')
+                : (product.cat || (isNovo ? 'Novo' : 'Destaque'));
 
-              let batteryLabel = 'Revisado';
+              let batteryLabel = '';
               if (product.battery) {
                 const match = product.battery.match(/(\d+)\s*%/);
                 batteryLabel = match ? `Bateria ${match[1]}%` : `Bateria ${product.battery.replace(/^bateria\s*/i, '')}`;
-              } else if (isNovo) {
+              } else if (isIphoneStore && isNovo) {
                 batteryLabel = 'Bateria 100%';
               }
 
@@ -397,12 +440,18 @@ Gostaria de confirmar a disponibilidade!`;
                   {/* Info */}
                   <div className={`flex flex-col flex-1 ${viewMode === 'list' ? 'justify-center text-left' : 'text-left mt-2'}`}>
                     <div className="flex items-center justify-between gap-1 mb-1.5 w-full">
-                      <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 dark:bg-sky-950/80 text-blue-600 dark:text-sky-400 border border-blue-200/60 dark:border-sky-800/60 truncate max-w-[50%]">
+                      <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 dark:bg-sky-950/80 text-blue-600 dark:text-sky-400 border border-blue-200/60 dark:border-sky-800/60 truncate max-w-[60%]">
                         {catLabel}
                       </span>
-                      <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 truncate max-w-[50%]">
-                        {batteryLabel}
-                      </span>
+                      {batteryLabel ? (
+                        <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 truncate max-w-[40%]">
+                          {batteryLabel}
+                        </span>
+                      ) : (
+                        <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 truncate max-w-[40%]">
+                          {product.badge || 'Disponível'}
+                        </span>
+                      )}
                     </div>
 
                     <h3 

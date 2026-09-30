@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Smartphone } from "lucide-react";
+import { Home, ShoppingBag } from "lucide-react";
 
 export function MobileBottomNav({ basePath }: { basePath?: string } = {}) {
   const routerState = useRouterState();
@@ -34,7 +34,7 @@ export function MobileBottomNav({ basePath }: { basePath?: string } = {}) {
           <span className="text-[11px] leading-none">Início</span>
         </Link>
 
-        {/* Loja */}
+        {/* Loja / Catálogo */}
         <Link
           to={lojaPath}
           className={`flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition-all ${
@@ -43,12 +43,12 @@ export function MobileBottomNav({ basePath }: { basePath?: string } = {}) {
               : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-semibold"
           }`}
         >
-          <Smartphone
+          <ShoppingBag
             className={`w-5 h-5 transition-transform ${
               isLoja ? "scale-110 stroke-[2.5]" : "stroke-[1.8]"
             }`}
           />
-          <span className="text-[11px] leading-none">Loja</span>
+          <span className="text-[11px] leading-none">Catálogo</span>
         </Link>
       </div>
     </nav>

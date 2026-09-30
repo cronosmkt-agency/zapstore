@@ -44,7 +44,7 @@ function AdminSettingsPage() {
   const { session, logout } = useAuth();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState<'payments' | 'plans' | 'platform' | 'database' | 'account'>('payments');
+  const [activeTab, setActiveTab] = useState<'payments' | 'plans' | 'platform' | 'database' | 'account'>('platform');
   const [sbUrl, setSbUrl] = useState(() => getSupabaseUrl());
   const [sbKey, setSbKey] = useState(() => getSupabaseAnonKey());
   const [isTestingSupabase, setIsTestingSupabase] = useState(false);

@@ -30,12 +30,14 @@ function PlansPage() {
   const currentPlan = session.user.plan_slug;
   const storeSettings = db.storeSettings.getByProfileId(session.userId);
   const storeName = storeSettings?.store_name || session.user.display_name || 'Minha Loja';
+  const platform = db.platformSettings.get();
+  const supportWhatsapp = (platform?.support_whatsapp || '5521964639999').replace(/\D/g, '');
 
   const handleUpgradeClick = (planName: string) => {
     const message = encodeURIComponent(
-      `Olá, equipe Cronos! Tenho a loja "${storeName}" (${session.user.slug}) e gostaria de fazer upgrade para o plano ${planName}. Como posso proceder?`
+      `Olá, equipe ZapStore! Tenho a loja "${storeName}" (link: zapstore.com/${session.user.slug}) e gostaria de fazer upgrade para o plano ${planName}. Como posso proceder com a ativação?`
     );
-    const waUrl = `https://wa.me/5511999999999?text=${message}`;
+    const waUrl = `https://wa.me/${supportWhatsapp}?text=${message}`;
 
     toast.info('Solicitação de Upgrade', {
       description: `Entrando em contato com nossa equipe para ativar o plano ${planName}.`,

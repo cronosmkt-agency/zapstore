@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, Link, useNavigate } from '@tanstack/react-router';
 import { useAuth } from '@/context/AuthContext';
+import { useEffect } from 'react';
 import {
   LayoutDashboard,
   Users,
@@ -21,8 +22,13 @@ function AdminLayout() {
   const navigate = useNavigate();
 
   // Strict admin access check
+  useEffect(() => {
+    if (!session || !session.is_admin) {
+      navigate({ to: '/dashboard' });
+    }
+  }, [session, navigate]);
+
   if (!session || !session.is_admin) {
-    navigate({ to: '/dashboard' });
     return null;
   }
 

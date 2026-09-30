@@ -82,8 +82,7 @@ export function ProductDetailModal({
 
   const isIphoneStore =
     storeName.toLowerCase().includes("terephones") ||
-    (product.cat || "").toLowerCase().includes("lacrad") ||
-    (product.cat || "").toLowerCase().includes("seminov");
+    product.name.toLowerCase().includes("iphone");
 
   const storageDisplay =
     product.storage || product.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() || "128GB";
@@ -114,21 +113,23 @@ Gostaria de confirmar a disponibilidade!`;
     window.open(url, "_blank");
   };
 
-  const defaultBoxItems = isNovo
-    ? [
-        "Aparelho iPhone Novo Lacrado de Fábrica",
-        "Cabo original Apple USB-C / Lightning trançado",
-        "Documentação oficial & chave de chip",
-        `Brinde ${storeName}: Película 3D de alta proteção instalada`,
-        `Brinde ${storeName}: Capa protetora anti-impacto MagSafe`,
-      ]
-    : [
-        "Aparelho iPhone Seminovo Grade A+ Impecável",
-        "Cabo de carregamento Turbo homologado",
-        "Certificado de revisão técnica em 25+ itens",
-        `Brinde ${storeName}: Película 3D instalada na hora`,
-        `Brinde ${storeName}: Capa protetora anti-impacto MagSafe`,
-      ];
+  const defaultBoxItems = isIphoneStore
+    ? (isNovo
+      ? [
+          "Aparelho iPhone Novo Lacrado de Fábrica",
+          "Cabo original Apple USB-C / Lightning trançado",
+          "Documentação oficial & chave de chip",
+          `Brinde ${storeName}: Película 3D de alta proteção instalada`,
+          `Brinde ${storeName}: Capa protetora anti-impacto MagSafe`,
+        ]
+      : [
+          "Aparelho iPhone Seminovo Grade A+ Impecável",
+          "Cabo de carregamento Turbo homologado",
+          "Certificado de revisão técnica em 25+ itens",
+          `Brinde ${storeName}: Película 3D instalada na hora`,
+          `Brinde ${storeName}: Capa protetora anti-impacto MagSafe`,
+        ])
+    : [];
 
   const boxList = product.boxItems && product.boxItems.length > 0 ? product.boxItems : defaultBoxItems;
 
@@ -361,8 +362,21 @@ Gostaria de confirmar a disponibilidade!`;
             ) : null
           )}
 
-          {/* O que vem na embalagem / Pedido (Apenas se for iPhone ou se houver boxItems explícitos) */}
-          {isIphoneStore ? (
+          {/* Descrição do Produto (se informada) */}
+          {product.description ? (
+            <div className="product-modal-box p-3.5 sm:p-4 text-left">
+              <h3 className="text-xs uppercase tracking-wider font-extrabold text-slate-800 dark:text-slate-100 mb-1.5 flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-sky-400" />
+                Descrição
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">
+                {product.description}
+              </p>
+            </div>
+          ) : null}
+
+          {/* O que vem na embalagem / Pedido (Apenas se houver boxItems explícitos ou for iPhone) */}
+          {boxList.length > 0 ? (
             <div className="product-modal-box p-3.5 sm:p-5">
               <h3 className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-slate-800 dark:text-white mb-2 sm:mb-2.5 flex items-center gap-2">
                 <Gift className="w-4 h-4 text-emerald-400" />
@@ -402,11 +416,11 @@ Gostaria de confirmar a disponibilidade!`;
           <div className="flex sm:hidden items-center justify-between w-full text-[11px] text-slate-500 dark:text-slate-300">
             <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold whitespace-nowrap">
               <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
-              <span>Pague só na entrega</span>
+              <span>Atendimento Direto</span>
             </div>
             <span className="text-slate-300 dark:text-slate-700">•</span>
             <div className="text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">
-              Zap: <span className="font-extrabold text-slate-900 dark:text-sky-300">(21) 96463-9999</span>
+              WhatsApp: <span className="font-extrabold text-slate-900 dark:text-sky-300">{whatsappNumber ? whatsappNumber.replace(/^55(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3') : 'Online'}</span>
             </div>
           </div>
 
@@ -414,11 +428,11 @@ Gostaria de confirmar a disponibilidade!`;
           <div className="hidden sm:flex items-center gap-2.5 text-xs text-slate-500 dark:text-slate-300 shrink-0">
             <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold whitespace-nowrap">
               <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
-              <span>Pague após testar na mão</span>
+              <span>Pedido direto com o lojista</span>
             </div>
             <span className="text-slate-300 dark:text-slate-700">•</span>
             <div className="text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">
-              WhatsApp: <span className="font-extrabold text-slate-900 dark:text-sky-300">(21) 96463-9999</span>
+              WhatsApp: <span className="font-extrabold text-slate-900 dark:text-sky-300">{whatsappNumber ? whatsappNumber.replace(/^55(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3') : 'Online'}</span>
             </div>
           </div>
 

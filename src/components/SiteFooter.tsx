@@ -76,6 +76,15 @@ export function SiteFooter({
                   {name}
                 </span>
               </div>
+            ) : (name && !name.toLowerCase().includes("terephones")) ? (
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-black text-base flex items-center justify-center shadow-xs shrink-0">
+                  {name.charAt(0).toUpperCase()}
+                </div>
+                <span className="font-black text-lg tracking-tight text-slate-900 dark:text-white">
+                  {name}
+                </span>
+              </div>
             ) : (
               <BrandLogo showText={true} dark={isDark} />
             )}
@@ -288,15 +297,21 @@ export function SiteFooter({
         />
 
         <div
-          className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs"
+          className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs"
           style={{ color: "var(--text-muted)" }}
         >
           <div>
-            © {new Date().getFullYear()} {name} {city ? `— ${city}, ${state || 'Brasil'}` : '— Teresópolis, RJ'}. Todos os
+            © {new Date().getFullYear()} {name}{city ? ` — ${city}, ${state || 'Brasil'}` : ''}. Todos os
             direitos reservados.
           </div>
-          <div>
-            Entrega express & suporte oficial via WhatsApp
+          <div className="flex items-center gap-3">
+            <span className="hidden sm:inline">Entrega express & suporte via WhatsApp</span>
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-sky-400 border border-slate-200 dark:border-slate-700/60 transition shadow-2xs"
+            >
+              <span>⚡ Criado com ZapStore</span>
+            </Link>
           </div>
         </div>
       </div>

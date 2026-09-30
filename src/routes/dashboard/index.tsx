@@ -15,6 +15,7 @@ import {
   Settings,
   Star,
   ExternalLink,
+  MessageCircle,
 } from 'lucide-react';
 import { planLabel } from '@/lib/planLimits';
 
@@ -28,6 +29,7 @@ function DashboardOverview() {
     totalProducts: 0,
     availableProducts: 0,
     visits: 0,
+    leads: 0,
   });
   const [checklist, setChecklist] = useState({
     hasLogo: false,
@@ -41,13 +43,15 @@ function DashboardOverview() {
     if (session?.userId) {
       const products = db.products.getByProfileId(session.userId);
       const settings = db.storeSettings.getByProfileId(session.userId);
+      const analyticsStats = db.analytics.getStats(session.userId);
 
       setStoreName(settings?.store_name || session.user.display_name || 'Lojista');
 
       setStats({
         totalProducts: products.length,
         availableProducts: products.filter((p) => p.is_available).length,
-        visits: 0,
+        visits: analyticsStats.visits,
+        leads: analyticsStats.leads,
       });
 
       setChecklist({
@@ -76,14 +80,21 @@ function DashboardOverview() {
       {/* ─── Hero Welcome & Quick Action Buttons ────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-xs">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">
               Olá, {storeName.split(' ')[0]}! 👋
             </h1>
-            <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Loja Ativa
             </span>
+            <Link
+              to="/dashboard/planos"
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-bold hover:bg-purple-100 transition"
+            >
+              <ShieldCheck className="w-3 h-3" />
+              Plano {planLabel(session.user.plan_slug)}
+            </Link>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Acompanhe o desempenho da sua loja e gerencie seu catálogo em tempo real.
@@ -146,30 +157,11 @@ function DashboardOverview() {
           </span>
         </div>
 
-        {/* Plano Atual */}
+        {/* Visitas na Loja */}
         <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md transition">
           <div className="flex items-center justify-between mb-2 sm:mb-3">
             <h3 className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">
-              Plano Atual
-            </h3>
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
-              <ShieldCheck className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-2xl sm:text-3xl font-black text-slate-900">{planLabel(session.user.plan_slug)}</p>
-          <Link
-            to="/dashboard/planos"
-            className="text-[10px] sm:text-xs text-blue-600 font-bold hover:underline mt-0.5 block truncate"
-          >
-            Ver limites do plano &rarr;
-          </Link>
-        </div>
-
-        {/* Visitas */}
-        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md transition">
-          <div className="flex items-center justify-between mb-2 sm:mb-3">
-            <h3 className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">
-              Visitas (Hoje)
+              Visitas na Loja
             </h3>
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
               <Eye className="w-4 h-4" />
@@ -177,7 +169,23 @@ function DashboardOverview() {
           </div>
           <p className="text-2xl sm:text-3xl font-black text-slate-900">{stats.visits}</p>
           <span className="text-[10px] sm:text-xs text-slate-400 mt-0.5 block truncate">
-            Analytics integrado
+            Acessos à vitrine
+          </span>
+        </div>
+
+        {/* Contatos no Zap / Leads */}
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md transition">
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <h3 className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">
+              Contatos no Zap
+            </h3>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+              <MessageCircle className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-2xl sm:text-3xl font-black text-emerald-600">{stats.leads}</p>
+          <span className="text-[10px] sm:text-xs text-emerald-600/80 font-semibold mt-0.5 block truncate">
+            Cliques em pedir no Zap
           </span>
         </div>
       </div>

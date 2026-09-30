@@ -10,11 +10,12 @@ export function WhatsFloat({
   phoneDisplay?: string;
   storeName?: string;
 } = {}) {
+  const isTere = (storeName || "").toLowerCase().includes("terephones");
   const whatsUrl = whatsapp
     ? (whatsapp.startsWith("http") ? whatsapp : `https://wa.me/${whatsapp.replace(/\D/g, "")}`)
-    : WHATSAPP;
-  const phoneText = phoneDisplay || "(21) 96463-9999";
-  const nameText = storeName || "Terephones";
+    : (isTere ? WHATSAPP : "#");
+  const phoneText = phoneDisplay || (isTere ? "(21) 96463-9999" : "Atendimento Online");
+  const nameText = storeName || "Loja Oficial";
 
   return (
     <a

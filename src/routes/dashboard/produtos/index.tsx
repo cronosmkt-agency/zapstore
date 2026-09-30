@@ -14,6 +14,7 @@ import {
   Layers,
   CheckCircle,
   ExternalLink,
+  Copy,
 } from 'lucide-react';
 import { canAddProduct, planLimits } from '@/lib/planLimits';
 import { toast } from 'sonner';
@@ -47,6 +48,22 @@ function ProdutosList() {
     db.products.update(id, { is_available: !currentStatus });
     loadProducts();
     toast.success(!currentStatus ? 'Produto visível no catálogo' : 'Produto desativado do catálogo');
+  };
+
+  const handleDuplicate = (id: string, name: string) => {
+    if (!session) return;
+    const canAddMore = canAddProduct(session.user.plan_slug, products.length);
+    if (!canAddMore) {
+      toast.error('Limite de produtos atingido no seu plano atual.');
+      return;
+    }
+    const cloned = db.products.duplicate(id);
+    if (cloned) {
+      loadProducts();
+      toast.success(`Cópia criada para "${name}"!`);
+    } else {
+      toast.error('Erro ao duplicar produto.');
+    }
   };
 
   const handleDelete = (id: string, name: string) => {
@@ -251,6 +268,15 @@ function ProdutosList() {
                   </div>
 
                   <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => handleDuplicate(product.id, product.name)}
+                      className="px-2 py-1.5 rounded-lg bg-slate-100 hover:bg-purple-50 text-slate-700 hover:text-purple-600 text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                      title="Duplicar produto"
+                    >
+                      <Copy size={13} />
+                      <span className="hidden sm:inline">Duplicar</span>
+                    </button>
                     <Link
                       to="/dashboard/produtos/$id"
                       params={{ id: product.id }}
@@ -359,7 +385,15 @@ function ProdutosList() {
                       </button>
                     </td>
                     <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleDuplicate(product.id, product.name)}
+                          className="p-2 hover:bg-purple-50 text-slate-400 hover:text-purple-600 rounded-xl transition cursor-pointer"
+                          title="Duplicar Produto"
+                        >
+                          <Copy className="w-4 h-4" />
+                        </button>
                         <Link
                           to="/dashboard/produtos/$id"
                           params={{ id: product.id }}

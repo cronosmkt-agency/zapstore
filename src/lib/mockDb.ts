@@ -1306,7 +1306,7 @@ const KEYS = {
 } as const;
 
 // Versão do banco para forçar migração transparente no navegador do usuário
-const DB_VERSION = 'v17_fix_demo_logins_and_devices_images';
+const DB_VERSION = 'v18_multi_tenant_isolation_and_analytics';
 
 // ─── Helpers ──────────────────────────────────────────────────
 function isClient() { return typeof window !== 'undefined'; }
@@ -1658,6 +1658,23 @@ export const db = {
     },
     countByProfileId: (profileId: string): number =>
       db.products.getByProfileId(profileId).length,
+    duplicate: (id: string): Product | undefined => {
+      const original = db.products.getById(id);
+      if (!original) return undefined;
+      const clone: Product = {
+        ...original,
+        id: uuid(),
+        name: `${original.name} (Cópia)`,
+        created_at: now(),
+        updated_at: now(),
+      };
+      const all = db.products.getAll();
+      write(KEYS.products, [...all, clone]);
+      if (isSupabaseConfigured()) {
+        supabase.from('products').insert(clone).then();
+      }
+      return clone;
+    },
   },
 
   reviews: {
@@ -1779,5 +1796,47 @@ export const db = {
         .reduce((sum, p) => sum + (prices[p.plan] ?? 0), 0);
     },
   },
+
+  // ── Analytics & Conversion tracking ─────────────────────────
+  analytics: {
+    trackVisit: (profileId: string): void => {
+      if (!isClient() || !profileId) return;
+      try {
+        const key = `zapstore_stats_${profileId}`;
+        const raw = localStorage.getItem(key);
+        const data = raw ? JSON.parse(raw) : { visits: 0, leads: 0, lastUpdated: now() };
+        data.visits = (data.visits || 0) + 1;
+        data.lastUpdated = now();
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch {}
+    },
+    trackLead: (profileId: string): void => {
+      if (!isClient() || !profileId) return;
+      try {
+        const key = `zapstore_stats_${profileId}`;
+        const raw = localStorage.getItem(key);
+        const data = raw ? JSON.parse(raw) : { visits: 0, leads: 0, lastUpdated: now() };
+        data.leads = (data.leads || 0) + 1;
+        data.lastUpdated = now();
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch {}
+    },
+    getStats: (profileId: string): { visits: number; leads: number } => {
+      if (!isClient() || !profileId) return { visits: 0, leads: 0 };
+      try {
+        const key = `zapstore_stats_${profileId}`;
+        const raw = localStorage.getItem(key);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          return {
+            visits: Math.max(parsed.visits || 0, 1),
+            leads: parsed.leads || 0,
+          };
+        }
+      } catch {}
+      return { visits: 1, leads: 0 };
+    },
+  },
+
   syncFromSupabase: syncFromSupabase,
 };

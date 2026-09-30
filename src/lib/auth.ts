@@ -225,6 +225,7 @@ export interface SignupData {
   whatsapp?: string;
   store_name: string;
   plan?: PlanSlug;
+  niche?: string;
 }
 
 export interface SignupResult {
@@ -253,6 +254,7 @@ export async function signup(data: SignupData): Promise<SignupResult> {
             slug,
             store_name: data.store_name,
             whatsapp: data.whatsapp,
+            niche: data.niche || 'geral',
           },
         },
       });
@@ -279,6 +281,7 @@ export async function signup(data: SignupData): Promise<SignupResult> {
           store_name: data.store_name,
           whatsapp: data.whatsapp,
           theme_mode: 'white',
+          enable_tradein: data.niche === 'celulares',
         });
 
         const session: AuthSession = {
@@ -328,11 +331,13 @@ export async function signup(data: SignupData): Promise<SignupResult> {
     is_admin: false,
   });
 
+  const isCelulares = data.niche === 'celulares';
+
   // Criar configurações padrão da loja
   db.storeSettings.create({
     profile_id: profile.id,
     store_name: data.store_name,
-    store_tagline: '',
+    store_tagline: isCelulares ? 'Especialista em iPhones e Smartphones' : '',
     whatsapp: data.whatsapp,
     custom_domain_verified: false,
     theme_mode: 'white',
@@ -342,16 +347,29 @@ export async function signup(data: SignupData): Promise<SignupResult> {
     enable_tawk: false,
     enable_whatsapp_float: true,
     enable_dark_mode_toggle: true,
+    enable_tradein: isCelulares,
     cta_button_text: 'Ver Loja',
     differentials: [],
   });
 
-  // Criar categoria padrão
-  db.categories.create({
-    profile_id: profile.id,
-    name: 'Geral',
-    slug: 'geral',
-    sort_order: 1,
+  // Criar categorias padrão de acordo com o nicho
+  const defaultCategories: Record<string, string[]> = {
+    celulares: ['iPhones Novos', 'Seminovos Grade A+', 'Acessórios & Cabos'],
+    moda: ['Lançamentos', 'Feminino', 'Masculino', 'Acessórios'],
+    gastronomia: ['Mais Pedidos', 'Burgers & Pratos', 'Acompanhamentos', 'Bebidas'],
+    veiculos: ['Seminovos Selecionados', 'Novos / 0km', 'Utilitários & SUVs'],
+    imoveis: ['Apartamentos', 'Casas em Condomínio', 'Alto Padrão'],
+    geral: ['Destaques', 'Novidades', 'Mais Vendidos'],
+  };
+
+  const categoriesToCreate = defaultCategories[data.niche || 'geral'] || defaultCategories.geral;
+  categoriesToCreate.forEach((name, index) => {
+    db.categories.create({
+      profile_id: profile.id,
+      name,
+      slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      sort_order: index + 1,
+    });
   });
 
   // Salvar senha

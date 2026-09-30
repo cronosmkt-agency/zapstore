@@ -254,11 +254,15 @@ function SlugStorePage() {
     const s = db.storeSettings.getBySlug(slug) || null;
     setSettings(s);
 
+    const isTerephones = slug === "terephones";
+
     const prods = db.products.getBySlug(slug);
     if (prods && prods.length > 0) {
       setProductList(prods.map(mapToProductItem));
-    } else {
+    } else if (isTerephones) {
       setProductList(defaultProducts);
+    } else {
+      setProductList([]);
     }
 
     const revs = db.reviews.getVisibleBySlug(slug);
@@ -270,12 +274,20 @@ function SlugStorePage() {
           text: r.comment,
         }))
       );
-    } else {
+    } else if (isTerephones) {
       setReviewsList(defaultReviews);
+    } else {
+      setReviewsList([]);
     }
 
-    // Set initial theme based on store settings or localStorage
-    const saved = localStorage.getItem("terephones_theme") as ThemeMode | null;
+    // Track store visit in analytics
+    if (p.id) {
+      db.analytics.trackVisit(p.id);
+    }
+
+    // Set initial theme based on store settings or scoped localStorage
+    const themeKey = `zapstore_theme_${slug}`;
+    const saved = (localStorage.getItem(themeKey) || (isTerephones ? localStorage.getItem("terephones_theme") : null)) as ThemeMode | null;
     const initialTheme: ThemeMode =
       saved === "black-piano" || saved === "white"
         ? saved
@@ -338,7 +350,10 @@ function SlugStorePage() {
     } else {
       root.classList.add("theme-white");
     }
-    localStorage.setItem("terephones_theme", next);
+    localStorage.setItem(`zapstore_theme_${slug}`, next);
+    if (slug === "terephones") {
+      localStorage.setItem("terephones_theme", next);
+    }
     window.dispatchEvent(new CustomEvent("theme-changed", { detail: { theme: next } }));
     toast.success(next === "black-piano" ? "Modo Black ativado" : "Modo Branco ativado", {
       id: "theme-toggle",
@@ -352,6 +367,11 @@ function SlugStorePage() {
   };
 
   const handleBuyWhatsApp = (prod: ProductItem) => {
+    if (profile?.id) {
+      db.analytics.trackLead(profile.id);
+    }
+
+    const isTerephones = slug === "terephones" || (settings?.store_name || "").toLowerCase().includes("terephones");
     const isNovo =
       prod.cat === "Novos" ||
       prod.cat === "Lacrados" ||
@@ -359,26 +379,25 @@ function SlugStorePage() {
       prod.badge.toLowerCase().includes("novo") ||
       prod.name.toLowerCase().includes("lacrad");
     const storageDisplay =
-      prod.storage || prod.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() || "128GB";
-    const condText = isNovo
-      ? "Novo Lacrado de Fábrica Apple"
-      : `Seminovo Grade A+${prod.battery ? ` (Saúde da Bateria: ${prod.battery})` : ""}`;
+      prod.storage || prod.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() || "";
+    const condText = isTerephones
+      ? (isNovo
+        ? "Novo Lacrado de Fábrica Apple"
+        : `Seminovo Grade A+${prod.battery ? ` (Saúde da Bateria: ${prod.battery})` : ""}`)
+      : (prod.specs || prod.condition || "Pronta entrega");
 
-    const storeName = settings?.store_name || "Terephones";
-    let text = settings?.whatsapp_message_template || `Olá, equipe {store_name}! Gostaria de pedir este iPhone que vi no catálogo:
+    const storeName = settings?.store_name || (isTerephones ? "Terephones" : "Loja");
+    const defaultTemplate = isTerephones
+      ? `Olá, equipe {store_name}! Gostaria de pedir este iPhone que vi no catálogo:\n\n📱 *Aparelho:* {nome}\n💰 *Valor à vista:* {preco} (ou até 18x no cartão)\n💾 *Capacidade:* {storage}\n✨ *Condição:* {condition}\n\nGostaria de confirmar a disponibilidade para entrega hoje!`
+      : `Olá, equipe {store_name}! Gostaria de fazer o pedido deste item que vi no catálogo:\n\n🛍️ *Produto:* {nome}\n💰 *Valor:* {preco}\n✨ *Detalhes:* {condition}\n\nGostaria de verificar a disponibilidade e entrega!`;
 
-📱 *Aparelho:* {nome}
-💰 *Valor à vista:* {preco} (ou até 18x no cartão)
-💾 *Capacidade:* {storage}
-✨ *Condição:* {condition}
-
-Gostaria de confirmar a disponibilidade para entrega hoje!`;
+    let text = settings?.whatsapp_message_template || defaultTemplate;
 
     text = text
       .replace(/{store_name}/g, storeName)
       .replace(/{nome}/g, prod.name)
       .replace(/{preco}/g, fmt(prod.price))
-      .replace(/{storage}/g, storageDisplay)
+      .replace(/{storage}/g, storageDisplay || "Padrão")
       .replace(/{condition}/g, condText);
 
     const rawWhatsapp = settings?.whatsapp || "5521964639999";
@@ -387,8 +406,11 @@ Gostaria de confirmar a disponibilidade para entrega hoje!`;
   };
 
   const handleTradeWhatsApp = () => {
+    if (profile?.id) {
+      db.analytics.trackLead(profile.id);
+    }
     const storeName = settings?.store_name || "Terephones";
-    let text = settings?.tradein_whatsapp_message || `Olá, equipe {store_name}! Gostaria de fazer uma simulação de Troca com Troco (Trade-in) do meu iPhone usado por um novo.`;
+    let text = settings?.tradein_whatsapp_message || `Olá, equipe {store_name}! Gostaria de fazer uma simulação de Troca com Troco (Trade-in) do meu aparelho usado por um novo.`;
     text = text.replace(/{store_name}/g, storeName);
     const rawWhatsapp = settings?.whatsapp || "5521964639999";
     const digits = rawWhatsapp.replace(/\D/g, "");
@@ -397,7 +419,8 @@ Gostaria de confirmar a disponibilidade para entrega hoje!`;
 
   // Top 4 best-sellers / featured products
   const featured = useMemo(() => {
-    const list = productList && productList.length > 0 ? productList : defaultProducts;
+    const list = productList;
+    if (list.length === 0) return [];
 
     const explicit = list.filter((p: any) => p.is_featured);
     const chosen: ProductItem[] = [...explicit];
@@ -503,7 +526,7 @@ Gostaria de confirmar a disponibilidade para entrega hoje!`;
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.08] tracking-tight text-slate-900 dark:text-white">
                 {settings.hero_title ? (
                   <span className="whitespace-pre-line">{settings.hero_title}</span>
-                ) : (
+                ) : slug === "terephones" ? (
                   <>
                     O seu novo{" "}
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 dark:from-sky-400 dark:via-blue-400 dark:to-teal-300">
@@ -512,21 +535,35 @@ Gostaria de confirmar a disponibilidade para entrega hoje!`;
                     ,<br />
                     na sua mão hoje.
                   </>
+                ) : (
+                  <>
+                    Bem-vindo à{" "}
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 dark:from-sky-400 dark:via-blue-400 dark:to-teal-300">
+                      {storeName}
+                    </span>
+                  </>
                 )}
               </h1>
 
               {/* Value Prop Subtitle */}
               <p className="mt-3 sm:mt-5 text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-xl mx-auto lg:mx-0 leading-relaxed">
                 {settings.hero_subtitle || (
-                  <>
-                    Entrega Express em até 1 hora na sua porta ou Retirada presencial na loja parceira{" "}
-                    <strong className="text-slate-900 dark:text-white font-bold">SejaDelta</strong>.
-                    Aparelhos revisados com até 1 ano de garantia Apple e{" "}
-                    <strong className="text-emerald-600 dark:text-emerald-400 font-extrabold">
-                      pagamento somente na entrega!
-                    </strong>{" "}
-                    🍎⚡
-                  </>
+                  slug === "terephones" ? (
+                    <>
+                      Entrega Express em até 1 hora na sua porta ou Retirada presencial na loja parceira{" "}
+                      <strong className="text-slate-900 dark:text-white font-bold">SejaDelta</strong>.
+                      Aparelhos revisados com até 1 ano de garantia Apple e{" "}
+                      <strong className="text-emerald-600 dark:text-emerald-400 font-extrabold">
+                        pagamento somente na entrega!
+                      </strong>{" "}
+                      🍎⚡
+                    </>
+                  ) : (
+                    <>
+                      Confira nossa seleção exclusiva de produtos com procedência e qualidade garantida.
+                      Faça seus pedidos de forma simples e direta pelo nosso WhatsApp oficial!
+                    </>
+                  )
                 )}
               </p>
 
@@ -556,182 +593,215 @@ Gostaria de confirmar a disponibilidade para entrega hoje!`;
               <div className="mt-5 sm:mt-8 grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center lg:justify-start gap-2 sm:gap-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
                 <div className="flex items-center justify-center sm:justify-start gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60">
                   <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
-                  <span>{settings.trust_badge_rating || "4,9 no Google"}</span>
+                  <span>{settings.trust_badge_rating || (slug === "terephones" ? "4,9 no Google" : "Nota 5.0")}</span>
                 </div>
                 <div className="flex items-center justify-center sm:justify-start gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60">
                   <Truck className="w-3.5 h-3.5 text-sky-500 shrink-0" />
-                  <span>{settings.trust_badge_delivery || "Entrega em até 1h"}</span>
+                  <span>{settings.trust_badge_delivery || (slug === "terephones" ? "Entrega em até 1h" : "Entrega Ágil")}</span>
                 </div>
                 <div className="flex items-center justify-center sm:justify-start gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60">
                   <Building2 className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-                  <span>{settings.trust_badge_location || "Ponto SejaDelta"}</span>
+                  <span>{settings.trust_badge_location || (slug === "terephones" ? "Ponto SejaDelta" : "Loja Verificada")}</span>
                 </div>
                 <div className="flex items-center justify-center sm:justify-start gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60 text-emerald-600 dark:text-emerald-400 font-black">
                   <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
-                  <span>{settings.trust_badge_payment || "Pague só na Entrega"}</span>
+                  <span>{settings.trust_badge_payment || (slug === "terephones" ? "Pague só na Entrega" : "Compra Segura")}</span>
                 </div>
               </div>
             </div>
 
             {/* Right Column: 3D Tilt Phone on Desktop */}
             <div className="hidden lg:flex lg:col-span-5 justify-center items-center">
-              <TiltPhone image={settings.hero_image_url || featured[0]?.img || heroIphone} />
+              <TiltPhone image={settings.hero_image_url || featured[0]?.img || (slug === "terephones" ? heroIphone : undefined)} />
             </div>
           </div>
         </section>
 
-        {/* 2. FEATURED PRODUCTS (Top 4 Best-Sellers) */}
+        {/* 2. FEATURED PRODUCTS */}
         <section id="destaques" className="py-10 sm:py-16 px-4 sm:px-6 relative scroll-mt-24">
           <div className="max-w-6xl mx-auto">
             <SectionTitle
               badge={settings.featured_badge || "Mais Desejados"}
               eyebrow={settings.featured_eyebrow || "Catálogo Selecionado"}
-              title={settings.featured_title || "Destaques da Semana"}
-              subtitle={settings.featured_subtitle || "Os modelos mais procurados com garantia e pronta entrega imediata."}
+              title={settings.featured_title || "Destaques da Vitrine"}
+              subtitle={settings.featured_subtitle || (slug === "terephones" ? "Os modelos mais procurados com garantia e pronta entrega imediata." : "Confira os itens mais procurados e disponíveis agora para pedido.")}
             />
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-              {featured.map((item) => {
-                const isNovo =
-                  item.cat === "Novos" ||
-                  item.cat === "Lacrados" ||
-                  item.badge.toLowerCase().includes("lacrad") ||
-                  item.badge.toLowerCase().includes("novo") ||
-                  item.name.toLowerCase().includes("lacrad");
-                const catLabel = slug === "terephones"
-                  ? (isNovo ? "Novo Lacrado" : "Seminovo Premium")
-                  : (item.cat || "Destaque");
+            {featured.length === 0 ? (
+              <div className="text-center py-12 sm:py-16 px-4 glass-card rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 max-w-xl mx-auto my-4">
+                <div className="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-sky-400 flex items-center justify-center mx-auto mb-3.5 shadow-xs">
+                  <ShoppingBag className="w-7 h-7" />
+                </div>
+                <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                  Novidades chegando no catálogo!
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto leading-relaxed">
+                  Estamos cadastrando e atualizando nossos produtos. Fale direto com a nossa equipe pelo WhatsApp para consultar disponibilidade e fazer seu pedido exclusivo agora mesmo.
+                </p>
+                <a
+                  href={whatsLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-5 inline-flex items-center gap-2 py-2.5 px-6 rounded-full font-bold text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-500 text-white shadow-md active:scale-95 transition"
+                >
+                  <WhatsAppIcon className="w-4 h-4 fill-white" />
+                  <span>Chamar no WhatsApp</span>
+                </a>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+                {featured.map((item) => {
+                  const isNovo =
+                    item.cat === "Novos" ||
+                    item.cat === "Lacrados" ||
+                    item.badge.toLowerCase().includes("lacrad") ||
+                    item.badge.toLowerCase().includes("novo") ||
+                    item.name.toLowerCase().includes("lacrad");
+                  const catLabel = slug === "terephones"
+                    ? (isNovo ? "Novo Lacrado" : "Seminovo Premium")
+                    : (item.cat || "Destaque");
 
-                let tagLabel = item.badge || "";
-                if (slug === "terephones") {
-                  if (item.battery) {
-                    const match = item.battery.match(/(\d+)\s*%/);
-                    tagLabel = match ? `Bateria ${match[1]}%` : `Bateria ${item.battery.replace(/^bateria\s*/i, "")}`;
-                  } else if (isNovo) {
-                    tagLabel = "Bateria 100%";
+                  let tagLabel = item.badge || "";
+                  if (slug === "terephones") {
+                    if (item.battery) {
+                      const match = item.battery.match(/(\d+)\s*%/);
+                      tagLabel = match ? `Bateria ${match[1]}%` : `Bateria ${item.battery.replace(/^bateria\s*/i, "")}`;
+                    } else if (isNovo) {
+                      tagLabel = "Bateria 100%";
+                    }
                   }
-                }
 
-                return (
-                  <div
-                    key={item.name}
-                    className="glass-card flex flex-col justify-between p-3 sm:p-5 rounded-2xl group transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative"
-                  >
-                    {/* Top Tags */}
-                    <div className="flex items-center justify-between gap-1 mb-2 w-full">
-                      <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 dark:bg-sky-950/80 text-blue-600 dark:text-sky-400 border border-blue-200/60 dark:border-sky-800/60 truncate max-w-[50%]">
-                        {catLabel}
-                      </span>
-                      {tagLabel ? (
-                        <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 truncate max-w-[50%]">
-                          {tagLabel}
-                        </span>
-                      ) : null}
-                    </div>
-
-                    {/* Product Photo */}
+                  return (
                     <div
-                      className="relative py-2 sm:py-4 flex items-center justify-center cursor-pointer"
-                      onClick={() => handleOpenDetail(item)}
+                      key={item.name}
+                      className="glass-card flex flex-col justify-between p-3 sm:p-5 rounded-2xl group transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative"
                     >
-                      <img
-                        src={item.img}
-                        alt={item.name}
-                        loading="lazy"
-                        className="w-24 h-24 sm:w-36 sm:h-36 object-contain transition-transform duration-300 group-hover:scale-105 select-none"
-                      />
-                    </div>
-
-                    {/* Product Info */}
-                    <div className="mt-1 sm:mt-2 text-left">
-                      <h3
-                        onClick={() => handleOpenDetail(item)}
-                        className="font-black text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-2 leading-snug cursor-pointer hover:text-blue-600 dark:hover:text-sky-400 transition"
-                        title={item.name}
-                      >
-                        {item.name}
-                      </h3>
-                      <div className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 truncate">
-                        {item.specs || item.storage || "Pronta entrega"}
+                      {/* Top Tags */}
+                      <div className="flex items-center justify-between gap-1 mb-2 w-full">
+                        <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 dark:bg-sky-950/80 text-blue-600 dark:text-sky-400 border border-blue-200/60 dark:border-sky-800/60 truncate max-w-[50%]">
+                          {catLabel}
+                        </span>
+                        {tagLabel ? (
+                          <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 truncate max-w-[50%]">
+                            {tagLabel}
+                          </span>
+                        ) : null}
                       </div>
 
-                      {/* Price Display */}
-                      <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
-                        <div className="text-sm sm:text-xl font-black text-blue-600 dark:text-sky-400 leading-tight">
-                          {fmt(item.price)}
+                      {/* Product Photo */}
+                      <div
+                        className="relative py-2 sm:py-4 flex items-center justify-center cursor-pointer"
+                        onClick={() => handleOpenDetail(item)}
+                      >
+                        <img
+                          src={item.img}
+                          alt={item.name}
+                          loading="lazy"
+                          className="w-24 h-24 sm:w-36 sm:h-36 object-contain transition-transform duration-300 group-hover:scale-105 select-none"
+                        />
+                      </div>
+
+                      {/* Product Info */}
+                      <div className="mt-1 sm:mt-2 text-left">
+                        <h3
+                          onClick={() => handleOpenDetail(item)}
+                          className="font-black text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-2 leading-snug cursor-pointer hover:text-blue-600 dark:hover:text-sky-400 transition"
+                          title={item.name}
+                        >
+                          {item.name}
+                        </h3>
+                        <div className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 truncate">
+                          {item.specs || item.storage || "Pronta entrega"}
                         </div>
-                        <div className="text-[9px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium">
-                          à vista ou até 18x no cartão
+
+                        {/* Price Display */}
+                        <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
+                          <div className="text-sm sm:text-xl font-black text-blue-600 dark:text-sky-400 leading-tight">
+                            {fmt(item.price)}
+                          </div>
+                          <div className="text-[9px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium">
+                            à vista ou até 18x no cartão
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Actions */}
-                    <div className="mt-3 flex flex-col gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => handleBuyWhatsApp(item)}
-                        className="w-full py-1.5 sm:py-2 px-2 rounded-xl font-bold text-[11px] sm:text-xs bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition cursor-pointer"
-                      >
-                        <WhatsAppIcon className="w-3.5 h-3.5 shrink-0" />
-                        <span>Pedir no Zap</span>
-                      </button>
+                      {/* Actions */}
+                      <div className="mt-3 flex flex-col gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleBuyWhatsApp(item)}
+                          className="w-full py-1.5 sm:py-2 px-2 rounded-xl font-bold text-[11px] sm:text-xs bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition cursor-pointer"
+                        >
+                          <WhatsAppIcon className="w-3.5 h-3.5 shrink-0" />
+                          <span>Pedir no Zap</span>
+                        </button>
 
-                      <button
-                        type="button"
-                        onClick={() => handleOpenDetail(item)}
-                        className="w-full py-1 sm:py-1.5 px-2 rounded-xl text-[10px] sm:text-[11px] font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 transition cursor-pointer flex items-center justify-center gap-1"
-                      >
-                        <Info className="w-3 h-3" />
-                        <span>Ver Detalhes</span>
-                      </button>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenDetail(item)}
+                          className="w-full py-1 sm:py-1.5 px-2 rounded-xl text-[10px] sm:text-[11px] font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 transition cursor-pointer flex items-center justify-center gap-1"
+                        >
+                          <Info className="w-3 h-3" />
+                          <span>Ver Detalhes</span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Transition Banner to Full Store */}
-            <div className="mt-6 sm:mt-8 glass-card p-4 sm:p-6 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 border border-blue-500/20 text-center sm:text-left">
-              <div>
-                <div className="text-xs sm:text-base font-black text-slate-900 dark:text-white">
-                  {settings.catalog_banner_title || "Buscando outro modelo, cor ou capacidade?"}
+            {productList.length > 0 && (
+              <div className="mt-6 sm:mt-8 glass-card p-4 sm:p-6 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 border border-blue-500/20 text-center sm:text-left">
+                <div>
+                  <div className="text-xs sm:text-base font-black text-slate-900 dark:text-white">
+                    {settings.catalog_banner_title || "Buscando outro modelo, cor ou opção?"}
+                  </div>
+                  <div className="text-[11px] sm:text-sm text-slate-600 dark:text-slate-300 mt-0.5">
+                    {settings.catalog_banner_subtitle || (slug === "terephones" ? "Temos estoque completo atualizado diariamente com garantia Apple de até 1 ano." : "Veja todas as opções disponíveis em nosso catálogo online completo.")}
+                  </div>
                 </div>
-                <div className="text-[11px] sm:text-sm text-slate-600 dark:text-slate-300 mt-0.5">
-                  {settings.catalog_banner_subtitle || "Temos estoque completo atualizado diariamente com garantia Apple de até 1 ano."}
-                </div>
+                <Link
+                  to="/$slug/loja"
+                  params={{ slug }}
+                  className="btn-primary-glow shrink-0 py-2 sm:py-2.5 px-4 sm:px-5 rounded-full text-xs sm:text-sm font-bold text-white inline-flex items-center gap-2 shadow-md active:scale-95 transition"
+                >
+                  <span>{settings.catalog_banner_button_text || "Ver Catálogo Completo na Loja"}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
-              <Link
-                to="/$slug/loja"
-                params={{ slug }}
-                className="btn-primary-glow shrink-0 py-2 sm:py-2.5 px-4 sm:px-5 rounded-full text-xs sm:text-sm font-bold text-white inline-flex items-center gap-2 shadow-md active:scale-95 transition"
-              >
-                <span>{settings.catalog_banner_button_text || "Ver Catálogo Completo na Loja"}</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
+            )}
           </div>
         </section>
 
-        {/* 3. TRUST & HYBRID MODEL */}
+        {/* 3. TRUST & DIFFERENTIALS */}
         <section id="diferenciais" className="py-10 sm:py-16 px-4 sm:px-6 relative scroll-mt-24">
           <div className="max-w-6xl mx-auto">
             <SectionTitle
               badge={settings.differentials_badge || "Segurança Total"}
               eyebrow={settings.differentials_eyebrow || `Por que a ${storeName}?`}
-              title={settings.differentials_title || "A Experiência Apple Mais Segura de Teresópolis"}
-              subtitle={settings.differentials_subtitle || "Comprar seu iPhone novo ou seminovo não precisa ser arriscado nem demorado."}
+              title={settings.differentials_title || (slug === "terephones" ? "A Experiência Apple Mais Segura de Teresópolis" : `Por que comprar na ${storeName}?`)}
+              subtitle={settings.differentials_subtitle || (slug === "terephones" ? "Comprar seu iPhone novo ou seminovo não precisa ser arriscado nem demorado." : "Qualidade garantida, atendimento ágil e as melhores condições para você.")}
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-6">
               {(settings.differentials && settings.differentials.length > 0
                 ? settings.differentials
-                : [
-                    { icon: "🚚", title: "Entrega Express em até 1h", description: "Levamos seu iPhone na sua porta em qualquer bairro de Teresópolis. Rápido, seguro e sem espera de dias." },
-                    { icon: "🛡️", title: "Pague Só na Entrega", description: "Zero risco de golpe na internet: confira a caixa, teste a câmera, tela e funções na sua mão antes de fazer o pagamento." },
-                    { icon: "🏪", title: "Ponto Físico na SejaDelta", description: "Prefere retirar presencialmente? Atendimento exclusivo na loja parceira SejaDelta no centro de Teresópolis." },
-                    { icon: "⭐", title: "Até 1 Ano de Garantia", description: "Novos lacrados com garantia mundial Apple e seminovos aprovados em 25+ testes com 90 dias de garantia total." },
-                  ]
+                : (slug === "terephones"
+                  ? [
+                      { icon: "🚚", title: "Entrega Express em até 1h", description: "Levamos seu iPhone na sua porta em qualquer bairro de Teresópolis. Rápido, seguro e sem espera de dias." },
+                      { icon: "🛡️", title: "Pague Só na Entrega", description: "Zero risco de golpe na internet: confira a caixa, teste a câmera, tela e funções na sua mão antes de fazer o pagamento." },
+                      { icon: "🏪", title: "Ponto Físico na SejaDelta", description: "Prefere retirar presencialmente? Atendimento exclusivo na loja parceira SejaDelta no centro de Teresópolis." },
+                      { icon: "⭐", title: "Até 1 Ano de Garantia", description: "Novos lacrados com garantia mundial Apple e seminovos aprovados em 25+ testes com 90 dias de garantia total." },
+                    ]
+                  : [
+                      { icon: "🚀", title: "Atendimento Personalizado", description: "Tire dúvidas e faça seus pedidos diretamente com nossos especialistas via WhatsApp com resposta rápida." },
+                      { icon: "🛡️", title: "Compra 100% Segura", description: "Negocie com transparência, acompanhe seu pedido e tenha total suporte antes e após a compra." },
+                      { icon: "⭐", title: "Qualidade Garantida", description: "Produtos e serviços selecionados com alto padrão de qualidade, procedência e garantia." },
+                      { icon: "💳", title: "Pagamento Facilitado", description: "Aceitamos PIX, cartões de crédito e as melhores condições de pagamento para o seu bolso." },
+                    ]
+                )
               ).map((p, idx) => {
                 const colors = [
                   "from-sky-500 to-blue-600",
@@ -764,15 +834,15 @@ Gostaria de confirmar a disponibilidade para entrega hoje!`;
           </div>
         </section>
 
-        {/* 4. TRADE-IN SECTION */}
-        {settings.enable_tradein !== false && (
+        {/* 4. TRADE-IN SECTION (Apenas quando explicitamente habilitado) */}
+        {(settings.enable_tradein === true || (slug === "terephones" && settings.enable_tradein !== false)) && (
           <section id="troca" className="py-10 sm:py-16 px-4 sm:px-6 relative scroll-mt-24">
             <div className="max-w-4xl mx-auto glass-card p-6 sm:p-10 rounded-3xl border border-blue-500/20 text-center">
               <SectionTitle
                 badge={settings.tradein_badge || "Trade-in Inteligente"}
                 eyebrow={settings.tradein_eyebrow || "Troque de Aparelho"}
-                title={settings.tradein_title || "Seu iPhone Usado Vale Dinheiro na Troca"}
-                subtitle={settings.tradein_subtitle || "Aceitamos seu iPhone a partir do modelo XR como entrada no novo. Avaliação rápida, justa e sem burocracia."}
+                title={settings.tradein_title || "Seu Usado Vale Dinheiro na Troca"}
+                subtitle={settings.tradein_subtitle || "Aceitamos seu aparelho usado como entrada no novo. Avaliação rápida, justa e sem burocracia."}
               />
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-5 mt-4 text-left">
@@ -780,7 +850,7 @@ Gostaria de confirmar a disponibilidade para entrega hoje!`;
                   {
                     num: "1",
                     title: settings.tradein_step1_title || "Envie as Fotos no WhatsApp",
-                    desc: settings.tradein_step1_desc || "Mande fotos do seu aparelho, informe modelo, capacidade e saúde da bateria.",
+                    desc: settings.tradein_step1_desc || "Mande fotos do seu aparelho, informe modelo, capacidade e estado geral.",
                   },
                   {
                     num: "2",
@@ -790,7 +860,7 @@ Gostaria de confirmar a disponibilidade para entrega hoje!`;
                   {
                     num: "3",
                     title: settings.tradein_step3_title || "Pague Só a Diferença (ou Receba Troco)",
-                    desc: settings.tradein_step3_desc || "Entregamos o aparelho novo e pegamos o seu usado no ato, com total segurança.",
+                    desc: settings.tradein_step3_desc || "Entregamos o produto novo e pegamos o seu usado no ato, com total segurança.",
                   },
                 ].map((s) => (
                   <div
@@ -830,106 +900,112 @@ Gostaria de confirmar a disponibilidade para entrega hoje!`;
           </section>
         )}
 
-        {/* 5. REVIEWS & LOCATION */}
-        <section id="sobre" className="py-10 sm:py-16 px-4 sm:px-6 overflow-hidden scroll-mt-24">
-          <div className="max-w-6xl mx-auto">
-            <SectionTitle
-              badge={settings.reviews_badge || "Google 4,9 ★"}
-              eyebrow={settings.reviews_eyebrow || "Depoimentos Reais"}
-              title={settings.reviews_title || "Quem Compra em Teresópolis Recomenda"}
-              subtitle={settings.reviews_subtitle || "Mais de 500 clientes atendidos com nota máxima em procedência e rapidez."}
-            />
+        {/* 5. REVIEWS & LOCATION (Apenas quando houver depoimentos) */}
+        {reviewsList.length > 0 && (
+          <section id="sobre" className="py-10 sm:py-16 px-4 sm:px-6 overflow-hidden scroll-mt-24">
+            <div className="max-w-6xl mx-auto">
+              <SectionTitle
+                badge={settings.reviews_badge || "Avaliação 5 ★"}
+                eyebrow={settings.reviews_eyebrow || "Depoimentos Reais"}
+                title={settings.reviews_title || (slug === "terephones" ? "Quem Compra em Teresópolis Recomenda" : "O Que Nossos Clientes Dizem")}
+                subtitle={settings.reviews_subtitle || (slug === "terephones" ? "Mais de 500 clientes atendidos com nota máxima em procedência e rapidez." : "Depoimentos de quem já comprou e comprova a nossa qualidade e atendimento.")}
+              />
 
-            <div className="relative mt-4 mb-12 sm:mb-16 overflow-hidden py-2">
-              <div className="marquee">
-                {doubledReviews.map((r, i) => (
-                  <div
-                    key={i}
-                    className="glass-card p-4 sm:p-5 w-[280px] sm:w-[320px] rounded-2xl shrink-0 text-left border border-slate-200/70 dark:border-slate-800/70"
-                  >
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-white text-xs bg-gradient-to-br from-blue-600 to-sky-500 shadow-xs">
-                        {r.name[0]}
-                      </div>
-                      <div>
-                        <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
-                          {r.name}
-                        </div>
-                        <div className="text-[11px] text-blue-600 dark:text-sky-400 font-semibold">
-                          {r.neighborhood ? `${r.neighborhood} • ` : ""}{settings.city || "Teresópolis"}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex gap-0.5 mb-2 text-amber-400 text-xs">
-                      {"★".repeat(5)}
-                    </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed italic">
-                      "{r.text}"
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* SejaDelta Location Card */}
-            {settings.enable_physical_location !== false && (
-              <div className="glass-card p-6 sm:p-10 rounded-3xl border border-blue-500/20 max-w-4xl mx-auto">
-                <div className="grid md:grid-cols-12 gap-6 items-center">
-                  <div className="md:col-span-8 text-center md:text-left">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/80 dark:border-indigo-800/80 mb-3">
-                      <Building2 className="w-3.5 h-3.5" />
-                      <span>{settings.location_badge || "Ponto Físico Oficial de Apoio"}</span>
-                    </span>
-
-                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                      {settings.location_title || "Loja Parceira SejaDelta em Teresópolis"}
-                    </h3>
-
-                    <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                      {settings.location_desc || "Você conta com o suporte e a segurança de um endereço presencial no centro da cidade para retirar aparelhos, aplicar películas ou tirar dúvidas pessoalmente."}
-                    </p>
-
-                    <div className="mt-4 space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-                      <div className="flex items-center justify-center md:justify-start gap-2">
-                        <MapPin className="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0" />
-                        <span>{settings.address || "Av. José Joaquim de Araújo Regadas, 146 — Várzea, Teresópolis - RJ"}</span>
-                      </div>
-                      <div className="flex items-center justify-center md:justify-start gap-2">
-                        <Clock className="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0" />
-                        <span>{settings.business_hours || "Segunda a Sábado — 10:00 às 18:00"}</span>
-                      </div>
-                      <div className="flex items-center justify-center md:justify-start gap-2">
-                        <Phone className="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0" />
-                        <span>WhatsApp de Suporte: {phoneDisplay}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="md:col-span-4 flex flex-col items-center justify-center gap-3">
-                    <a
-                      href={settings.google_maps_url || (settings.address ? `https://maps.google.com/?q=${encodeURIComponent(settings.address)}` : "https://maps.google.com/?q=Av.+Jos%C3%A9+Joaquim+de+Ara%C3%BAjo+Regadas,+146+-+V%C3%A1rzea,+Teres%C3%B3polis+-+RJ")}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-primary-glow w-full py-3 px-5 rounded-full text-xs font-bold text-white flex items-center justify-center gap-2 shadow-md active:scale-95 transition"
+              <div className="relative mt-4 mb-12 sm:mb-16 overflow-hidden py-2">
+                <div className="marquee">
+                  {doubledReviews.map((r, i) => (
+                    <div
+                      key={i}
+                      className="glass-card p-4 sm:p-5 w-[280px] sm:w-[320px] rounded-2xl shrink-0 text-left border border-slate-200/70 dark:border-slate-800/70"
                     >
-                      <ExternalLink className="w-4 h-4 shrink-0" />
-                      <span>Abrir no Google Maps</span>
-                    </a>
-
-                    <a
-                      href={`${whatsLink}?text=${encodeURIComponent(`Olá! Gostaria de agendar uma retirada na loja em ${settings.city || "Teresópolis"}.`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full py-2.5 px-4 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition text-center"
-                    >
-                      Agendar Retirada na Loja
-                    </a>
-                  </div>
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-white text-xs bg-gradient-to-br from-blue-600 to-sky-500 shadow-xs">
+                          {r.name[0]}
+                        </div>
+                        <div>
+                          <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
+                            {r.name}
+                          </div>
+                          <div className="text-[11px] text-blue-600 dark:text-sky-400 font-semibold">
+                            {r.neighborhood ? `${r.neighborhood} • ` : ""}{settings.city || "Cliente Verificado"}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-0.5 mb-2 text-amber-400 text-xs">
+                        {"★".repeat(5)}
+                      </div>
+                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed italic">
+                        "{r.text}"
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
-            )}
-          </div>
-        </section>
+
+              {/* Physical Location Card (Apenas se habilitado) */}
+              {(settings.enable_physical_location === true || (slug === "terephones" && settings.enable_physical_location !== false)) && (
+                <div className="glass-card p-6 sm:p-10 rounded-3xl border border-blue-500/20 max-w-4xl mx-auto">
+                  <div className="grid md:grid-cols-12 gap-6 items-center">
+                    <div className="md:col-span-8 text-center md:text-left">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/80 dark:border-indigo-800/80 mb-3">
+                        <Building2 className="w-3.5 h-3.5" />
+                        <span>{settings.location_badge || "Ponto de Atendimento"}</span>
+                      </span>
+
+                      <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                        {settings.location_title || (slug === "terephones" ? "Loja Parceira SejaDelta em Teresópolis" : "Atendimento Presencial")}
+                      </h3>
+
+                      <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                        {settings.location_desc || (slug === "terephones" ? "Você conta com o suporte e a segurança de um endereço presencial no centro da cidade para retirar aparelhos, aplicar películas ou tirar dúvidas pessoalmente." : "Venha conhecer nosso espaço ou agendar a retirada presencial do seu pedido com total comodidade.")}
+                      </p>
+
+                      <div className="mt-4 space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                        {settings.address && (
+                          <div className="flex items-center justify-center md:justify-start gap-2">
+                            <MapPin className="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0" />
+                            <span>{settings.address}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center justify-center md:justify-start gap-2">
+                          <Clock className="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0" />
+                          <span>{settings.business_hours || "Segunda a Sábado — Horário Comercial"}</span>
+                        </div>
+                        <div className="flex items-center justify-center md:justify-start gap-2">
+                          <Phone className="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0" />
+                          <span>WhatsApp de Suporte: {phoneDisplay}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="md:col-span-4 flex flex-col items-center justify-center gap-3">
+                      {settings.address && (
+                        <a
+                          href={settings.google_maps_url || `https://maps.google.com/?q=${encodeURIComponent(settings.address)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn-primary-glow w-full py-3 px-5 rounded-full text-xs font-bold text-white flex items-center justify-center gap-2 shadow-md active:scale-95 transition"
+                        >
+                          <ExternalLink className="w-4 h-4 shrink-0" />
+                          <span>Abrir no Google Maps</span>
+                        </a>
+                      )}
+
+                      <a
+                        href={`${whatsLink}?text=${encodeURIComponent(`Olá! Gostaria de mais informações sobre atendimento presencial ou agendar uma retirada.`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-2.5 px-4 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition text-center"
+                      >
+                        Agendar Atendimento
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
       </main>
 
       {/* Product Detail Modal */}
