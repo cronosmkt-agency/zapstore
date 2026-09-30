@@ -25,6 +25,7 @@ import {
   Lock,
   LogIn,
   ShieldCheck,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -55,6 +56,18 @@ function AdminUsersPage() {
         description: 'Você está no modo de suporte do administrador.',
       });
       navigate({ to: '/dashboard' });
+    } else {
+      toast.error('Erro ao acessar a conta do lojista.');
+    }
+  };
+
+  const handleImpersonateAndConfigure = (user: Profile) => {
+    const result = impersonate(user.id);
+    if (result) {
+      toast.success(`Abrindo configurações de ${user.display_name || user.email}`, {
+        description: 'Você está no modo de suporte editando a loja.',
+      });
+      navigate({ to: '/dashboard/configuracoes' });
     } else {
       toast.error('Erro ao acessar a conta do lojista.');
     }
@@ -393,11 +406,11 @@ function AdminUsersPage() {
                           </span>
                         </td>
                         <td className="px-4 sm:px-6 py-4 text-right whitespace-nowrap">
-                          <div className="inline-flex items-center gap-2">
+                          <div className="inline-flex items-center gap-1.5 sm:gap-2">
                             <button
                               type="button"
                               onClick={() => handleImpersonateUser(user)}
-                              className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-600 hover:text-white transition-all cursor-pointer shadow-xs"
+                              className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-600 hover:text-white transition-all cursor-pointer shadow-xs"
                               title="Acessar painel deste lojista como administrador"
                             >
                               <LogIn size={13} />
@@ -405,8 +418,17 @@ function AdminUsersPage() {
                             </button>
                             <button
                               type="button"
+                              onClick={() => handleImpersonateAndConfigure(user)}
+                              className="inline-flex items-center gap-1 text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-600 hover:text-white transition-all cursor-pointer shadow-xs"
+                              title="Abrir configurações de identidade, visual e catálogo desta loja"
+                            >
+                              <SlidersHorizontal size={13} />
+                              <span>Configurar</span>
+                            </button>
+                            <button
+                              type="button"
                               onClick={() => openManageModal(user)}
-                              className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-600 hover:text-white transition-all cursor-pointer shadow-xs"
+                              className="inline-flex items-center gap-1 text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-600 hover:text-white transition-all cursor-pointer shadow-xs"
                             >
                               <Settings2 size={13} />
                               <span>Gerenciar</span>
@@ -504,24 +526,34 @@ function AdminUsersPage() {
               </div>
 
               {/* Support Mode Card */}
-              <div className="p-3.5 bg-emerald-50/70 border border-emerald-200/90 rounded-2xl flex items-center justify-between gap-3">
+              <div className="p-3.5 bg-emerald-50/70 border border-emerald-200/90 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
                   <div className="min-w-0">
                     <span className="text-xs font-bold text-slate-800 block">Modo Suporte do Administrador</span>
-                    <span className="text-[11px] text-slate-500 block truncate">
+                    <span className="text-[11px] text-slate-500 block">
                       Acesse a loja deste lojista para ajustar configurações e produtos diretamente.
                     </span>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => handleImpersonateUser(selectedUser)}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 px-3.5 py-2 rounded-xl shadow-xs transition cursor-pointer shrink-0"
-                >
-                  <LogIn size={13} />
-                  <span>Entrar Como Lojista</span>
-                </button>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleImpersonateUser(selectedUser)}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 px-3 py-2 rounded-xl shadow-xs transition cursor-pointer"
+                  >
+                    <LogIn size={13} />
+                    <span>Painel</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleImpersonateAndConfigure(selectedUser)}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded-xl shadow-xs transition cursor-pointer"
+                  >
+                    <SlidersHorizontal size={13} />
+                    <span>Configurações</span>
+                  </button>
+                </div>
               </div>
 
               {/* Form: Store & Plan Details */}

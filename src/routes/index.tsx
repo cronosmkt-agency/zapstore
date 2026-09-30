@@ -23,6 +23,10 @@ import {
   LayoutDashboard,
   UserPlus,
   Package,
+  Menu,
+  X,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { ThemeToggleSwitch } from "@/components/SiteNavbar";
@@ -115,7 +119,7 @@ function LandingPage() {
     {
       id: "alpha-imoveis",
       name: "Alpha Imóveis",
-      niche: "Imobiliária & Alto Padrão",
+      niche: "Imobiliária",
       nicheKey: "imoveis",
       slug: "alpha-imoveis",
       logo: "/demos/logos/alpha-imoveis.png",
@@ -129,6 +133,7 @@ function LandingPage() {
 
   // Theme state: 'white' or 'black-piano'
   const [currentTheme, setCurrentTheme] = useState<"white" | "black-piano">("white");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("terephones_theme");
@@ -196,7 +201,7 @@ function LandingPage() {
   return (
     <div
       className={`min-h-screen font-sans transition-colors duration-300 selection:bg-blue-600 selection:text-white ${
-        isDark ? "bg-zinc-950 text-zinc-100" : "bg-slate-50 text-slate-900"
+        isDark ? "bg-[#06080d] text-zinc-100" : "bg-slate-50 text-slate-900"
       }`}
     >
       {/* ─── Top Glow Gradient ──────────────────────────────────── */}
@@ -210,54 +215,83 @@ function LandingPage() {
 
       {/* ─── Navbar ────────────────────────────────────────────── */}
       <header
-        className={`sticky top-0 z-50 backdrop-blur-xl border-b transition-colors duration-300 ${
+        className={`sticky top-0 z-50 backdrop-blur-xl border-b transition-all duration-300 ${
           isDark
-            ? "bg-zinc-950/85 border-zinc-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.5)]"
+            ? "bg-[#06080d]/85 border-white/10 shadow-[0_4px_25px_rgba(0,0,0,0.6)]"
             : "bg-white/90 border-slate-200/90 shadow-sm"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5 group shrink-0">
-            <img
-              src="/zapstore-logo.png"
-              alt="ZapStore"
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-cover shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform"
-            />
-            <span
-              className={`font-black text-lg sm:text-xl tracking-tight ${
-                isDark ? "text-white" : "text-slate-900"
-              }`}
-            >
-              Zap<span className="text-blue-600">Store</span>
-            </span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3">
+          {/* Logo & Brand */}
+          <Link to="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
+            <div className="relative">
+              <img
+                src="/zapstore-logo.png"
+                alt="ZapStore"
+                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-cover transition-transform group-hover:scale-105 ${
+                  isDark
+                    ? "shadow-[0_0_15px_rgba(59,130,246,0.4)] ring-1 ring-blue-500/30"
+                    : "shadow-md shadow-blue-500/20"
+                }`}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <span
+                className={`font-black text-lg sm:text-xl tracking-tight ${
+                  isDark ? "text-white" : "text-slate-900"
+                }`}
+              >
+                Zap<span className="text-blue-500">Store</span>
+              </span>
+              <span className="hidden sm:inline-flex text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-cyan-400 border border-blue-500/20">
+                SaaS WhatsApp
+              </span>
+            </div>
           </Link>
 
-          {/* Desktop Nav Links */}
+          {/* Desktop & Tablet Navigation Links */}
           <nav
-            className={`hidden lg:flex items-center gap-7 text-sm font-medium ${
-              isDark ? "text-zinc-400" : "text-slate-600"
+            className={`hidden md:flex items-center gap-1 lg:gap-2 text-xs lg:text-sm font-semibold p-1 rounded-full border backdrop-blur-md ${
+              isDark
+                ? "bg-zinc-900/60 border-zinc-800 text-zinc-300"
+                : "bg-slate-100/80 border-slate-200/80 text-slate-600"
             }`}
           >
-            <a href="#como-funciona" className="hover:text-blue-600 transition">
+            <a
+              href="#como-funciona"
+              className="px-3 py-1.5 rounded-full hover:text-blue-600 dark:hover:text-white hover:bg-white/80 dark:hover:bg-zinc-800 transition"
+            >
               Como Funciona
             </a>
-            <a href="#lojas-demo" className="hover:text-blue-600 transition">
-              Lojas Demo
+            <a
+              href="#lojas-demo"
+              className="px-3 py-1.5 rounded-full hover:text-blue-600 dark:hover:text-white hover:bg-white/80 dark:hover:bg-zinc-800 transition flex items-center gap-1.5"
+            >
+              <span>Lojas Demo</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             </a>
-            <a href="#vantagens" className="hover:text-blue-600 transition">
+            <a
+              href="#vantagens"
+              className="px-3 py-1.5 rounded-full hover:text-blue-600 dark:hover:text-white hover:bg-white/80 dark:hover:bg-zinc-800 transition"
+            >
               Vantagens
             </a>
-            <a href="#planos" className="hover:text-blue-600 transition">
+            <a
+              href="#planos"
+              className="px-3 py-1.5 rounded-full hover:text-blue-600 dark:hover:text-white hover:bg-white/80 dark:hover:bg-zinc-800 transition"
+            >
               Planos
             </a>
-            <a href="#faq" className="hover:text-blue-600 transition">
+            <a
+              href="#faq"
+              className="px-3 py-1.5 rounded-full hover:text-blue-600 dark:hover:text-white hover:bg-white/80 dark:hover:bg-zinc-800 transition"
+            >
               Dúvidas
             </a>
           </nav>
 
           {/* Right Action Bar (Theme Toggle + Auth Buttons) */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             {/* Day/Night Neumorphic Slider Switch */}
             <div className="scale-75 sm:scale-85 origin-center">
               <ThemeToggleSwitch isDark={isDark} toggleTheme={toggleTheme} />
@@ -266,10 +300,10 @@ function LandingPage() {
             {/* Login button */}
             <Link
               to="/login"
-              className={`px-2.5 sm:px-3.5 py-1.5 text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition whitespace-nowrap ${
+              className={`px-3 sm:px-3.5 py-1.5 text-xs sm:text-sm font-bold rounded-xl border transition whitespace-nowrap shadow-2xs cursor-pointer ${
                 isDark
-                  ? "text-zinc-300 hover:text-white hover:bg-zinc-900"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                  ? "bg-zinc-900/80 border-zinc-800 text-zinc-200 hover:text-white hover:bg-zinc-800 hover:border-zinc-700"
+                  : "bg-white border-slate-200 text-slate-700 hover:text-slate-900 hover:bg-slate-100/90"
               }`}
             >
               Entrar
@@ -278,13 +312,73 @@ function LandingPage() {
             {/* Signup CTA button */}
             <Link
               to="/signup"
-              className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-500 rounded-lg sm:rounded-xl shadow-md shadow-blue-600/25 transition-all hover:scale-105 active:scale-95 flex items-center gap-1 sm:gap-1.5 whitespace-nowrap"
+              className="px-3.5 sm:px-4.5 py-1.5 text-xs sm:text-sm font-extrabold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 bg-[length:200%_auto] hover:bg-[right_center] rounded-xl shadow-md shadow-blue-600/30 hover:shadow-blue-600/50 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center gap-1 sm:gap-1.5 whitespace-nowrap cursor-pointer"
             >
               <span>Criar Loja</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
+
+            {/* Mobile menu toggle */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className={`md:hidden p-2 rounded-xl border transition-colors cursor-pointer ${
+                isDark
+                  ? "bg-zinc-900 border-zinc-800 text-zinc-200"
+                  : "bg-white border-slate-200 text-slate-700"
+              }`}
+              aria-label="Menu de Navegação"
+            >
+              {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile dropdown menu */}
+        {mobileMenuOpen && (
+          <div
+            className={`md:hidden px-4 py-4 border-t space-y-2 animate-in slide-in-from-top-2 duration-200 ${
+              isDark ? "bg-[#06080d]/95 border-zinc-800 text-zinc-200" : "bg-white/95 border-slate-200 text-slate-800"
+            }`}
+          >
+            <a
+              href="#como-funciona"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-lg font-semibold text-xs hover:bg-blue-500/10 hover:text-blue-500 transition"
+            >
+              Como Funciona
+            </a>
+            <a
+              href="#lojas-demo"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-lg font-semibold text-xs hover:bg-blue-500/10 hover:text-blue-500 transition flex items-center justify-between"
+            >
+              <span>Lojas Demo de Demonstração</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            </a>
+            <a
+              href="#vantagens"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-lg font-semibold text-xs hover:bg-blue-500/10 hover:text-blue-500 transition"
+            >
+              Vantagens
+            </a>
+            <a
+              href="#planos"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-lg font-semibold text-xs hover:bg-blue-500/10 hover:text-blue-500 transition"
+            >
+              Planos & Preços
+            </a>
+            <a
+              href="#faq"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-lg font-semibold text-xs hover:bg-blue-500/10 hover:text-blue-500 transition"
+            >
+              Dúvidas Frequentes
+            </a>
+          </div>
+        )}
       </header>
 
       {/* ─── 1. HERO SECTION (Full Viewport Fold on Mobile) ─────── */}

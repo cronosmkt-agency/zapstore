@@ -182,8 +182,8 @@ export async function login(email: string, password: string): Promise<LoginResul
   }
 
   // 2. Fallback resiliente para banco Mock / contas demo locais
-  const storedPw = db.passwords.get(cleanEmail);
-  if (!storedPw || storedPw !== password) {
+  const isMatch = db.passwords.verify ? db.passwords.verify(cleanEmail, password) : (db.passwords.get(cleanEmail) === password);
+  if (!isMatch) {
     return { ok: false, error: 'Email ou senha incorretos.' };
   }
 

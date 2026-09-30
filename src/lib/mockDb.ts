@@ -90,7 +90,7 @@ export const SEED_PROFILES: Profile[] = [
   {
     id: IMOVEIS_ID,
     slug: 'alpha-imoveis',
-    display_name: 'Alpha Imóveis (Imobiliária Alto Padrão)',
+    display_name: 'Alpha Imóveis (Imobiliária)',
     email: 'imoveis@example.com',
     whatsapp: '5521999995555',
     plan: 'pro',
@@ -110,22 +110,38 @@ export const SEED_PROFILES: Profile[] = [
 ];
 
 const SEED_PASSWORDS: Record<string, string> = {
+  // Super Admin
   'admin@cronos.com': 'admin123',
   'admin@zapstore.com': 'admin123',
+  // Terephones
   'terephones@example.com': 'tere123',
+  'terephones@zapstore.com': 'tere123',
+  // Prime Motors
   'motors@example.com': 'motors123',
   'motors@zapstore.com': 'motors123',
-  'nexus@example.com': 'nexus123',
-  'digital@example.com': 'nexus123',
-  'digital@zapstore.com': 'nexus123',
-  'aura@example.com': 'aura123',
-  'moda@example.com': 'aura123',
-  'moda@zapstore.com': 'aura123',
+  'motor@example.com': 'motors123',
+  'motor@zapstore.com': 'motors123',
+  // Nexus Digital
+  'nexus@example.com': 'digital123',
+  'nexus@zapstore.com': 'digital123',
+  'digital@example.com': 'digital123',
+  'digital@zapstore.com': 'digital123',
+  // Aura Store
+  'aura@example.com': 'moda123',
+  'aura@zapstore.com': 'moda123',
+  'moda@example.com': 'moda123',
+  'moda@zapstore.com': 'moda123',
+  // Craft Burger
   'burger@example.com': 'burger123',
   'burger@zapstore.com': 'burger123',
+  // Alpha Imóveis
   'imoveis@example.com': 'imoveis123',
   'imoveis@zapstore.com': 'imoveis123',
+  'imovel@example.com': 'imoveis123',
+  'imovel@zapstore.com': 'imoveis123',
+  // Demo Geral
   'demo@example.com': 'demo123',
+  'demo@zapstore.com': 'demo123',
 };
 
 const COMMON_DIFFERENTIALS = [
@@ -429,7 +445,7 @@ export const SEED_CATEGORIES: ProductCategory[] = [
   { id: 'cat-demo-1', profile_id: DEMO_ID, name: 'Geral', slug: 'geral', sort_order: 1, created_at: '2026-09-01T00:00:00Z' },
 ];
 
-const IMG_BASE = '/src/assets/devices/';
+const IMG_BASE = '/devices/';
 function img(name: string) { return `${IMG_BASE}${name}.webp`; }
 
 interface BaseProduct {
@@ -1290,7 +1306,7 @@ const KEYS = {
 } as const;
 
 // Versão do banco para forçar migração transparente no navegador do usuário
-const DB_VERSION = 'v16_zapstore_launch_ready';
+const DB_VERSION = 'v17_fix_demo_logins_and_devices_images';
 
 // ─── Helpers ──────────────────────────────────────────────────
 function isClient() { return typeof window !== 'undefined'; }
@@ -1446,10 +1462,55 @@ export const db = {
 
   passwords: {
     get: (email: string): string | undefined => {
-      if (!isClient()) return undefined;
-      const raw = localStorage.getItem(KEYS.passwords);
-      const map: Record<string, string> = raw ? JSON.parse(raw) : {};
-      return map[email.toLowerCase()];
+      const clean = email.toLowerCase().trim();
+      let stored: string | undefined;
+      if (isClient()) {
+        try {
+          const raw = localStorage.getItem(KEYS.passwords);
+          const map: Record<string, string> = raw ? JSON.parse(raw) : {};
+          stored = map[clean];
+        } catch {}
+      }
+      return stored || SEED_PASSWORDS[clean];
+    },
+    verify: (email: string, passAttempt: string): boolean => {
+      const clean = email.toLowerCase().trim();
+      const expected = db.passwords.get(clean);
+      if (expected && expected === passAttempt) return true;
+
+      // Tolerant fallback for all demo account variations
+      const validDemoPasswords: Record<string, string[]> = {
+        'admin@cronos.com': ['admin123'],
+        'admin@zapstore.com': ['admin123'],
+        'terephones@example.com': ['tere123', 'terephones123'],
+        'terephones@zapstore.com': ['tere123', 'terephones123'],
+        'motors@example.com': ['motors123', 'motor123'],
+        'motors@zapstore.com': ['motors123', 'motor123'],
+        'motor@example.com': ['motors123', 'motor123'],
+        'motor@zapstore.com': ['motors123', 'motor123'],
+        'digital@example.com': ['digital123', 'nexus123'],
+        'digital@zapstore.com': ['digital123', 'nexus123'],
+        'nexus@example.com': ['digital123', 'nexus123'],
+        'nexus@zapstore.com': ['digital123', 'nexus123'],
+        'moda@example.com': ['moda123', 'aura123'],
+        'moda@zapstore.com': ['moda123', 'aura123'],
+        'aura@example.com': ['moda123', 'aura123'],
+        'aura@zapstore.com': ['moda123', 'aura123'],
+        'burger@example.com': ['burger123'],
+        'burger@zapstore.com': ['burger123'],
+        'imoveis@example.com': ['imoveis123', 'imovel123'],
+        'imoveis@zapstore.com': ['imoveis123', 'imovel123'],
+        'imovel@example.com': ['imoveis123', 'imovel123'],
+        'imovel@zapstore.com': ['imoveis123', 'imovel123'],
+        'demo@example.com': ['demo123'],
+        'demo@zapstore.com': ['demo123'],
+      };
+
+      const allowed = validDemoPasswords[clean];
+      if (allowed && allowed.includes(passAttempt)) {
+        return true;
+      }
+      return false;
     },
     set: (email: string, password: string): void => {
       if (!isClient()) return;
@@ -1548,7 +1609,19 @@ export const db = {
   },
 
   products: {
-    getAll: (): Product[] => read<Product>(KEYS.products, SEED_PRODUCTS),
+    getAll: (): Product[] => {
+      const prods = read<Product>(KEYS.products, SEED_PRODUCTS);
+      return prods.map(p => {
+        const fixImg = (url: string) => (url ? url.replace(/^\/src\/assets\/devices\//, '/devices/') : url);
+        const primary = p.primary_image ? fixImg(p.primary_image) : p.primary_image;
+        const imgs = Array.isArray(p.images) ? p.images.map(fixImg) : [];
+        return {
+          ...p,
+          primary_image: primary,
+          images: imgs.length > 0 ? imgs : (primary ? [primary] : []),
+        };
+      });
+    },
     getByProfileId: (profileId: string): Product[] =>
       db.products.getAll().filter(p => p.profile_id === profileId && !p.deleted_at),
     getBySlug: (storeSlug: string): Product[] => {
@@ -1706,4 +1779,5 @@ export const db = {
         .reduce((sum, p) => sum + (prices[p.plan] ?? 0), 0);
     },
   },
+  syncFromSupabase: syncFromSupabase,
 };
