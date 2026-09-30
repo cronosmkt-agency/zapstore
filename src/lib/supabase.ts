@@ -1,28 +1,48 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-function getEnvValue(key: string): string {
-  if (typeof import.meta !== 'undefined' && import.meta.env?.[key]) {
-    return String(import.meta.env[key]);
+export function getSupabaseUrl(): string {
+  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_SUPABASE_URL) {
+    return String(import.meta.env.VITE_SUPABASE_URL);
   }
-  if (typeof process !== 'undefined' && process.env?.[key]) {
-    return String(process.env[key]);
+  if (typeof process !== 'undefined' && process.env && process.env.VITE_SUPABASE_URL) {
+    return String(process.env.VITE_SUPABASE_URL);
+  }
+  if (typeof globalThis !== 'undefined' && (globalThis as any).VITE_SUPABASE_URL) {
+    return String((globalThis as any).VITE_SUPABASE_URL);
   }
   if (typeof window !== 'undefined') {
-    if ((window as any).__ENV__?.[key]) return String((window as any).__ENV__[key]);
+    if ((window as any).__ENV__?.VITE_SUPABASE_URL) return String((window as any).__ENV__.VITE_SUPABASE_URL);
     try {
-      const stored = localStorage.getItem(key.toLowerCase());
+      const stored = localStorage.getItem('vite_supabase_url');
       if (stored) return stored;
     } catch {}
   }
   return '';
 }
 
-const supabaseUrl = getEnvValue('VITE_SUPABASE_URL');
-const supabaseAnonKey = getEnvValue('VITE_SUPABASE_ANON_KEY');
+export function getSupabaseAnonKey(): string {
+  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_SUPABASE_ANON_KEY) {
+    return String(import.meta.env.VITE_SUPABASE_ANON_KEY);
+  }
+  if (typeof process !== 'undefined' && process.env && process.env.VITE_SUPABASE_ANON_KEY) {
+    return String(process.env.VITE_SUPABASE_ANON_KEY);
+  }
+  if (typeof globalThis !== 'undefined' && (globalThis as any).VITE_SUPABASE_ANON_KEY) {
+    return String((globalThis as any).VITE_SUPABASE_ANON_KEY);
+  }
+  if (typeof window !== 'undefined') {
+    if ((window as any).__ENV__?.VITE_SUPABASE_ANON_KEY) return String((window as any).__ENV__.VITE_SUPABASE_ANON_KEY);
+    try {
+      const stored = localStorage.getItem('vite_supabase_anon_key');
+      if (stored) return stored;
+    } catch {}
+  }
+  return '';
+}
 
 export const isSupabaseConfigured = (): boolean => {
-  const url = getEnvValue('VITE_SUPABASE_URL');
-  const key = getEnvValue('VITE_SUPABASE_ANON_KEY');
+  const url = getSupabaseUrl();
+  const key = getSupabaseAnonKey();
   return Boolean(
     url &&
     key &&
@@ -39,15 +59,37 @@ export function setSupabaseCredentials(url: string, anonKey: string): void {
   }
 }
 
-// Cliente Singleton do Supabase
-export const supabase: SupabaseClient = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'placeholder-anon-key',
-  {
-    auth: {
-      persistSession: typeof window !== 'undefined',
-      autoRefreshToken: typeof window !== 'undefined',
-      detectSessionInUrl: typeof window !== 'undefined',
-    },
+let cachedClient: SupabaseClient | null = null;
+let lastUrl = '';
+let lastKey = '';
+
+export function getSupabaseClient(): SupabaseClient {
+  const url = getSupabaseUrl() || 'https://placeholder.supabase.co';
+  const key = getSupabaseAnonKey() || 'placeholder-anon-key';
+
+  if (!cachedClient || lastUrl !== url || lastKey !== key) {
+    lastUrl = url;
+    lastKey = key;
+    cachedClient = createClient(url, key, {
+      auth: {
+        persistSession: typeof window !== 'undefined',
+        autoRefreshToken: typeof window !== 'undefined',
+        detectSessionInUrl: typeof window !== 'undefined',
+      },
+    });
   }
-);
+
+  return cachedClient;
+}
+
+// Proxy singleton para que todas as chamadas transparentemente usem o cliente ativo
+export const supabase: SupabaseClient = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    const client = getSupabaseClient();
+    const value = (client as any)[prop];
+    if (typeof value === 'function') {
+      return value.bind(client);
+    }
+    return value;
+  },
+});
