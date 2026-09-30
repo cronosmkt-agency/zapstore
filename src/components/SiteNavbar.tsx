@@ -14,6 +14,13 @@ interface SiteNavbarProps {
   storeLogo?: string;
   whatsapp?: string;
   showThemeToggle?: boolean;
+  // Header Customization Props
+  header_show_announcement?: boolean;
+  header_announcement_text?: string;
+  header_cta_text?: string;
+  header_show_whatsapp_button?: boolean;
+  header_nav_home_label?: string;
+  header_nav_catalog_label?: string;
 }
 
 export function SiteNavbar({
@@ -24,6 +31,12 @@ export function SiteNavbar({
   storeLogo,
   whatsapp,
   showThemeToggle = true,
+  header_show_announcement,
+  header_announcement_text,
+  header_cta_text,
+  header_show_whatsapp_button = true,
+  header_nav_home_label,
+  header_nav_catalog_label,
 }: SiteNavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [afterHours, setAfterHours] = useState(false);
@@ -37,6 +50,10 @@ export function SiteNavbar({
   const currentPath = routerState.location.pathname;
 
   const isDark = currentTheme === "black-piano";
+  const isIphoneStore =
+    (storeName || "").toLowerCase().includes("phone") ||
+    (storeName || "").toLowerCase().includes("apple") ||
+    (basePath || "").includes("terephones");
 
   const handleToggleTheme = () => {
     const willBeDark = !isDark;
@@ -74,14 +91,21 @@ export function SiteNavbar({
     : WHATSAPP;
 
   const navLinks: { label: string; path: string; hasDot?: boolean }[] = [
-    { label: "Início", path: homePath },
-    { label: "Loja", path: lojaPath },
+    { label: header_nav_home_label || "Início", path: homePath },
+    { label: header_nav_catalog_label || (isIphoneStore ? "Loja" : "Catálogo"), path: lojaPath },
   ];
 
   return (
     <>
+      {/* Top Announcement Bar if enabled */}
+      {header_show_announcement && header_announcement_text && (
+        <div className="fixed top-0 inset-x-0 z-50 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white text-[11px] sm:text-xs font-bold py-1.5 px-4 text-center shadow-xs">
+          <span>{header_announcement_text}</span>
+        </div>
+      )}
+
       {/* Desktop pill navbar */}
-      <div className="hidden lg:flex fixed top-4 inset-x-0 z-50 flex-col items-center pointer-events-none px-6">
+      <div className={`hidden lg:flex fixed ${header_show_announcement && header_announcement_text ? 'top-8' : 'top-4'} inset-x-0 z-50 flex-col items-center pointer-events-none px-6 transition-all duration-300`}>
         <nav
           className={`pointer-events-auto nav-pill nav-pill-desk ${
             scrolled ? "scrolled" : ""
@@ -149,20 +173,24 @@ export function SiteNavbar({
                 : "Aberto até 18:00"}
             </div>
 
-            <span
-              className="h-5 border-l"
-              style={{ borderColor: "rgba(var(--blue-rgb),0.18)" }}
-            />
+            {header_show_whatsapp_button && (
+              <>
+                <span
+                  className="h-5 border-l"
+                  style={{ borderColor: "rgba(var(--blue-rgb),0.18)" }}
+                />
 
-            <a
-              href={whatsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-pedir-agora text-xs py-2 px-4 rounded-full flex items-center gap-1.5"
-            >
-              <WhatsAppIcon className="w-3.5 h-3.5" />
-              <span>Pedir no WhatsApp</span>
-            </a>
+                <a
+                  href={whatsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-pedir-agora text-xs py-2 px-4 rounded-full flex items-center gap-1.5"
+                >
+                  <WhatsAppIcon className="w-3.5 h-3.5" />
+                  <span>{header_cta_text || (isIphoneStore ? "Pedir no WhatsApp" : "Chamar no Zap")}</span>
+                </a>
+              </>
+            )}
           </div>
         </nav>
 
@@ -192,7 +220,7 @@ export function SiteNavbar({
       </div>
 
       {/* Mobile pill navbar */}
-      <div className="lg:hidden fixed top-4 left-4 right-4 z-50 flex flex-col items-center pointer-events-none">
+      <div className={`lg:hidden fixed ${header_show_announcement && header_announcement_text ? 'top-9' : 'top-4'} left-4 right-4 z-50 flex flex-col items-center pointer-events-none transition-all duration-300`}>
         <nav className={`pointer-events-auto w-full nav-pill ${scrolled ? "scrolled" : ""}`}>
           <div className="flex items-center justify-between h-14 px-4 sm:px-5">
             <Link

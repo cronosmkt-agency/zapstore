@@ -29,6 +29,7 @@ import {
   Plus,
   X,
   Trash2,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Differential, ProductCategory } from '@/types';
@@ -138,6 +139,33 @@ function SettingsPage() {
     enable_tawk: false,
     tawk_widget_id: '',
     enable_dark_mode_toggle: true,
+
+    // 12. Header & Rodapé
+    header_show_announcement: false,
+    header_announcement_text: '',
+    header_cta_text: '',
+    header_show_whatsapp_button: true,
+    header_nav_home_label: 'Início',
+    header_nav_catalog_label: 'Catálogo',
+
+    footer_about_text: '',
+    footer_show_navigation: true,
+    footer_nav_title: 'Navegação',
+    footer_nav_home_label: 'Início',
+    footer_catalog_link_label: 'Catálogo',
+    footer_show_tradein_link: true,
+    footer_tradein_label: 'Troca com Troco',
+    footer_show_delivery_link: true,
+    footer_delivery_label: 'Entrega Expressa',
+    footer_show_location_link: true,
+    footer_location_label: 'Ponto Físico',
+    footer_show_institutional: true,
+    footer_inst_title: 'Institucional',
+    footer_about_link_label: 'Sobre Nós',
+    footer_warranty_link_label: 'Termos de Garantia',
+    footer_show_contact: true,
+    footer_contact_title: 'Atendimento',
+    footer_custom_copyright: '',
   });
 
   const [merchantSlug, setMerchantSlug] = useState('');
@@ -259,6 +287,7 @@ function SettingsPage() {
     { id: 'local', label: 'Landing: Ponto Físico', icon: Building2, group: 'Landing Page' },
     { id: 'mensagens', label: 'Mensagens WhatsApp', icon: MessageCircle, group: 'Comunicação' },
     { id: 'visual', label: 'Visual & Tema', icon: Palette, group: 'Aparência' },
+    { id: 'header_footer', label: 'Header & Rodapé', icon: SlidersHorizontal, group: 'Aparência' },
     { id: 'contato', label: 'Contato & Redes', icon: Phone, group: 'Comunicação' },
     { id: 'seo', label: 'SEO & Google', icon: Globe, group: 'Marketing' },
     { id: 'integracoes', label: 'Integrações', icon: LinkIcon, group: 'Sistema' },
@@ -1322,6 +1351,349 @@ function SettingsPage() {
                     <option value="Poppins">Poppins (Arredondada, Descontraída)</option>
                     <option value="Montserrat">Montserrat (Elegante e Sofisticada)</option>
                   </select>
+                </div>
+              </div>
+            )}
+
+            {/* ─── TAB: HEADER & RODAPÉ ─────────────────────────────── */}
+            {activeTab === 'header_footer' && (
+              <div className="space-y-6 animate-in slide-in-from-right-4">
+                <div className="border-b border-slate-100 pb-3">
+                  <h2 className="text-base font-black text-slate-900">Cabeçalho (Header) & Rodapé (Footer)</h2>
+                  <p className="text-xs text-slate-500">
+                    Personalize barras de comunicado, botões de ação do topo, textos sobre a empresa, links de navegação e copyright.
+                  </p>
+                </div>
+
+                {/* 1. SEÇÃO CABEÇALHO */}
+                <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
+                  <div className="border-b border-slate-200/80 pb-2">
+                    <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      <span>Cabeçalho da Vitrine (Header)</span>
+                    </h3>
+                    <p className="text-xs text-slate-500">Controles do topo do site e barra superior de anúncios.</p>
+                  </div>
+
+                  {/* Toggle Barra de Anúncio */}
+                  <label className="flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+                    <div>
+                      <div className="font-bold text-slate-900 text-xs sm:text-sm mb-0.5">Barra de Comunicado no Topo</div>
+                      <div className="text-[11px] sm:text-xs text-slate-500">Exibir faixa destacada no topo da vitrine com aviso importante, frete ou garantia</div>
+                    </div>
+                    <div className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${formData.header_show_announcement ? 'bg-blue-600' : 'bg-slate-300'}`}>
+                      <input type="checkbox" name="header_show_announcement" checked={Boolean(formData.header_show_announcement)} onChange={handleChange} className="sr-only" />
+                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-xs ${formData.header_show_announcement ? 'translate-x-6' : 'translate-x-1'}`} />
+                    </div>
+                  </label>
+
+                  {formData.header_show_announcement && (
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                        Texto da Barra de Comunicado
+                      </label>
+                      <input
+                        name="header_announcement_text"
+                        value={formData.header_announcement_text || ''}
+                        onChange={handleChange}
+                        placeholder="Ex: ⚡ Entrega Express em até 1 hora na sua porta • Pagamento na entrega!"
+                        className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:border-blue-600 outline-none text-xs sm:text-sm font-medium"
+                      />
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                        Texto do Link "Início"
+                      </label>
+                      <input
+                        name="header_nav_home_label"
+                        value={formData.header_nav_home_label || ''}
+                        onChange={handleChange}
+                        placeholder="Início"
+                        className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:border-blue-600 outline-none text-xs sm:text-sm font-medium"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                        Texto do Link "Catálogo"
+                      </label>
+                      <input
+                        name="header_nav_catalog_label"
+                        value={formData.header_nav_catalog_label || ''}
+                        onChange={handleChange}
+                        placeholder="Catálogo / Estoque / Cardápio"
+                        className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:border-blue-600 outline-none text-xs sm:text-sm font-medium"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                        Texto do Botão de Ação (CTA)
+                      </label>
+                      <input
+                        name="header_cta_text"
+                        value={formData.header_cta_text || ''}
+                        onChange={handleChange}
+                        placeholder="Ex: Falar no WhatsApp, Ver Estoque, Fazer Pedido"
+                        className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:border-blue-600 outline-none text-xs sm:text-sm font-medium"
+                      />
+                    </div>
+
+                    <label className="flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors self-end">
+                      <div>
+                        <div className="font-bold text-slate-900 text-xs sm:text-sm mb-0.5">Exibir Botão de Ação no Header</div>
+                        <div className="text-[11px] sm:text-xs text-slate-500">Exibe o botão de WhatsApp no cabeçalho</div>
+                      </div>
+                      <div className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${formData.header_show_whatsapp_button !== false ? 'bg-blue-600' : 'bg-slate-300'}`}>
+                        <input type="checkbox" name="header_show_whatsapp_button" checked={formData.header_show_whatsapp_button !== false} onChange={handleChange} className="sr-only" />
+                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-xs ${formData.header_show_whatsapp_button !== false ? 'translate-x-6' : 'translate-x-1'}`} />
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                {/* 2. SEÇÃO RODAPÉ - SOBRE E COPYRIGHT */}
+                <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
+                  <div className="border-b border-slate-200/80 pb-2">
+                    <h3 className="text-sm font-bold text-slate-900">Rodapé: Sobre & Copyright</h3>
+                    <p className="text-xs text-slate-500">Texto institucional da loja e rodapé de encerramento.</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                      Texto Institucional / Missão da Loja
+                    </label>
+                    <textarea
+                      name="footer_about_text"
+                      value={formData.footer_about_text || ''}
+                      onChange={handleChange}
+                      rows={3}
+                      placeholder="Breve parágrafo descrevendo sua loja, tempo de mercado, procedência e garantia."
+                      className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:border-blue-600 outline-none text-xs sm:text-sm font-medium resize-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                      Texto de Copyright
+                    </label>
+                    <input
+                      name="footer_custom_copyright"
+                      value={formData.footer_custom_copyright || ''}
+                      onChange={handleChange}
+                      placeholder="Ex: © 2026 Minha Loja. Todos os direitos reservados."
+                      className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:border-blue-600 outline-none text-xs sm:text-sm font-medium"
+                    />
+                  </div>
+                </div>
+
+                {/* 3. SEÇÃO RODAPÉ - COLUNA NAVEGAÇÃO */}
+                <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
+                  <div className="border-b border-slate-200/80 pb-2 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900">Rodapé: Coluna de Navegação</h3>
+                      <p className="text-xs text-slate-500">Links rápidos da vitrine para seções da página e catálogo.</p>
+                    </div>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <span className="text-xs font-bold text-slate-700">Ativar Coluna</span>
+                      <div className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${formData.footer_show_navigation !== false ? 'bg-blue-600' : 'bg-slate-300'}`}>
+                        <input type="checkbox" name="footer_show_navigation" checked={formData.footer_show_navigation !== false} onChange={handleChange} className="sr-only" />
+                        <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform shadow-xs ${formData.footer_show_navigation !== false ? 'translate-x-4.5' : 'translate-x-1'}`} />
+                      </div>
+                    </label>
+                  </div>
+
+                  {formData.footer_show_navigation !== false && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                            Título da Coluna
+                          </label>
+                          <input
+                            name="footer_nav_title"
+                            value={formData.footer_nav_title || ''}
+                            onChange={handleChange}
+                            placeholder="Navegação / Catálogo"
+                            className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:border-blue-600 outline-none text-xs sm:text-sm font-medium"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                            Link "Início"
+                          </label>
+                          <input
+                            name="footer_nav_home_label"
+                            value={formData.footer_nav_home_label || ''}
+                            onChange={handleChange}
+                            placeholder="Início"
+                            className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:border-blue-600 outline-none text-xs sm:text-sm font-medium"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                            Link "Catálogo"
+                          </label>
+                          <input
+                            name="footer_catalog_link_label"
+                            value={formData.footer_catalog_link_label || ''}
+                            onChange={handleChange}
+                            placeholder="Catálogo de Produtos"
+                            className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:border-blue-600 outline-none text-xs sm:text-sm font-medium"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                        {/* Entrega */}
+                        <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-2">
+                          <label className="flex items-center justify-between cursor-pointer">
+                            <span className="text-xs font-bold text-slate-900">Link Entrega / Frete</span>
+                            <div className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${formData.footer_show_delivery_link !== false ? 'bg-blue-600' : 'bg-slate-300'}`}>
+                              <input type="checkbox" name="footer_show_delivery_link" checked={formData.footer_show_delivery_link !== false} onChange={handleChange} className="sr-only" />
+                              <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform shadow-xs ${formData.footer_show_delivery_link !== false ? 'translate-x-4.5' : 'translate-x-1'}`} />
+                            </div>
+                          </label>
+                          <input
+                            name="footer_delivery_label"
+                            value={formData.footer_delivery_label || ''}
+                            onChange={handleChange}
+                            placeholder="Entrega Express em 1h"
+                            className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-xs font-medium focus:bg-white focus:border-blue-600 outline-none"
+                          />
+                        </div>
+
+                        {/* Trade-in */}
+                        <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-2">
+                          <label className="flex items-center justify-between cursor-pointer">
+                            <span className="text-xs font-bold text-slate-900">Link Troca (Trade-in)</span>
+                            <div className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${Boolean(formData.footer_show_tradein_link) ? 'bg-blue-600' : 'bg-slate-300'}`}>
+                              <input type="checkbox" name="footer_show_tradein_link" checked={Boolean(formData.footer_show_tradein_link)} onChange={handleChange} className="sr-only" />
+                              <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform shadow-xs ${Boolean(formData.footer_show_tradein_link) ? 'translate-x-4.5' : 'translate-x-1'}`} />
+                            </div>
+                          </label>
+                          <input
+                            name="footer_tradein_label"
+                            value={formData.footer_tradein_label || ''}
+                            onChange={handleChange}
+                            placeholder="Troca com Troco"
+                            className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-xs font-medium focus:bg-white focus:border-blue-600 outline-none"
+                          />
+                        </div>
+
+                        {/* Ponto Físico */}
+                        <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-2">
+                          <label className="flex items-center justify-between cursor-pointer">
+                            <span className="text-xs font-bold text-slate-900">Link Ponto Físico</span>
+                            <div className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${formData.footer_show_location_link !== false ? 'bg-blue-600' : 'bg-slate-300'}`}>
+                              <input type="checkbox" name="footer_show_location_link" checked={formData.footer_show_location_link !== false} onChange={handleChange} className="sr-only" />
+                              <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform shadow-xs ${formData.footer_show_location_link !== false ? 'translate-x-4.5' : 'translate-x-1'}`} />
+                            </div>
+                          </label>
+                          <input
+                            name="footer_location_label"
+                            value={formData.footer_location_label || ''}
+                            onChange={handleChange}
+                            placeholder="Ponto Físico / Showroom"
+                            className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-xs font-medium focus:bg-white focus:border-blue-600 outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 4. SEÇÃO RODAPÉ - COLUNA INSTITUCIONAL */}
+                <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
+                  <div className="border-b border-slate-200/80 pb-2 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900">Rodapé: Coluna Institucional</h3>
+                      <p className="text-xs text-slate-500">Links sobre termos, garantia e institucional da loja.</p>
+                    </div>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <span className="text-xs font-bold text-slate-700">Ativar Coluna</span>
+                      <div className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${formData.footer_show_institutional !== false ? 'bg-blue-600' : 'bg-slate-300'}`}>
+                        <input type="checkbox" name="footer_show_institutional" checked={formData.footer_show_institutional !== false} onChange={handleChange} className="sr-only" />
+                        <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform shadow-xs ${formData.footer_show_institutional !== false ? 'translate-x-4.5' : 'translate-x-1'}`} />
+                      </div>
+                    </label>
+                  </div>
+
+                  {formData.footer_show_institutional !== false && (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                          Título da Coluna
+                        </label>
+                        <input
+                          name="footer_inst_title"
+                          value={formData.footer_inst_title || ''}
+                          onChange={handleChange}
+                          placeholder="Institucional / Transparência"
+                          className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:border-blue-600 outline-none text-xs sm:text-sm font-medium"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                          Link "Sobre a Loja"
+                        </label>
+                        <input
+                          name="footer_about_link_label"
+                          value={formData.footer_about_link_label || ''}
+                          onChange={handleChange}
+                          placeholder="Sobre Nossa Loja"
+                          className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:border-blue-600 outline-none text-xs sm:text-sm font-medium"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                          Link "Termos / Garantia"
+                        </label>
+                        <input
+                          name="footer_warranty_link_label"
+                          value={formData.footer_warranty_link_label || ''}
+                          onChange={handleChange}
+                          placeholder="Termos de Garantia"
+                          className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:border-blue-600 outline-none text-xs sm:text-sm font-medium"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 5. SEÇÃO RODAPÉ - COLUNA DE ATENDIMENTO */}
+                <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
+                  <div className="border-b border-slate-200/80 pb-2 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900">Rodapé: Coluna de Contato & Localização</h3>
+                      <p className="text-xs text-slate-500">Exibição de endereço, horário de funcionamento e WhatsApp no rodapé.</p>
+                    </div>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <span className="text-xs font-bold text-slate-700">Ativar Coluna</span>
+                      <div className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${formData.footer_show_contact !== false ? 'bg-blue-600' : 'bg-slate-300'}`}>
+                        <input type="checkbox" name="footer_show_contact" checked={formData.footer_show_contact !== false} onChange={handleChange} className="sr-only" />
+                        <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform shadow-xs ${formData.footer_show_contact !== false ? 'translate-x-4.5' : 'translate-x-1'}`} />
+                      </div>
+                    </label>
+                  </div>
+
+                  {formData.footer_show_contact !== false && (
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                        Título da Coluna de Contato
+                      </label>
+                      <input
+                        name="footer_contact_title"
+                        value={formData.footer_contact_title || ''}
+                        onChange={handleChange}
+                        placeholder="Atendimento / Fale Conosco"
+                        className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:border-blue-600 outline-none text-xs sm:text-sm font-medium"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             )}

@@ -118,6 +118,32 @@ export interface StoreSettings {
     facebook?: string;
     tiktok?: string;
   };
+  // Header Customization
+  header_show_announcement?: boolean;
+  header_announcement_text?: string;
+  header_cta_text?: string;
+  header_show_whatsapp_button?: boolean;
+  header_nav_home_label?: string;
+  header_nav_catalog_label?: string;
+  // Footer Customization
+  footer_about_text?: string;
+  footer_show_navigation?: boolean;
+  footer_nav_title?: string;
+  footer_nav_home_label?: string;
+  footer_catalog_link_label?: string;
+  footer_show_tradein_link?: boolean;
+  footer_tradein_label?: string;
+  footer_show_delivery_link?: boolean;
+  footer_delivery_label?: string;
+  footer_show_location_link?: boolean;
+  footer_location_label?: string;
+  footer_show_institutional?: boolean;
+  footer_inst_title?: string;
+  footer_about_link_label?: string;
+  footer_warranty_link_label?: string;
+  footer_show_contact?: boolean;
+  footer_contact_title?: string;
+  footer_custom_copyright?: string;
   // Legado
   google_sheet_url?: string;
   updated_at: string;

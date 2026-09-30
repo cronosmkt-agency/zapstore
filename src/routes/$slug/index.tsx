@@ -505,9 +505,15 @@ function SlugStorePage() {
         storeLogo={settings.logo_url}
         whatsapp={rawWhatsapp}
         showThemeToggle={settings.enable_dark_mode_toggle !== false}
+        header_show_announcement={settings.header_show_announcement}
+        header_announcement_text={settings.header_announcement_text}
+        header_cta_text={settings.header_cta_text}
+        header_show_whatsapp_button={settings.header_show_whatsapp_button}
+        header_nav_home_label={settings.header_nav_home_label}
+        header_nav_catalog_label={settings.header_nav_catalog_label}
       />
 
-      <main>
+      <main className="space-y-12 sm:space-y-20 mb-16 sm:mb-24">
         {/* 1. HERO SECTION */}
         <section
           id="inicio"
@@ -1036,6 +1042,27 @@ function SlugStorePage() {
         instagramUrl={settings.instagram_url}
         facebookUrl={settings.facebook_url}
         tiktokUrl={settings.tiktok_url}
+        enable_tradein={settings.enable_tradein}
+        enable_physical_location={settings.enable_physical_location}
+        location_title={settings.location_title}
+        footer_about_text={settings.footer_about_text}
+        footer_show_navigation={settings.footer_show_navigation}
+        footer_nav_title={settings.footer_nav_title}
+        footer_nav_home_label={settings.footer_nav_home_label}
+        footer_catalog_link_label={settings.footer_catalog_link_label}
+        footer_show_tradein_link={settings.footer_show_tradein_link}
+        footer_tradein_label={settings.footer_tradein_label}
+        footer_show_delivery_link={settings.footer_show_delivery_link}
+        footer_delivery_label={settings.footer_delivery_label}
+        footer_show_location_link={settings.footer_show_location_link}
+        footer_location_label={settings.footer_location_label}
+        footer_show_institutional={settings.footer_show_institutional}
+        footer_inst_title={settings.footer_inst_title}
+        footer_about_link_label={settings.footer_about_link_label}
+        footer_warranty_link_label={settings.footer_warranty_link_label}
+        footer_show_contact={settings.footer_show_contact}
+        footer_contact_title={settings.footer_contact_title}
+        footer_custom_copyright={settings.footer_custom_copyright}
       />
 
       {/* Floating WhatsApp */}

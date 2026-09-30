@@ -284,6 +284,12 @@ Gostaria de confirmar a disponibilidade!`;
         storeLogo={settings.logo_url}
         whatsapp={rawWhatsapp}
         showThemeToggle={settings.enable_dark_mode_toggle !== false}
+        header_show_announcement={settings.header_show_announcement}
+        header_announcement_text={settings.header_announcement_text}
+        header_cta_text={settings.header_cta_text}
+        header_show_whatsapp_button={settings.header_show_whatsapp_button}
+        header_nav_home_label={settings.header_nav_home_label}
+        header_nav_catalog_label={settings.header_nav_catalog_label}
       />
 
       {/* Header */}
@@ -303,7 +309,7 @@ Gostaria de confirmar a disponibilidade!`;
         </div>
       </div>
 
-      <div className="container mx-auto max-w-6xl px-4">
+      <div className="container mx-auto max-w-6xl px-4 mb-20 sm:mb-28">
         {/* Controls Bar */}
         <div className="p-3 sm:p-4 rounded-2xl mb-8 flex flex-col md:flex-row gap-3 sm:gap-4 justify-between items-center bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm">
           {/* Category Tabs */}
@@ -526,6 +532,27 @@ Gostaria de confirmar a disponibilidade!`;
         instagramUrl={settings.instagram_url}
         facebookUrl={settings.facebook_url}
         tiktokUrl={settings.tiktok_url}
+        enable_tradein={settings.enable_tradein}
+        enable_physical_location={settings.enable_physical_location}
+        location_title={settings.location_title}
+        footer_about_text={settings.footer_about_text}
+        footer_show_navigation={settings.footer_show_navigation}
+        footer_nav_title={settings.footer_nav_title}
+        footer_nav_home_label={settings.footer_nav_home_label}
+        footer_catalog_link_label={settings.footer_catalog_link_label}
+        footer_show_tradein_link={settings.footer_show_tradein_link}
+        footer_tradein_label={settings.footer_tradein_label}
+        footer_show_delivery_link={settings.footer_show_delivery_link}
+        footer_delivery_label={settings.footer_delivery_label}
+        footer_show_location_link={settings.footer_show_location_link}
+        footer_location_label={settings.footer_location_label}
+        footer_show_institutional={settings.footer_show_institutional}
+        footer_inst_title={settings.footer_inst_title}
+        footer_about_link_label={settings.footer_about_link_label}
+        footer_warranty_link_label={settings.footer_warranty_link_label}
+        footer_show_contact={settings.footer_show_contact}
+        footer_contact_title={settings.footer_contact_title}
+        footer_custom_copyright={settings.footer_custom_copyright}
       />
 
       {/* Floating WhatsApp */}
