@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { login } from '@/lib/auth'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -179,9 +180,30 @@ function LoginPage() {
                   <Label htmlFor="password" className="text-xs sm:text-sm font-semibold text-slate-700">
                     Senha
                   </Label>
-                  <span className="text-xs text-slate-400 hover:text-blue-600 cursor-pointer">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      toast.info("Recuperação de Acesso", {
+                        description: "Para redefinir sua senha com segurança, fale com nosso suporte no WhatsApp.",
+                        action: {
+                          label: "Falar no WhatsApp",
+                          onClick: () =>
+                            window.open(
+                              "https://wa.me/5521964639999?text=" +
+                                encodeURIComponent(
+                                  "Olá equipe ZapStore! Preciso de ajuda para redefinir minha senha da conta: " +
+                                    (email.trim() ? email.trim() : "")
+                                ),
+                              "_blank"
+                            ),
+                        },
+                        duration: 8000,
+                      });
+                    }}
+                    className="text-xs text-slate-400 hover:text-blue-600 transition cursor-pointer font-medium"
+                  >
                     Esqueceu a senha?
-                  </span>
+                  </button>
                 </div>
                 <div className="relative">
                   <Input

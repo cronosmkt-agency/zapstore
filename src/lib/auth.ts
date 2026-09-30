@@ -4,7 +4,8 @@
 // ============================================================
 
 import { db, initDb } from '@/lib/mockDb';
-import type { AuthSession, PlanSlug } from '@/types';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import type { AuthSession, PlanSlug, Profile } from '@/types';
 
 const SESSION_KEY = 'saas_session';
 const SESSION_TTL = 7 * 24 * 60 * 60 * 1000; // 7 dias
@@ -129,13 +130,64 @@ export interface LoginResult {
 
 export async function login(email: string, password: string): Promise<LoginResult> {
   initDb();
+  const cleanEmail = email.toLowerCase().trim();
 
-  const storedPw = db.passwords.get(email.toLowerCase().trim());
+  // 1. Tentar autenticação real via Supabase se configurado
+  if (isSupabaseConfigured()) {
+    try {
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password,
+      });
+
+      if (!authError && authData.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', authData.user.id)
+          .single();
+
+        if (profile) {
+          if (!profile.is_active) {
+            return { ok: false, error: 'Conta desativada. Contate o suporte.' };
+          }
+
+          const session: AuthSession = {
+            userId: profile.id,
+            email: profile.email,
+            display_name: profile.display_name,
+            slug: profile.slug,
+            plan: profile.plan,
+            plan_slug: profile.plan,
+            is_admin: profile.is_admin ?? false,
+            expires_at: Date.now() + SESSION_TTL,
+            user: {
+              id: profile.id,
+              email: profile.email,
+              display_name: profile.display_name,
+              slug: profile.slug,
+              plan: profile.plan,
+              plan_slug: profile.plan,
+              is_admin: profile.is_admin ?? false,
+            },
+          };
+
+          saveSession(session);
+          return { ok: true, session };
+        }
+      }
+    } catch (e) {
+      console.warn('Supabase auth fallback para MockDB:', e);
+    }
+  }
+
+  // 2. Fallback resiliente para banco Mock / contas demo locais
+  const storedPw = db.passwords.get(cleanEmail);
   if (!storedPw || storedPw !== password) {
     return { ok: false, error: 'Email ou senha incorretos.' };
   }
 
-  const profile = db.profiles.getByEmail(email.toLowerCase().trim());
+  const profile = db.profiles.getByEmail(cleanEmail);
   if (!profile) return { ok: false, error: 'Usuário não encontrado.' };
   if (!profile.is_active) return { ok: false, error: 'Conta desativada. Contate o suporte.' };
 
@@ -189,7 +241,75 @@ export async function signup(data: SignupData): Promise<SignupResult> {
   const displayName = data.display_name || data.full_name || 'Lojista';
   const plan = data.plan || 'free';
 
-  // Validações
+  // 1. Cadastro no Supabase se configurado
+  if (isSupabaseConfigured()) {
+    try {
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password: data.password,
+        options: {
+          data: {
+            display_name: displayName,
+            slug,
+            store_name: data.store_name,
+            whatsapp: data.whatsapp,
+          },
+        },
+      });
+
+      if (authError) {
+        return { ok: false, error: authError.message };
+      }
+
+      if (authData.user) {
+        // Garantir dados de perfil e configurações
+        await supabase.from('profiles').upsert({
+          id: authData.user.id,
+          email,
+          display_name: displayName,
+          slug,
+          whatsapp: data.whatsapp,
+          plan,
+          is_active: true,
+          is_admin: false,
+        });
+
+        await supabase.from('store_settings').upsert({
+          profile_id: authData.user.id,
+          store_name: data.store_name,
+          whatsapp: data.whatsapp,
+          theme_mode: 'white',
+        });
+
+        const session: AuthSession = {
+          userId: authData.user.id,
+          email,
+          display_name: displayName,
+          slug,
+          plan,
+          plan_slug: plan,
+          is_admin: false,
+          expires_at: Date.now() + SESSION_TTL,
+          user: {
+            id: authData.user.id,
+            email,
+            display_name: displayName,
+            slug,
+            plan,
+            plan_slug: plan,
+            is_admin: false,
+          },
+        };
+
+        saveSession(session);
+        return { ok: true, session };
+      }
+    } catch (e) {
+      console.warn('Supabase signup fallback para MockDB:', e);
+    }
+  }
+
+  // 2. Fallback resiliente MockDB
   if (db.profiles.getByEmail(email)) {
     return { ok: false, error: 'Este email já está em uso.' };
   }
@@ -264,11 +384,24 @@ export async function signup(data: SignupData): Promise<SignupResult> {
 }
 
 export async function logout(): Promise<void> {
+  if (isSupabaseConfigured()) {
+    try {
+      await supabase.auth.signOut();
+    } catch {}
+  }
   clearSession();
 }
 
 export async function checkSlugAvailability(slug: string, excludeId?: string): Promise<boolean> {
   initDb();
+  if (isSupabaseConfigured()) {
+    try {
+      let query = supabase.from('profiles').select('id').eq('slug', slug.toLowerCase().trim());
+      if (excludeId) query = query.neq('id', excludeId);
+      const { data } = await query;
+      if (data && data.length > 0) return false;
+    } catch {}
+  }
   return db.profiles.slugAvailable(slug, excludeId);
 }
 

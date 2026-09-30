@@ -100,11 +100,11 @@ function LandingPage() {
       theme: "Black Piano",
     },
     {
-      id: "burger-craft",
+      id: "craft-burger",
       name: "Craft Burger",
       niche: "Gastronomia & Delivery",
       nicheKey: "gastronomia",
-      slug: "burger-craft",
+      slug: "craft-burger",
       logo: "/demos/logos/craft-burger.png",
       badge: "Hamburgueria na Brasa",
       badgeColor: "bg-orange-500/15 text-orange-600 border-orange-500/25",
@@ -1199,9 +1199,17 @@ function LandingPage() {
           </div>
 
           {/* Bottom Bar */}
-          <div className="pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-slate-400 text-center sm:text-left">
+          <div className="pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-slate-400 text-center sm:text-left text-xs">
             <p>&copy; {new Date().getFullYear()} ZapStore. Todos os direitos reservados.</p>
-            <div className="flex items-center gap-4 text-[11px]">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-[11px]">
+              <Link to="/termos-de-uso" className="hover:text-blue-600 transition">
+                Termos de Uso
+              </Link>
+              <span>•</span>
+              <Link to="/politica-de-privacidade" className="hover:text-blue-600 transition">
+                Privacidade
+              </Link>
+              <span>•</span>
               <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 Sistemas 100% Operacionais

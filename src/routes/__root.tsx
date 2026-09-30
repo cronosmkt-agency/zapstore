@@ -22,16 +22,16 @@ function NotFoundComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">Página não encontrada</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+          A página que você está procurando não existe, foi alterada ou está temporariamente indisponível.
         </p>
         <div className="mt-6">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-blue-700 shadow-sm"
           >
-            Go home
+            Voltar para o Início
           </Link>
         </div>
       </div>
@@ -49,27 +49,27 @@ function ErrorComponent({ error, reset }: { error: any; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
+        <h1 className="text-xl font-bold tracking-tight text-foreground">
+          Ops! Ocorreu um erro inesperado
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          Não conseguimos carregar os dados desta página. Tente recarregar ou retornar para a página inicial.
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
           <button
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-blue-700 shadow-sm cursor-pointer"
           >
-            Try again
+            Tentar novamente
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex items-center justify-center rounded-xl border border-input bg-background px-5 py-2.5 text-sm font-semibold text-foreground transition-all hover:bg-accent"
           >
-            Go home
+            Ir para o Início
           </a>
         </div>
       </div>
@@ -82,32 +82,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Terephones — iPhones Novos & Seminovos em Teresópolis" },
-      { name: "description", content: "Terephones: iPhones novos e seminovos em Teresópolis/RJ. Entrega Express em até 1h na sua porta ou Retirada na Loja Física Parceira SejaDelta. Garantia de até 1 ano." },
-      { name: "author", content: "Terephones" },
-      { property: "og:title", content: "Terephones — iPhones Novos & Seminovos em Teresópolis" },
-      { property: "og:description", content: "Entrega no mesmo dia em até 1h ou retire presencialmente na SejaDelta. Seu novo iPhone em Teresópolis com procedência e garantia total." },
-      { property: "og:image", content: "https://ik.imagekit.io/zinma/tr:w-1200,f-auto,q-85/TerePhones-Logo.png" },
+      { title: "ZapStore — Crie sua Loja Online e Venda pelo WhatsApp em Minutos" },
+      { name: "description", content: "ZapStore: Plataforma SaaS multi-lojas para criar seu catálogo digital, receber pedidos organizados direto no WhatsApp e gerenciar produtos, clientes e vendas com facilidade." },
+      { name: "author", content: "ZapStore" },
+      { property: "og:title", content: "ZapStore — Crie sua Loja Online e Venda pelo WhatsApp em Minutos" },
+      { property: "og:description", content: "Crie sua loja online personalizada em minutos para qualquer nicho e receba pedidos organizados diretamente no seu WhatsApp." },
+      { property: "og:image", content: "/zapstore-logo.png" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "https://ik.imagekit.io/zinma/tr:w-1200,f-auto,q-85/TerePhones-Logo.png" },
+      { name: "twitter:image", content: "/zapstore-logo.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "https://ik.imagekit.io/zinma/tr:w-64,f-auto,q-85/TerePhones-Logo.png", type: "image/png" },
-      { rel: "apple-touch-icon", href: "https://ik.imagekit.io/zinma/tr:w-180,f-auto,q-85/TerePhones-Logo.png" },
-      { rel: "preconnect", href: "https://ik.imagekit.io" },
-      { rel: "dns-prefetch", href: "https://ik.imagekit.io" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/zapstore-logo.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" },
-      {
-        rel: "preload",
-        as: "image",
-        href: "https://ik.imagekit.io/zinma/tr:w-800,f-webp,q-85/Terephones-iphone.png",
-        type: "image/webp",
-        fetchPriority: "high",
-      },
     ],
     scripts: [
       {
@@ -117,16 +108,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@graph": [
             {
               "@type": "Organization",
-              name: "Terephones",
-              alternateName: "Terephones iPhones Teresópolis",
-              telephone: "+5521964639999",
-              areaServed: "Teresópolis, RJ",
-              logo: "https://ik.imagekit.io/zinma/tr:w-600,f-auto,q-85/TerePhones-Logo.png",
-              image: "https://ik.imagekit.io/zinma/tr:w-600,f-auto,q-85/TerePhones-Logo.png",
+              name: "ZapStore",
+              alternateName: "ZapStore SaaS Multi-Lojas",
+              url: "https://zapstore-mu.vercel.app",
+              logo: "https://zapstore-mu.vercel.app/zapstore-logo.png",
+              sameAs: [
+                "https://github.com/cronosmkt-agency/zapstore"
+              ],
             },
             {
               "@type": "WebSite",
-              name: "Terephones",
+              name: "ZapStore",
+              url: "https://zapstore-mu.vercel.app",
               inLanguage: "pt-BR",
             },
           ],
@@ -149,12 +142,18 @@ function RootShell({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                var t = localStorage.getItem('terephones_theme');
-                if (t === 'black-piano') {
-                  document.documentElement.classList.add('theme-black-piano', 'dark');
-                } else if (t === 'white') {
-                  document.documentElement.classList.add('theme-white');
-                  document.documentElement.classList.remove('dark');
+                var p = window.location.pathname;
+                var reserved = ['dashboard', 'admin', 'login', 'signup', 'termos-de-uso', 'politica-de-privacidade'];
+                var seg = p.split('/').filter(Boolean)[0] || '';
+                // Only load custom theme on public store routes
+                if (seg && reserved.indexOf(seg) === -1) {
+                  var t = localStorage.getItem('zapstore_theme_' + seg) || (seg === 'terephones' ? localStorage.getItem('terephones_theme') : null);
+                  if (t === 'black-piano') {
+                    document.documentElement.classList.add('theme-black-piano', 'dark');
+                  } else if (t === 'white') {
+                    document.documentElement.classList.add('theme-white');
+                    document.documentElement.classList.remove('dark');
+                  }
                 }
               } catch (e) {}
             `,

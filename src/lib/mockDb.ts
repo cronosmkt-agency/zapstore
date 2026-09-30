@@ -8,6 +8,7 @@ import type {
   Profile, StoreSettings, Product, ProductCategory,
   StoreReview, Plan, Subscription, ActivityLog, PlanSlug
 } from '@/types';
+import { supabase, isSupabaseConfigured } from './supabase';
 
 // ─── Seed data ────────────────────────────────────────────────
 // IDs fixos para o demo
@@ -25,7 +26,7 @@ export const SEED_PROFILES: Profile[] = [
     id: ADMIN_ID,
     slug: 'admin',
     display_name: 'Administrador ZapStore',
-    email: 'admin@zapstore.com',
+    email: 'admin@cronos.com',
     plan: 'pro',
     is_active: true,
     is_admin: true,
@@ -46,7 +47,7 @@ export const SEED_PROFILES: Profile[] = [
     id: MOTORS_ID,
     slug: 'prime-motors',
     display_name: 'Prime Motors (Carros & Veículos)',
-    email: 'motors@zapstore.com',
+    email: 'motors@example.com',
     whatsapp: '5521999991111',
     plan: 'pro',
     plan_expires_at: '2027-01-01T00:00:00Z',
@@ -57,7 +58,7 @@ export const SEED_PROFILES: Profile[] = [
     id: DIGITAL_ID,
     slug: 'nexus-digital',
     display_name: 'Nexus Digital (Cursos & Infoprodutos)',
-    email: 'digital@zapstore.com',
+    email: 'nexus@example.com',
     whatsapp: '5521999992222',
     plan: 'pro',
     plan_expires_at: '2027-01-01T00:00:00Z',
@@ -68,7 +69,7 @@ export const SEED_PROFILES: Profile[] = [
     id: MODA_ID,
     slug: 'aura-store',
     display_name: 'Aura Store (Moda & Streetwear)',
-    email: 'moda@zapstore.com',
+    email: 'aura@example.com',
     whatsapp: '5521999993333',
     plan: 'starter',
     plan_expires_at: '2027-01-01T00:00:00Z',
@@ -77,9 +78,9 @@ export const SEED_PROFILES: Profile[] = [
   },
   {
     id: BURGER_ID,
-    slug: 'burger-craft',
+    slug: 'craft-burger',
     display_name: 'Craft Burger (Gastronomia & Delivery)',
-    email: 'burger@zapstore.com',
+    email: 'burger@example.com',
     whatsapp: '5521999994444',
     plan: 'starter',
     plan_expires_at: '2027-01-01T00:00:00Z',
@@ -90,7 +91,7 @@ export const SEED_PROFILES: Profile[] = [
     id: IMOVEIS_ID,
     slug: 'alpha-imoveis',
     display_name: 'Alpha Imóveis (Imobiliária Alto Padrão)',
-    email: 'imoveis@zapstore.com',
+    email: 'imoveis@example.com',
     whatsapp: '5521999995555',
     plan: 'pro',
     plan_expires_at: '2027-01-01T00:00:00Z',
@@ -108,15 +109,22 @@ export const SEED_PROFILES: Profile[] = [
   },
 ];
 
-export const SEED_PASSWORDS: Record<string, string> = {
-  'admin@zapstore.com': 'admin123',
+const SEED_PASSWORDS: Record<string, string> = {
   'admin@cronos.com': 'admin123',
+  'admin@zapstore.com': 'admin123',
   'terephones@example.com': 'tere123',
-  'motors@zapstore.com': 'motor123',
-  'digital@zapstore.com': 'digital123',
-  'moda@zapstore.com': 'moda123',
+  'motors@example.com': 'motors123',
+  'motors@zapstore.com': 'motors123',
+  'nexus@example.com': 'nexus123',
+  'digital@example.com': 'nexus123',
+  'digital@zapstore.com': 'nexus123',
+  'aura@example.com': 'aura123',
+  'moda@example.com': 'aura123',
+  'moda@zapstore.com': 'aura123',
+  'burger@example.com': 'burger123',
   'burger@zapstore.com': 'burger123',
-  'imoveis@zapstore.com': 'imovel123',
+  'imoveis@example.com': 'imoveis123',
+  'imoveis@zapstore.com': 'imoveis123',
   'demo@example.com': 'demo123',
 };
 
@@ -1282,7 +1290,7 @@ const KEYS = {
 } as const;
 
 // Versão do banco para forçar migração transparente no navegador do usuário
-const DB_VERSION = 'v15_zapstore_real_png_assets_and_logos';
+const DB_VERSION = 'v16_zapstore_launch_ready';
 
 // ─── Helpers ──────────────────────────────────────────────────
 function isClient() { return typeof window !== 'undefined'; }
@@ -1309,9 +1317,50 @@ function uuid(): string {
 
 function now(): string { return new Date().toISOString(); }
 
+// ─── Sincronização Supabase ───────────────────────────────────
+let isSyncing = false;
+export async function syncFromSupabase(): Promise<void> {
+  if (!isSupabaseConfigured() || !isClient() || isSyncing) return;
+  isSyncing = true;
+  try {
+    const [profilesRes, settingsRes, categoriesRes, productsRes, reviewsRes] = await Promise.all([
+      supabase.from('profiles').select('*'),
+      supabase.from('store_settings').select('*'),
+      supabase.from('product_categories').select('*'),
+      supabase.from('products').select('*').is('deleted_at', null),
+      supabase.from('store_reviews').select('*'),
+    ]);
+
+    if (profilesRes.data && profilesRes.data.length > 0) {
+      write(KEYS.profiles, profilesRes.data as Profile[]);
+    }
+    if (settingsRes.data && settingsRes.data.length > 0) {
+      write(KEYS.store_settings, settingsRes.data as StoreSettings[]);
+    }
+    if (categoriesRes.data && categoriesRes.data.length > 0) {
+      write(KEYS.categories, categoriesRes.data as ProductCategory[]);
+    }
+    if (productsRes.data && productsRes.data.length > 0) {
+      write(KEYS.products, productsRes.data as Product[]);
+    }
+    if (reviewsRes.data && reviewsRes.data.length > 0) {
+      write(KEYS.reviews, reviewsRes.data as StoreReview[]);
+    }
+  } catch (e) {
+    console.warn('Sync from Supabase failed, using local cache:', e);
+  } finally {
+    isSyncing = false;
+  }
+}
+
 // ─── Inicialização do DB ──────────────────────────────────────
 export function initDb(): void {
   if (!isClient()) return;
+  
+  if (isSupabaseConfigured()) {
+    syncFromSupabase();
+  }
+
   if (localStorage.getItem(KEYS.initialized) === DB_VERSION) return;
   
   write(KEYS.profiles,       SEED_PROFILES);
@@ -1341,11 +1390,33 @@ export const db = {
       const cleanSlug = slug.toLowerCase().replace(/[^a-z0-9]/g, '');
       return all.find(p => {
         const pSlug = p.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
-        return p.slug.toLowerCase() === slug.toLowerCase() || pSlug === cleanSlug;
+        if (p.slug.toLowerCase() === slug.toLowerCase() || pSlug === cleanSlug) return true;
+        // Aliases for craft-burger / burger-craft
+        if ((cleanSlug === 'craftburger' || cleanSlug === 'burgercraft') && (pSlug === 'craftburger' || pSlug === 'burgercraft')) return true;
+        return false;
       });
     },
-    getByEmail: (email: string): Profile | undefined => 
-      db.profiles.getAll().find(p => p.email.toLowerCase() === email.toLowerCase()),
+    getByEmail: (email: string): Profile | undefined => {
+      const target = email.toLowerCase().trim();
+      const all = db.profiles.getAll();
+      const direct = all.find(p => p.email.toLowerCase() === target);
+      if (direct) return direct;
+      const aliasMap: Record<string, string> = {
+        'admin@zapstore.com': 'admin@cronos.com',
+        'motors@zapstore.com': 'motors@example.com',
+        'digital@zapstore.com': 'nexus@example.com',
+        'digital@example.com': 'nexus@example.com',
+        'moda@zapstore.com': 'aura@example.com',
+        'moda@example.com': 'aura@example.com',
+        'burger@zapstore.com': 'burger@example.com',
+        'imoveis@zapstore.com': 'imoveis@example.com',
+      };
+      const aliased = aliasMap[target];
+      if (aliased) {
+        return all.find(p => p.email.toLowerCase() === aliased);
+      }
+      return undefined;
+    },
     slugAvailable: (slug: string, excludeId?: string): boolean => {
       const cleanSlug = slug.toLowerCase().replace(/[^a-z0-9]/g, '');
       return !db.profiles.getAll().some(p => {
@@ -1366,6 +1437,9 @@ export const db = {
       const updated = { ...all[idx], ...data };
       all[idx] = updated;
       write(KEYS.profiles, all);
+      if (isSupabaseConfigured()) {
+        supabase.from('profiles').update(data).eq('id', id).then();
+      }
       return updated;
     },
   },
@@ -1398,6 +1472,9 @@ export const db = {
     create: (data: Omit<StoreSettings, 'id' | 'updated_at'>): StoreSettings => {
       const s: StoreSettings = { ...data, id: uuid(), updated_at: now() };
       write(KEYS.store_settings, [...db.storeSettings.getAll(), s]);
+      if (isSupabaseConfigured()) {
+        supabase.from('store_settings').upsert({ ...s, profile_id: s.profile_id }).then();
+      }
       return s;
     },
     update: (profileId: string, data: Partial<StoreSettings>): StoreSettings => {
@@ -1423,11 +1500,17 @@ export const db = {
           updated_at: now(),
         } as StoreSettings;
         write(KEYS.store_settings, [...all, created]);
+        if (isSupabaseConfigured()) {
+          supabase.from('store_settings').upsert({ ...created, profile_id: profileId }).then();
+        }
         return created;
       }
       const updated = { ...all[idx], ...data, updated_at: now() };
       all[idx] = updated;
       write(KEYS.store_settings, all);
+      if (isSupabaseConfigured()) {
+        supabase.from('store_settings').upsert({ profile_id: profileId, ...data, updated_at: now() }).then();
+      }
       return updated;
     },
   },
@@ -1439,6 +1522,9 @@ export const db = {
     create: (data: Omit<ProductCategory, 'id' | 'created_at'>): ProductCategory => {
       const c: ProductCategory = { ...data, id: uuid(), created_at: now() };
       write(KEYS.categories, [...db.categories.getAll(), c]);
+      if (isSupabaseConfigured()) {
+        supabase.from('product_categories').insert({ profile_id: c.profile_id, name: c.name, slug: c.slug, sort_order: c.sort_order }).then();
+      }
       return c;
     },
     update: (id: string, data: Partial<ProductCategory>): ProductCategory | undefined => {
@@ -1448,10 +1534,16 @@ export const db = {
       const updated = { ...all[idx], ...data };
       all[idx] = updated;
       write(KEYS.categories, all);
+      if (isSupabaseConfigured()) {
+        supabase.from('product_categories').update(data).eq('id', id).then();
+      }
       return updated;
     },
     delete: (id: string): void => {
       write(KEYS.categories, db.categories.getAll().filter(c => c.id !== id));
+      if (isSupabaseConfigured()) {
+        supabase.from('product_categories').delete().eq('id', id).then();
+      }
     },
   },
 
@@ -1468,6 +1560,9 @@ export const db = {
     create: (data: Omit<Product, 'id' | 'created_at' | 'updated_at'>): Product => {
       const p: Product = { ...data, id: uuid(), created_at: now(), updated_at: now() };
       write(KEYS.products, [...db.products.getAll(), p]);
+      if (isSupabaseConfigured()) {
+        supabase.from('products').insert(p).then();
+      }
       return p;
     },
     update: (id: string, data: Partial<Product>): Product | undefined => {
@@ -1477,10 +1572,16 @@ export const db = {
       const updated = { ...all[idx], ...data, updated_at: now() };
       all[idx] = updated;
       write(KEYS.products, all);
+      if (isSupabaseConfigured()) {
+        supabase.from('products').update({ ...data, updated_at: now() }).eq('id', id).then();
+      }
       return updated;
     },
     softDelete: (id: string): void => {
       db.products.update(id, { deleted_at: now(), is_available: false });
+      if (isSupabaseConfigured()) {
+        supabase.from('products').update({ deleted_at: now(), is_available: false }).eq('id', id).then();
+      }
     },
     countByProfileId: (profileId: string): number =>
       db.products.getByProfileId(profileId).length,

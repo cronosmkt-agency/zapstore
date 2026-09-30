@@ -1,2 +1,10 @@
 User-agent: *
 Allow: /
+
+# Private areas
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /dashboard
+Disallow: /dashboard/*
+
+Sitemap: https://zapstore-mu.vercel.app/sitemap.xml

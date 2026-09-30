@@ -1,0 +1,10 @@
+name = "zapstore"
+compatibility_date = "2024-09-30"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = ".output/public"
+binding = "ASSETS"
+
+# Em caso de deploy de Cloudflare Pages direto com build SPA:
+# pages_build_output_dir = ".output/public"

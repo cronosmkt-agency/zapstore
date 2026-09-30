@@ -16,8 +16,10 @@ import { Route as ChatRouteImport } from './routes/chat'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LojaRouteImport } from './routes/loja'
+import { Route as PoliticaDePrivacidadeRouteImport } from './routes/politica-de-privacidade'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TermosDeUsoRouteImport } from './routes/termos-de-uso'
 import { Route as SlugIndexRouteImport } from './routes/$slug/index'
 import { Route as SlugLojaRouteImport } from './routes/$slug/loja'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
@@ -69,6 +71,11 @@ const LojaRoute = LojaRouteImport.update({
   path: '/loja',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PoliticaDePrivacidadeRoute = PoliticaDePrivacidadeRouteImport.update({
+  id: '/politica-de-privacidade',
+  path: '/politica-de-privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -77,6 +84,11 @@ const SignupRoute = SignupRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermosDeUsoRoute = TermosDeUsoRouteImport.update({
+  id: '/termos-de-uso',
+  path: '/termos-de-uso',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SlugIndexRoute = SlugIndexRouteImport.update({
@@ -163,8 +175,10 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteWithChildren
   '/login': typeof LoginRoute
   '/loja': typeof LojaRoute
+  '/politica-de-privacidade': typeof PoliticaDePrivacidadeRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos-de-uso': typeof TermosDeUsoRoute
   '/$slug/loja': typeof SlugLojaRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/metricas': typeof AdminMetricasRoute
@@ -186,8 +200,10 @@ export interface FileRoutesByTo {
   '/chat': typeof ChatRoute
   '/login': typeof LoginRoute
   '/loja': typeof LojaRoute
+  '/politica-de-privacidade': typeof PoliticaDePrivacidadeRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos-de-uso': typeof TermosDeUsoRoute
   '/$slug/loja': typeof SlugLojaRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/metricas': typeof AdminMetricasRoute
@@ -212,8 +228,10 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteWithChildren
   '/login': typeof LoginRoute
   '/loja': typeof LojaRoute
+  '/politica-de-privacidade': typeof PoliticaDePrivacidadeRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos-de-uso': typeof TermosDeUsoRoute
   '/$slug/loja': typeof SlugLojaRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/metricas': typeof AdminMetricasRoute
@@ -240,8 +258,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/loja'
+    | '/politica-de-privacidade'
     | '/signup'
     | '/sitemap.xml'
+    | '/termos-de-uso'
     | '/$slug/loja'
     | '/admin/configuracoes'
     | '/admin/metricas'
@@ -263,8 +283,10 @@ export interface FileRouteTypes {
     | '/chat'
     | '/login'
     | '/loja'
+    | '/politica-de-privacidade'
     | '/signup'
     | '/sitemap.xml'
+    | '/termos-de-uso'
     | '/$slug/loja'
     | '/admin/configuracoes'
     | '/admin/metricas'
@@ -288,8 +310,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/loja'
+    | '/politica-de-privacidade'
     | '/signup'
     | '/sitemap.xml'
+    | '/termos-de-uso'
     | '/$slug/loja'
     | '/admin/configuracoes'
     | '/admin/metricas'
@@ -315,8 +339,10 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRouteWithChildren
   LoginRoute: typeof LoginRoute
   LojaRoute: typeof LojaRoute
+  PoliticaDePrivacidadeRoute: typeof PoliticaDePrivacidadeRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermosDeUsoRoute: typeof TermosDeUsoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -370,6 +396,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LojaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/politica-de-privacidade': {
+      id: '/politica-de-privacidade'
+      path: '/politica-de-privacidade'
+      fullPath: '/politica-de-privacidade'
+      preLoaderRoute: typeof PoliticaDePrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -382,6 +415,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/termos-de-uso': {
+      id: '/termos-de-uso'
+      path: '/termos-de-uso'
+      fullPath: '/termos-de-uso'
+      preLoaderRoute: typeof TermosDeUsoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$slug/': {
@@ -565,8 +605,10 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRouteWithChildren,
   LoginRoute: LoginRoute,
   LojaRoute: LojaRoute,
+  PoliticaDePrivacidadeRoute: PoliticaDePrivacidadeRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermosDeUsoRoute: TermosDeUsoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

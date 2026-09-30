@@ -253,7 +253,8 @@ function AdminSettingsPage() {
                   Webhook Secret para Confirmação Automática
                 </Label>
                 <Input
-                  value={platform.stripe_webhook_secret || 'whsec_prod_zapstore_mock981'}
+                  type="password"
+                  value={platform.stripe_webhook_secret || ''}
                   onChange={(e) => setPlatform({ ...platform, stripe_webhook_secret: e.target.value })}
                   placeholder="whsec_..."
                   className="h-10 bg-slate-50 border-slate-200 text-xs font-mono rounded-xl"

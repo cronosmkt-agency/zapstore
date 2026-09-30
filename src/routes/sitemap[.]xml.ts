@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 
-// TODO: replace with your project URL once a project name or custom domain is set.
-const BASE_URL = "";
+const BASE_URL = process.env.VITE_APP_URL || "https://zapstore-mu.vercel.app";
 
 interface SitemapEntry {
   path: string;
@@ -15,7 +14,27 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const entries: SitemapEntry[] = [{ path: "/", changefreq: "weekly", priority: "1.0" }];
+        const today = new Date().toISOString().split("T")[0];
+        const entries: SitemapEntry[] = [
+          { path: "/", lastmod: today, changefreq: "daily", priority: "1.0" },
+          { path: "/login", changefreq: "monthly", priority: "0.5" },
+          { path: "/signup", changefreq: "monthly", priority: "0.8" },
+          { path: "/termos-de-uso", changefreq: "yearly", priority: "0.3" },
+          { path: "/politica-de-privacidade", changefreq: "yearly", priority: "0.3" },
+          // Demo Stores & Catalogs
+          { path: "/terephones", lastmod: today, changefreq: "weekly", priority: "0.8" },
+          { path: "/terephones/loja", lastmod: today, changefreq: "weekly", priority: "0.8" },
+          { path: "/prime-motors", lastmod: today, changefreq: "weekly", priority: "0.8" },
+          { path: "/prime-motors/loja", lastmod: today, changefreq: "weekly", priority: "0.8" },
+          { path: "/nexus-digital", lastmod: today, changefreq: "weekly", priority: "0.8" },
+          { path: "/nexus-digital/loja", lastmod: today, changefreq: "weekly", priority: "0.8" },
+          { path: "/aura-store", lastmod: today, changefreq: "weekly", priority: "0.8" },
+          { path: "/aura-store/loja", lastmod: today, changefreq: "weekly", priority: "0.8" },
+          { path: "/craft-burger", lastmod: today, changefreq: "weekly", priority: "0.8" },
+          { path: "/craft-burger/loja", lastmod: today, changefreq: "weekly", priority: "0.8" },
+          { path: "/alpha-imoveis", lastmod: today, changefreq: "weekly", priority: "0.8" },
+          { path: "/alpha-imoveis/loja", lastmod: today, changefreq: "weekly", priority: "0.8" },
+        ];
 
         const urls = entries.map((e) =>
           [
