@@ -136,7 +136,7 @@ function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("terephones_theme");
+    const saved = localStorage.getItem("zapstore_landing_theme");
     const initial = saved === "black-piano" ? "black-piano" : "white";
     setCurrentTheme(initial);
 
@@ -161,7 +161,7 @@ function LandingPage() {
       root.classList.add("theme-white");
     }
 
-    localStorage.setItem("terephones_theme", next);
+    localStorage.setItem("zapstore_landing_theme", next);
     window.dispatchEvent(new CustomEvent("theme-changed", { detail: { theme: next } }));
     toast.success(next === "black-piano" ? "Modo Black ativado" : "Modo Branco ativado", {
       id: "theme-toggle",

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   X,
   ShieldCheck,
@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   CreditCard,
   Zap,
+  ShoppingBag,
 } from "lucide-react";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
@@ -21,6 +22,7 @@ export interface ProductItem {
   cat: string;
   badge: string;
   img: string;
+  images?: string[];
   specs?: string;
   storage?: string;
   condition?: string;
@@ -54,6 +56,9 @@ export function ProductDetailModal({
   whatsappNumber = "5521964639999",
   storeName = "Terephones",
 }: ProductDetailModalProps) {
+  const [selectedImg, setSelectedImg] = useState<string>("");
+  const [quantity, setQuantity] = useState<number>(1);
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -69,6 +74,27 @@ export function ProductDetailModal({
     };
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    if (product) {
+      setSelectedImg(product.img || product.images?.[0] || "");
+      setQuantity(1);
+    }
+  }, [product]);
+
+  const galleryImages = useMemo(() => {
+    if (!product) return [];
+    const list: string[] = [];
+    if (product.img) list.push(product.img);
+    if (product.images && Array.isArray(product.images)) {
+      for (const imgUrl of product.images) {
+        if (imgUrl && !list.includes(imgUrl)) {
+          list.push(imgUrl);
+        }
+      }
+    }
+    return list;
+  }, [product]);
+
   if (!isOpen || !product) return null;
 
   const isNovo =
@@ -82,32 +108,56 @@ export function ProductDetailModal({
 
   const isIphoneStore =
     storeName.toLowerCase().includes("terephones") ||
+    storeName.toLowerCase().includes("apple") ||
+    storeName.toLowerCase().includes("phone") ||
     product.name.toLowerCase().includes("iphone");
 
   const storageDisplay =
-    product.storage || product.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() || "128GB";
+    product.storage || product.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() || "";
+
+  const maxQuantity = Math.max(1, product.quantity || 10);
+  const totalPrice = product.price * quantity;
+
+  // Contextual delivery badge
+  const deliveryBadgeText = isIphoneStore
+    ? "Pronta Entrega em até 1h"
+    : product.price > 50000
+    ? "Agendamento & Visita Exclusiva"
+    : (product.cat?.toLowerCase().includes("curso") || product.cat?.toLowerCase().includes("info"))
+    ? "Acesso Imediato Online"
+    : "Pronta Entrega / Envio Ágil";
+
+  // Contextual installments
+  const installmentText = product.price > 50000
+    ? "Consulte opções de financiamento ou entrada facilitada"
+    : `ou até 12x de ${fmt(totalPrice / 12)} (consulte opções no cartão)`;
 
   const handleWhatsApp = () => {
     const condText = isNovo
       ? "Novo Lacrado de Fábrica Apple"
       : `Seminovo Grade A+${product.battery ? ` (Saúde da Bateria: ${product.battery})` : ""}`;
 
-    const text = isIphoneStore
-      ? `Olá, equipe ${storeName}! Gostaria de pedir este item que vi no catálogo:
+    const qtyNotice = quantity > 1 ? `\n🔢 *Quantidade:* ${quantity} unidades` : "";
+    const totalNotice = quantity > 1 ? `\n💳 *Valor Total:* ${fmt(totalPrice)}` : "";
 
-📱 *Aparelho:* ${product.name}
-💰 *Valor à vista:* ${fmt(product.price)} (ou até 18x no cartão)
-💾 *Capacidade:* ${storageDisplay}
+    let text = "";
+    if (isIphoneStore) {
+      text = `Olá, equipe ${storeName}! Gostaria de pedir este item que vi no catálogo:
+
+📱 *Aparelho:* ${product.name}${qtyNotice}
+💰 *Valor Unitário:* ${fmt(product.price)}${totalNotice} (ou até 18x no cartão)${storageDisplay ? `\n💾 *Capacidade:* ${storageDisplay}` : ""}
 ✨ *Condição:* ${condText}
 
-Gostaria de confirmar a disponibilidade para entrega hoje!`
-      : `Olá, equipe ${storeName}! Gostaria de mais informações e pedir este produto que vi no catálogo:
+Gostaria de confirmar a disponibilidade para entrega hoje!`;
+    } else {
+      text = `Olá, equipe ${storeName}! Gostaria de pedir este item que vi no catálogo:
 
-📦 *Produto:* ${product.name}
-💰 *Valor:* ${fmt(product.price)}
-🏷️ *Categoria:* ${product.cat || "Geral"}
+📦 *Produto:* ${product.name}${qtyNotice}
+💰 *Valor Unitário:* ${fmt(product.price)}${totalNotice}
+🏷️ *Categoria:* ${product.cat || "Geral"}${product.specs ? `\n⚙️ *Especificações:* ${product.specs}` : ""}
 
-Gostaria de confirmar a disponibilidade!`;
+Gostaria de confirmar a disponibilidade para compra!`;
+    }
 
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`;
     window.open(url, "_blank");
@@ -138,9 +188,8 @@ Gostaria de confirmar a disponibilidade!`;
   );
 
   const hasBatteryInBadge =
-    product.badge.toLowerCase().includes("bateria") || product.badge.toLowerCase().includes("bat");
+    Boolean(product.badge && (product.badge.toLowerCase().includes("bateria") || product.badge.toLowerCase().includes("bat")));
 
-  // Format battery text avoiding duplication like "Bateria 100% Bateria"
   const formattedBattery = product.battery
     ? product.battery.toLowerCase().startsWith("bateria")
       ? product.battery
@@ -162,32 +211,38 @@ Gostaria de confirmar a disponibilidade!`;
 
       {/* Modal Container */}
       <div
-        className="relative w-full max-w-[94vw] sm:max-w-[720px] my-auto product-modal-container overflow-hidden shadow-2xl z-10 max-h-[92vh] sm:max-h-[88vh] flex flex-col rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-white/10"
+        className="relative w-full max-w-[94vw] sm:max-w-[720px] my-auto product-modal-container overflow-hidden shadow-2xl z-10 max-h-[92vh] sm:max-h-[88vh] flex flex-col rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#0b0f17]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header bar com badges e botão fechar */}
         <div className="flex items-center justify-between px-3.5 sm:px-6 py-2.5 sm:py-3 border-b border-slate-200/60 dark:border-white/10 shrink-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md">
           <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-            <span
-              className={`text-[10px] sm:text-xs uppercase tracking-wider font-extrabold px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full shadow-xs ${
-                isNovo ? "product-badge-novo" : "product-badge-seminovo"
-              }`}
-            >
-              {product.badge}
-            </span>
+            {product.badge && (
+              <span
+                className={`text-[10px] sm:text-xs uppercase tracking-wider font-extrabold px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full shadow-xs ${
+                  isNovo ? "product-badge-novo" : "product-badge-seminovo"
+                }`}
+              >
+                {product.badge}
+              </span>
+            )}
             {formattedBattery && !hasBatteryInBadge && (
               <span className="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
                 <Battery className="w-3 h-3 text-emerald-500 shrink-0" />
                 <span>{formattedBattery}</span>
               </span>
             )}
-            {product.quantity && product.quantity > 1 && !badgeHasQty && (
-              <span className="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center gap-1">
-                <span>📦 {product.quantity} un. em estoque</span>
+            {product.quantity && product.quantity > 0 && !badgeHasQty && (
+              <span className={`text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${
+                product.quantity <= 2 
+                  ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                  : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'
+              }`}>
+                <span>{product.quantity <= 2 ? `⚠️ Últimas ${product.quantity} un.` : `📦 ${product.quantity} un. em estoque`}</span>
               </span>
             )}
             <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 hidden xs:inline">
-              {isNovo ? "Novo Lacrado" : (product.cat || "Seminovo")}
+              {product.cat || (isNovo ? "Novo" : "Destaque")}
             </span>
           </div>
 
@@ -204,25 +259,45 @@ Gostaria de confirmar a disponibilidade!`;
         <div className="overflow-y-auto overscroll-contain px-3.5 sm:px-6 py-3.5 sm:py-5 space-y-4 sm:space-y-6 [scrollbar-width:thin] [scrollbar-color:rgba(156,163,175,0.4)_transparent]">
           {/* Top Section: Imagem + Título + Preço */}
           <div className="grid sm:grid-cols-2 gap-3.5 sm:gap-6 items-center">
-            {/* Foto do Aparelho */}
-            <div
-              className="relative rounded-2xl p-3 sm:p-5 flex items-center justify-center overflow-hidden border border-slate-200/60 dark:border-white/10 bg-slate-50/70 dark:bg-slate-900/50"
-              style={{
-                minHeight: "140px",
-              }}
-            >
+            {/* Foto Principal + Faixa de Miniaturas */}
+            <div className="flex flex-col gap-2">
               <div
-                className="absolute inset-0 pointer-events-none opacity-40 dark:opacity-30"
-                style={{
-                  background: "radial-gradient(circle at center, rgba(56, 189, 248, 0.3), rgba(0,0,0,0) 70%)",
-                }}
-              />
-              <img
-                src={product.img}
-                alt={product.name}
-                className="max-h-32 sm:max-h-48 md:max-h-52 w-auto object-contain transition-transform hover:scale-105 duration-300 relative z-1"
-                style={{ filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.28))" }}
-              />
+                className="relative rounded-2xl p-3 sm:p-5 flex items-center justify-center overflow-hidden border border-slate-200/60 dark:border-white/10 bg-slate-50/70 dark:bg-slate-900/50"
+                style={{ minHeight: "150px" }}
+              >
+                <div
+                  className="absolute inset-0 pointer-events-none opacity-40 dark:opacity-30"
+                  style={{
+                    background: "radial-gradient(circle at center, rgba(56, 189, 248, 0.3), rgba(0,0,0,0) 70%)",
+                  }}
+                />
+                <img
+                  src={selectedImg || product.img}
+                  alt={product.name}
+                  className="max-h-36 sm:max-h-48 md:max-h-52 w-auto object-contain transition-all hover:scale-105 duration-300 relative z-1"
+                  style={{ filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.28))" }}
+                />
+              </div>
+
+              {/* Faixa de Miniaturas se houver mais de 1 imagem */}
+              {galleryImages.length > 1 && (
+                <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none justify-center">
+                  {galleryImages.map((imgUrl, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setSelectedImg(imgUrl)}
+                      className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl p-1 border transition-all cursor-pointer bg-white dark:bg-slate-800 shrink-0 ${
+                        selectedImg === imgUrl
+                          ? "border-blue-600 ring-2 ring-blue-500/30 scale-105"
+                          : "border-slate-200 dark:border-slate-700 opacity-70 hover:opacity-100"
+                      }`}
+                    >
+                      <img src={imgUrl} alt="" className="w-full h-full object-contain" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Informações Principais & Preço */}
@@ -235,27 +310,62 @@ Gostaria de confirmar a disponibilidade!`;
               </h2>
 
               <p className="text-xs sm:text-sm font-semibold mt-1 text-slate-600 dark:text-slate-300 flex items-center gap-1.5 flex-wrap">
-                <span>{storageDisplay}</span>
-                <span>•</span>
-                <span className="text-emerald-600 dark:text-emerald-400 font-bold">Pronta Entrega em até 1h</span>
+                {storageDisplay && (
+                  <>
+                    <span>{storageDisplay}</span>
+                    <span>•</span>
+                  </>
+                )}
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold">{deliveryBadgeText}</span>
               </p>
 
               {/* Preço em Destaque */}
               <div className="mt-2.5 sm:mt-3 product-modal-price-box p-3 sm:p-4 rounded-xl">
                 <div className="flex items-center justify-between">
                   <span className="price-label text-[10px] sm:text-[11px] uppercase font-extrabold tracking-wider text-slate-500 dark:text-sky-300">
-                    Valor à vista no PIX
+                    Valor à vista {quantity > 1 ? `(${quantity} unidades)` : "no PIX"}
                   </span>
                   <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                     DESCONTO PIX
                   </span>
                 </div>
                 <div className="text-2xl sm:text-3xl font-black text-gradient-blue mt-0.5">
-                  {fmt(product.price)}
+                  {fmt(totalPrice)}
                 </div>
                 <div className="price-installments mt-1 flex items-center gap-1.5 text-[11px] sm:text-xs text-slate-700 dark:text-slate-200 font-medium">
                   <CreditCard className="w-3.5 h-3.5 text-sky-500 shrink-0" />
-                  <span>ou até 12x de {fmt(product.price / 12)} (até 18x no cartão)</span>
+                  <span>{installmentText}</span>
+                </div>
+              </div>
+
+              {/* Seletor de Quantidade Interativo */}
+              <div className="mt-3 flex items-center justify-between p-2 sm:p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/70 dark:border-white/10">
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                  <ShoppingBag className="w-3.5 h-3.5 text-blue-600 dark:text-sky-400" />
+                  Quantidade:
+                </span>
+                <div className="flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    disabled={quantity <= 1}
+                    aria-label="Diminuir quantidade"
+                    className="w-7 h-7 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-bold text-sm text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition shadow-xs"
+                  >
+                    -
+                  </button>
+                  <span className="font-black text-xs sm:text-sm text-slate-900 dark:text-white min-w-6 text-center">
+                    {quantity}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))}
+                    disabled={quantity >= maxQuantity}
+                    aria-label="Aumentar quantidade"
+                    className="w-7 h-7 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-bold text-sm text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition shadow-xs"
+                  >
+                    +
+                  </button>
                 </div>
               </div>
 
@@ -263,7 +373,7 @@ Gostaria de confirmar a disponibilidade!`;
               {isIphoneStore && (
                 <div className="mt-2 flex items-center gap-1.5 text-[11px] sm:text-xs text-emerald-600 dark:text-emerald-400 font-bold">
                   <Zap className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
-                  <span>Aceitamos seu iPhone usado na troca (Trade-In)</span>
+                  <span>Aceitamos seu aparelho usado na troca (Trade-In)</span>
                 </div>
               )}
             </div>
@@ -284,7 +394,7 @@ Gostaria de confirmar a disponibilidade!`;
                     Armazenamento
                   </div>
                   <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white">
-                    {storageDisplay}
+                    {storageDisplay || "Original"}
                   </div>
                 </div>
 
@@ -304,7 +414,7 @@ Gostaria de confirmar a disponibilidade!`;
                     Garantia
                   </div>
                   <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-blue-600 dark:text-sky-300 truncate">
-                    {product.warranty || (isNovo ? "1 Ano Apple" : "90 Dias Terephones")}
+                    {product.warranty || (isNovo ? "1 Ano Oficial" : "90 Dias de Garantia")}
                   </div>
                 </div>
 
@@ -347,16 +457,25 @@ Gostaria de confirmar a disponibilidade!`;
                   Destaques & Ficha Técnica
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
-                  {product.specs.split(" • ").map((spec, i) => (
-                    <div key={i} className="product-modal-box p-2.5 sm:p-3">
-                      <div className="text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-400">
-                        Item {i + 1}
+                  {product.specs.split(" • ").map((spec, i) => {
+                    let key = `Item ${i + 1}`;
+                    let val = spec.trim();
+                    if (spec.includes(":")) {
+                      const parts = spec.split(":");
+                      key = parts[0].trim();
+                      val = parts.slice(1).join(":").trim();
+                    }
+                    return (
+                      <div key={i} className="product-modal-box p-2.5 sm:p-3">
+                        <div className="text-[10px] sm:text-[11px] font-bold text-blue-600 dark:text-sky-400 uppercase tracking-wider truncate">
+                          {key}
+                        </div>
+                        <div className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white mt-0.5 truncate">
+                          {val}
+                        </div>
                       </div>
-                      <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white mt-0.5">
-                        {spec}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ) : null
@@ -375,7 +494,7 @@ Gostaria de confirmar a disponibilidade!`;
             </div>
           ) : null}
 
-          {/* O que vem na embalagem / Pedido (Apenas se houver boxItems explícitos ou for iPhone) */}
+          {/* O que vem na embalagem / Pedido */}
           {boxList.length > 0 ? (
             <div className="product-modal-box p-3.5 sm:p-5">
               <h3 className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-slate-800 dark:text-white mb-2 sm:mb-2.5 flex items-center gap-2">
@@ -393,24 +512,24 @@ Gostaria de confirmar a disponibilidade!`;
             </div>
           ) : null}
 
-          {/* Compromissos de Segurança */}
+          {/* Compromissos de Segurança & Entrega */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-slate-700 dark:text-slate-200 font-semibold">
             <div className="product-modal-box p-2.5 sm:p-3 flex items-center gap-2">
               <Truck className="w-4 h-4 text-sky-400 shrink-0" />
-              <span>{isIphoneStore ? "Entrega Express em até 1h em Teresópolis" : "Atendimento Rápido e Seguro via WhatsApp"}</span>
+              <span>{isIphoneStore ? `Entrega Express ${storeName}` : "Atendimento Rápido e Seguro via WhatsApp"}</span>
             </div>
             <div className="product-modal-box p-2.5 sm:p-3 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>{isIphoneStore ? "Pague somente na entrega após testar" : "Garantia e Procedência Assegurada"}</span>
+              <span>{isIphoneStore ? "Pague na entrega após testar o produto" : "Garantia e Procedência Assegurada"}</span>
             </div>
             <div className="product-modal-box p-2.5 sm:p-3 flex items-center gap-2">
               <Building2 className="w-4 h-4 text-indigo-400 shrink-0" />
-              <span>{isIphoneStore ? "Retirada presencial na SejaDelta" : "Pagamento Facilitado (Pix ou Cartão)"}</span>
+              <span>{isIphoneStore ? `Retirada presencial ou delivery ${storeName}` : "Pagamento Facilitado (Pix ou Cartão)"}</span>
             </div>
           </div>
         </div>
 
-        {/* Footer Actions (Responsivo e com Botão de Chat no Site) */}
+        {/* Footer Actions */}
         <div className="product-modal-footer px-3.5 sm:px-6 py-2.5 sm:py-3.5 flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-3 shrink-0 border-t border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md">
           {/* Mobile trust info */}
           <div className="flex sm:hidden items-center justify-between w-full text-[11px] text-slate-500 dark:text-slate-300">
@@ -437,7 +556,6 @@ Gostaria de confirmar a disponibilidade!`;
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-            {/* Botão Fechar / Voltar */}
             <button
               onClick={onClose}
               className="px-4 py-2.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer text-center"
@@ -445,7 +563,6 @@ Gostaria de confirmar a disponibilidade!`;
               Fechar
             </button>
 
-            {/* Botão Pedir no WhatsApp */}
             <button
               onClick={handleWhatsApp}
               className="flex-1 sm:flex-none btn-whatsapp px-5 sm:px-6 py-2.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-md transition-all active:scale-95 text-white whitespace-nowrap"
@@ -459,5 +576,5 @@ Gostaria de confirmar a disponibilidade!`;
     </div>
   );
 }
-export default ProductDetailModal;
 
+export default ProductDetailModal;

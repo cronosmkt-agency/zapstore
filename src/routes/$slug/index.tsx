@@ -45,8 +45,8 @@ function BackgroundOrbs() {
   );
 }
 
-/* ---------- 3D Floating Tilt Phone (Desktop Only) ---------- */
-function TiltPhone({ image }: { image?: string }) {
+/* ---------- 3D Floating Tilt Phone / Hero Image (Desktop Only) ---------- */
+function TiltPhone({ image, storeName }: { image?: string; storeName?: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number | undefined>(undefined);
@@ -142,12 +142,12 @@ function TiltPhone({ image }: { image?: string }) {
       />
       <img
         src={image || heroIphone}
-        alt="iPhone em destaque"
+        alt={storeName ? `Destaque ${storeName}` : "Produto em destaque"}
         fetchPriority="high"
         decoding="async"
         width={500}
         height={500}
-        className="relative z-10 w-[300px] lg:w-[460px] h-auto float-slow"
+        className="relative z-10 w-[300px] lg:w-[460px] max-h-[420px] object-contain h-auto float-slow"
         style={{
           filter: "drop-shadow(0 35px 50px rgba(13,27,62,0.22))",
           transformStyle: "preserve-3d",
@@ -207,9 +207,10 @@ function mapToProductItem(p: Product): ProductItem {
   return {
     name: p.name,
     price: p.price,
-    cat: p.category_name || (p.badge?.toLowerCase().includes("lacrado") ? "Lacrados" : "Seminovos"),
+    cat: p.category_name || (p.badge?.toLowerCase().includes("lacrado") ? "Lacrados" : (p.badge?.toLowerCase().includes("seminov") ? "Seminovos" : "Geral")),
     badge: p.badge || "",
     img: p.primary_image || p.images?.[0] || "",
+    images: p.images && p.images.length > 0 ? p.images : (p.primary_image ? [p.primary_image] : []),
     specs: Object.values(specsObj).filter(Boolean).join(" • "),
     storage: specsObj.storage,
     condition: specsObj.condition,
@@ -618,7 +619,10 @@ function SlugStorePage() {
 
             {/* Right Column: 3D Tilt Phone on Desktop */}
             <div className="hidden lg:flex lg:col-span-5 justify-center items-center">
-              <TiltPhone image={settings.hero_image_url || featured[0]?.img || (slug === "terephones" ? heroIphone : undefined)} />
+              <TiltPhone
+                image={settings.hero_image_url || featured[0]?.img || (slug === "terephones" ? heroIphone : undefined)}
+                storeName={storeName}
+              />
             </div>
           </div>
         </section>

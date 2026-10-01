@@ -145,7 +145,7 @@ function ChatPage() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("terephones_theme") as ThemeMode | null;
+      const saved = localStorage.getItem("zapstore_chat_theme") as ThemeMode | null;
       if (saved === "black-piano" || saved === "white") {
         setCurrentTheme(saved);
         const root = document.documentElement;
@@ -286,7 +286,7 @@ function ChatPage() {
     } else {
       root.classList.add("theme-white");
     }
-    localStorage.setItem("terephones_theme", next);
+    localStorage.setItem("zapstore_chat_theme", next);
     window.dispatchEvent(new CustomEvent("theme-changed", { detail: { theme: next } }));
     toast.success(next === "black-piano" ? "Modo Black ativado" : "Modo Branco ativado", {
       id: "theme-toggle",

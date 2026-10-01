@@ -43,7 +43,7 @@ function SignupPage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const t = localStorage.getItem('terephones_theme')
+      const t = localStorage.getItem('zapstore_auth_theme')
       if (t === 'black-piano' || document.documentElement.classList.contains('theme-black-piano') || document.documentElement.classList.contains('dark')) {
         setTheme('black-piano')
       }
@@ -53,7 +53,7 @@ function SignupPage() {
   const toggleTheme = () => {
     const next = theme === 'black-piano' ? 'white' : 'black-piano'
     setTheme(next)
-    localStorage.setItem('terephones_theme', next)
+    localStorage.setItem('zapstore_auth_theme', next)
     const root = document.documentElement
     root.classList.remove('theme-white', 'theme-black-piano', 'dark')
     if (next === 'black-piano') {
@@ -388,6 +388,7 @@ function SignupPage() {
                       { id: 'gastronomia', label: '🍔 Gastronomia', desc: 'Burgers, Delivery' },
                       { id: 'veiculos', label: '🚗 Veículos & Carros', desc: 'Concessionária, Seminovos' },
                       { id: 'imoveis', label: '🏠 Imóveis & Imobiliária', desc: 'Casas, Apartamentos' },
+                      { id: 'infoprodutos', label: '💻 Cursos & Digital', desc: 'Infoprodutos, Mentorias' },
                       { id: 'geral', label: '📦 Catálogo Geral', desc: 'Produtos Variados' },
                     ].map((item) => (
                       <button

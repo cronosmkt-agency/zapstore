@@ -52,7 +52,7 @@ function LoginPage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const t = localStorage.getItem('terephones_theme');
+      const t = localStorage.getItem('zapstore_auth_theme');
       if (t === 'black-piano' || document.documentElement.classList.contains('theme-black-piano') || document.documentElement.classList.contains('dark')) {
         setTheme('black-piano');
       }
@@ -62,7 +62,7 @@ function LoginPage() {
   const toggleTheme = () => {
     const next = theme === 'black-piano' ? 'white' : 'black-piano';
     setTheme(next);
-    localStorage.setItem('terephones_theme', next);
+    localStorage.setItem('zapstore_auth_theme', next);
     const root = document.documentElement;
     root.classList.remove('theme-white', 'theme-black-piano', 'dark');
     if (next === 'black-piano') {

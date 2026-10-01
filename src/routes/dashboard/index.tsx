@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/mockDb';
 import { useEffect, useState } from 'react';
+import { Product } from '@/types';
 import {
   Package,
   CheckCircle,
@@ -16,12 +17,20 @@ import {
   Star,
   ExternalLink,
   MessageCircle,
+  Copy,
+  Check,
+  Share2,
+  Edit,
 } from 'lucide-react';
+import { WhatsAppIcon } from '@/components/WhatsAppIcon';
 import { planLabel } from '@/lib/planLimits';
+import { toast } from 'sonner';
 
 export const Route = createFileRoute('/dashboard/')({
   component: DashboardOverview,
 });
+
+const fmt = (n: number) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
 function DashboardOverview() {
   const { session } = useAuth();
@@ -38,6 +47,8 @@ function DashboardOverview() {
     hasSettings: false,
   });
   const [storeName, setStoreName] = useState('');
+  const [recentProducts, setRecentProducts] = useState<Product[]>([]);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   useEffect(() => {
     if (session?.userId) {
@@ -46,6 +57,7 @@ function DashboardOverview() {
       const analyticsStats = db.analytics.getStats(session.userId);
 
       setStoreName(settings?.store_name || session.user.display_name || 'Lojista');
+      setRecentProducts([...products].slice(-4).reverse());
 
       setStats({
         totalProducts: products.length,
@@ -64,6 +76,18 @@ function DashboardOverview() {
   }, [session]);
 
   if (!session) return null;
+
+  const storeSlug = session.user.slug;
+  const storeUrl = typeof window !== 'undefined' ? `${window.location.origin}/${storeSlug}` : `/${storeSlug}`;
+
+  const handleCopyLink = () => {
+    if (typeof navigator !== 'undefined') {
+      navigator.clipboard.writeText(storeUrl);
+      setCopiedLink(true);
+      toast.success('Link da sua loja copiado com sucesso!');
+      setTimeout(() => setCopiedLink(false), 2500);
+    }
+  };
 
   const tasks = [
     { id: 'logo', label: 'Logo da loja adicionada', done: checklist.hasLogo, link: '/dashboard/configuracoes' },
@@ -101,11 +125,11 @@ function DashboardOverview() {
           </p>
         </div>
 
-        {/* Action Buttons: 2 columns on mobile, row on tablet/desktop */}
+        {/* Action Buttons */}
         <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center shrink-0 pt-1 sm:pt-0">
           <Link
             to="/dashboard/produtos/novo"
-            className="flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold px-3.5 py-2.5 rounded-xl text-xs sm:text-sm shadow-md shadow-blue-600/20 transition-all hover:scale-102 active:scale-98 text-center"
+            className="flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold px-3.5 py-2.5 rounded-xl text-xs sm:text-sm shadow-md shadow-blue-600/20 transition-all hover:scale-102 active:scale-98 text-center cursor-pointer"
           >
             <Plus className="w-4 h-4 shrink-0" />
             <span>Adicionar Produto</span>
@@ -115,7 +139,7 @@ function DashboardOverview() {
             href={`/${session.user.slug}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition shadow-xs text-center"
+            className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition shadow-xs text-center cursor-pointer"
           >
             <Eye className="w-4 h-4 text-blue-600 shrink-0" />
             <span>Ver Loja</span>
@@ -123,7 +147,57 @@ function DashboardOverview() {
         </div>
       </div>
 
-      {/* ─── Metrics Grid (2x2 on Mobile, 4x1 on Desktop) ────────── */}
+      {/* ─── Share Store Link Card ───────────────────────────────── */}
+      <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl shadow-sm border border-blue-800/40 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5 w-full md:w-auto">
+          <div className="w-11 h-11 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-sky-400 shrink-0 border border-white/10">
+            <Share2 className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
+              <span>Link da Sua Loja Online</span>
+              <span className="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30">Pronta para Vender</span>
+            </h3>
+            <p className="text-xs text-slate-300 font-mono mt-0.5 truncate max-w-xs sm:max-w-md">
+              {storeUrl}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+          <button
+            type="button"
+            onClick={handleCopyLink}
+            className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition cursor-pointer backdrop-blur-md"
+          >
+            {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-sky-300" />}
+            <span>{copiedLink ? 'Copiado!' : 'Copiar Link'}</span>
+          </button>
+
+          <a
+            href={`/${session.user.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition cursor-pointer backdrop-blur-md"
+            title="Abrir vitrine em nova aba"
+          >
+            <ExternalLink className="w-3.5 h-3.5 text-sky-300" />
+            <span className="hidden sm:inline">Abrir</span>
+          </a>
+
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent(`Olá! Conheça o catálogo online da loja ${storeName} e faça seu pedido direto comigo: ${storeUrl}`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition cursor-pointer shadow-sm"
+          >
+            <WhatsAppIcon className="w-3.5 h-3.5" />
+            <span>Divulgar no Zap</span>
+          </a>
+        </div>
+      </div>
+
+      {/* ─── Metrics Grid ────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {/* Total de Produtos */}
         <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md transition">
@@ -189,6 +263,76 @@ function DashboardOverview() {
           </span>
         </div>
       </div>
+
+      {/* ─── Produtos Recentes Table ─────────────────────────────── */}
+      {recentProducts.length > 0 && (
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-xs overflow-hidden">
+          <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <Package className="w-4 h-4" />
+              </div>
+              <h2 className="text-sm sm:text-base font-black text-slate-900">Produtos Recentes</h2>
+            </div>
+            <Link
+              to="/dashboard/produtos"
+              className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition"
+            >
+              <span>Ver todos</span>
+              <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+
+          <div className="divide-y divide-slate-100">
+            {recentProducts.map((p) => {
+              const isLow = p.quantity !== undefined && p.quantity > 0 && p.quantity <= 2;
+              const isOut = p.quantity === 0 || !p.is_available;
+
+              return (
+                <div key={p.id} className="p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:bg-slate-50/80 transition-colors">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-11 h-11 rounded-xl bg-slate-50 border border-slate-200/70 p-1 flex items-center justify-center shrink-0 overflow-hidden">
+                      {p.primary_image ? (
+                        <img src={p.primary_image} alt={p.name} className="w-full h-full object-contain" />
+                      ) : (
+                        <Package className="w-5 h-5 text-slate-300" />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="text-xs sm:text-sm font-bold text-slate-900 truncate">{p.name}</h4>
+                      <p className="text-[11px] text-slate-400 mt-0.5 truncate">{p.category_name || 'Geral'}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 shrink-0">
+                    <div className="text-right">
+                      <div className="text-xs sm:text-sm font-black text-slate-900">{fmt(p.price)}</div>
+                      <div className="text-[10px]">
+                        {isOut ? (
+                          <span className="font-bold text-rose-600">Esgotado</span>
+                        ) : isLow ? (
+                          <span className="font-bold text-amber-600">Restam {p.quantity} un.</span>
+                        ) : (
+                          <span className="font-bold text-emerald-600">{p.quantity || 1} un.</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <Link
+                      to="/dashboard/produtos/$id"
+                      params={{ id: p.id }}
+                      className="p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition cursor-pointer"
+                      title="Editar produto"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ─── Onboarding Checklist & Progress ─────────────────────── */}
       <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-xs overflow-hidden">
@@ -288,3 +432,5 @@ function DashboardOverview() {
     </div>
   );
 }
+
+export default DashboardOverview;

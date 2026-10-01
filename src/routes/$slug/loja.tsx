@@ -2,7 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useEffect, useState, useMemo } from 'react';
 import { db, initDb } from '@/lib/mockDb';
 import { Profile, StoreSettings, Product, ProductCategory } from '@/types';
-import { MessageCircle, Search, LayoutGrid, List, Sparkles, Info } from 'lucide-react';
+import { MessageCircle, Search, LayoutGrid, List, Sparkles, Info, X } from 'lucide-react';
 import { ProductDetailModal, type ProductItem } from '@/components/ProductDetailModal';
 import { SiteNavbar } from '@/components/SiteNavbar';
 import { SiteFooter } from '@/components/SiteFooter';
@@ -27,9 +27,10 @@ function toProductItem(p: Product): ProductItem {
   return {
     name: p.name,
     price: p.price,
-    cat: p.category_name || (p.badge?.toLowerCase().includes('lacrado') ? 'Lacrados' : 'Seminovos'),
+    cat: p.category_name || (p.badge?.toLowerCase().includes('lacrado') ? 'Lacrados' : (p.badge?.toLowerCase().includes('seminov') ? 'Seminovos' : 'Geral')),
     badge: p.badge || '',
     img: p.primary_image || p.images?.[0] || '',
+    images: p.images && p.images.length > 0 ? p.images : (p.primary_image ? [p.primary_image] : []),
     specs: Object.values(specsObj).filter(Boolean).join(' • '),
     storage: specsObj.storage,
     condition: specsObj.condition,
@@ -55,6 +56,7 @@ function StoreCatalogPage() {
   
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc' | 'name-asc'>('featured');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [currentTheme, setCurrentTheme] = useState<ThemeMode>('white');
   const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(null);
@@ -127,6 +129,12 @@ function StoreCatalogPage() {
     });
   };
 
+  const storeName = settings?.store_name || (slug === 'terephones' ? 'Terephones' : 'Loja');
+  const isIphoneStore =
+    slug === 'terephones' ||
+    storeName.toLowerCase().includes('phone') ||
+    storeName.toLowerCase().includes('apple');
+
   const productListItems = useMemo(() => {
     if (products.length > 0) {
       return products.map(toProductItem);
@@ -155,9 +163,8 @@ function StoreCatalogPage() {
       const matchCat =
         selectedCategory === 'Todos' ||
         p.cat.toLowerCase() === selectedCategory.toLowerCase() ||
-        (selectedCategory.toLowerCase() === 'lacrados' && isItemNovo) ||
-        (selectedCategory.toLowerCase() === 'novos' && isItemNovo) ||
-        (selectedCategory.toLowerCase() === 'seminovos' && !isItemNovo);
+        (isIphoneStore && selectedCategory.toLowerCase() === 'lacrados' && isItemNovo) ||
+        (isIphoneStore && selectedCategory.toLowerCase() === 'seminovos' && !isItemNovo);
       const matchSearch =
         searchQuery.trim() === '' ||
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -165,7 +172,22 @@ function StoreCatalogPage() {
         (p.storage && p.storage.toLowerCase().includes(searchQuery.toLowerCase()));
       return matchCat && matchSearch;
     });
-  }, [productListItems, selectedCategory, searchQuery]);
+  }, [productListItems, selectedCategory, searchQuery, isIphoneStore]);
+
+  const sortedProducts = useMemo(() => {
+    const list = [...filteredProducts];
+    if (sortBy === 'price-asc') {
+      list.sort((a, b) => a.price - b.price);
+    } else if (sortBy === 'price-desc') {
+      list.sort((a, b) => b.price - a.price);
+    } else if (sortBy === 'name-asc') {
+      list.sort((a, b) => a.name.localeCompare(b.name));
+    } else {
+      // featured: products marked as is_featured come first
+      list.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
+    }
+    return list;
+  }, [filteredProducts, sortBy]);
 
   // Dynamic SEO meta tags and Page Title
   useEffect(() => {
@@ -188,7 +210,7 @@ function StoreCatalogPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#06080d] transition-colors">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -208,12 +230,7 @@ function StoreCatalogPage() {
 
   const rawWhatsapp = settings.whatsapp || '5521964639999';
   const whatsDigits = rawWhatsapp.replace(/\D/g, '');
-  const storeName = settings.store_name || 'Terephones';
   const phoneDisplay = settings.phone_display || '(21) 96463-9999';
-  const isIphoneStore =
-    slug === 'terephones' ||
-    storeName.toLowerCase().includes('phone') ||
-    storeName.toLowerCase().includes('apple');
 
   const handleOrderWhatsApp = (prod: ProductItem) => {
     if (profile?.id) {
@@ -226,21 +243,21 @@ function StoreCatalogPage() {
       prod.badge.toLowerCase().includes('lacrad') ||
       prod.badge.toLowerCase().includes('novo') ||
       prod.name.toLowerCase().includes('lacrad');
+
     const storageDisplay =
-      prod.storage || prod.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() || '128GB';
+      prod.storage || prod.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() || '';
+
     const condText = isNovo
       ? 'Novo Lacrado de Fábrica'
       : `Seminovo Grade A+${prod.battery ? ` (Saúde da Bateria: ${prod.battery})` : ''}`;
 
-    const isIphone = isIphoneStore || prod.cat === 'Lacrados' || prod.cat === 'Seminovos';
     let text = settings.whatsapp_message_template;
     if (!text) {
-      if (isIphone) {
-        text = `Olá, equipe ${storeName}! Gostaria de pedir este iPhone que vi na Loja:
+      if (isIphoneStore) {
+        text = `Olá, equipe ${storeName}! Gostaria de pedir este item que vi na Loja:
 
 📱 *Aparelho:* ${prod.name}
-💰 *Valor à vista:* ${fmt(prod.price)} (ou até 18x no cartão)
-💾 *Capacidade:* ${storageDisplay}
+💰 *Valor à vista:* ${fmt(prod.price)} (ou até 18x no cartão)${storageDisplay ? `\n💾 *Capacidade:* ${storageDisplay}` : ''}
 ✨ *Condição:* ${condText}
 
 Gostaria de confirmar a disponibilidade para entrega hoje!`;
@@ -249,7 +266,7 @@ Gostaria de confirmar a disponibilidade para entrega hoje!`;
 
 📦 *Produto:* ${prod.name}
 💰 *Valor:* ${fmt(prod.price)}
-🏷️ *Categoria:* ${prod.cat || 'Geral'}
+🏷️ *Categoria:* ${prod.cat || 'Geral'}${prod.specs ? `\n⚙️ *Especificações:* ${prod.specs}` : ''}
 
 Gostaria de confirmar a disponibilidade!`;
       }
@@ -304,8 +321,8 @@ Gostaria de confirmar a disponibilidade!`;
         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-lg mx-auto mb-4">
           {settings.store_tagline || (isIphoneStore ? 'Aparelhos selecionados, revisados e com entrega express em até 1h. Pague com segurança na entrega.' : 'Confira nosso catálogo de produtos exclusivos e faça seu pedido direto pelo WhatsApp.')}
         </p>
-        <div className="inline-block bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-3.5 py-1 rounded-full text-xs font-bold border border-blue-200/70 dark:border-blue-700/50">
-          {filteredProducts.length} itens disponíveis hoje
+        <div className="inline-flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-3.5 py-1 rounded-full text-xs font-bold border border-blue-200/70 dark:border-blue-700/50">
+          <span>{sortedProducts.length} de {productListItems.length} itens encontrados</span>
         </div>
       </div>
 
@@ -330,29 +347,55 @@ Gostaria de confirmar a disponibilidade!`;
             ))}
           </div>
           
-          {/* Search + Grid / List Toggle */}
-          <div className="flex gap-2 w-full md:w-auto">
-            <div className="relative flex-1 md:w-72">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+          {/* Search + Sort + Grid / List Toggle */}
+          <div className="flex flex-wrap sm:flex-nowrap gap-2 w-full md:w-auto items-center">
+            {/* Search Input */}
+            <div className="relative flex-1 md:w-64">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 pointer-events-none" />
               <input 
                 type="text" 
-                placeholder="Buscar produto ou categoria..." 
+                placeholder="Buscar produto..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-700/80 text-slate-900 dark:text-white rounded-xl py-2 pl-10 pr-4 text-xs font-medium focus:outline-none focus:border-blue-500 transition-colors shadow-xs"
+                className="w-full bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-700/80 text-slate-900 dark:text-white rounded-xl py-2 pl-9 pr-8 text-xs font-medium focus:outline-none focus:border-blue-500 transition-colors shadow-xs"
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 cursor-pointer"
+                  title="Limpar busca"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
-            <div className="flex bg-slate-100 dark:bg-slate-900/80 rounded-xl p-1 border border-slate-200/80 dark:border-slate-800/80">
+
+            {/* Sort Selector */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold focus:outline-none focus:border-blue-500 transition cursor-pointer shadow-xs shrink-0"
+              title="Ordenar produtos"
+            >
+              <option value="featured">Destaques</option>
+              <option value="price-asc">Menor Preço</option>
+              <option value="price-desc">Maior Preço</option>
+              <option value="name-asc">Nome A-Z</option>
+            </select>
+
+            {/* View Mode Toggle */}
+            <div className="flex bg-slate-100 dark:bg-slate-900/80 rounded-xl p-1 border border-slate-200/80 dark:border-slate-800/80 shrink-0">
               <button 
                 onClick={() => setViewMode('grid')} 
-                className={`p-1.5 rounded-lg transition-colors focus:outline-none ${viewMode === 'grid' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-xs' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
+                className={`p-1.5 rounded-lg transition-colors focus:outline-none cursor-pointer ${viewMode === 'grid' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-xs' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                 title="Visualização em Grade"
               >
                 <LayoutGrid size={16} />
               </button>
               <button 
                 onClick={() => setViewMode('list')} 
-                className={`p-1.5 rounded-lg transition-colors focus:outline-none ${viewMode === 'list' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-xs' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
+                className={`p-1.5 rounded-lg transition-colors focus:outline-none cursor-pointer ${viewMode === 'list' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-xs' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                 title="Visualização em Lista"
               >
                 <List size={16} />
@@ -384,19 +427,39 @@ Gostaria de confirmar a disponibilidade!`;
               <span>Falar com Atendente no WhatsApp</span>
             </a>
           </div>
-        ) : filteredProducts.length === 0 ? (
-          <div className="text-center py-20 text-slate-500 dark:text-slate-400 glass-card rounded-2xl">
-            <p className="font-semibold">Nenhum produto encontrado para sua busca.</p>
-            <button
-              onClick={() => { setSelectedCategory('Todos'); setSearchQuery(''); }}
-              className="mt-3 text-xs font-bold text-blue-600 dark:text-sky-400 hover:underline"
-            >
-              Limpar filtros
-            </button>
+        ) : sortedProducts.length === 0 ? (
+          <div className="text-center py-16 px-4 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm max-w-lg mx-auto my-8">
+            <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-amber-50 dark:bg-amber-950/60 flex items-center justify-center text-amber-600 dark:text-amber-400">
+              <Search className="w-7 h-7" />
+            </div>
+            <h3 className="text-lg font-black text-slate-900 dark:text-white mb-1.5">
+              Nenhum produto encontrado
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-5">
+              {searchQuery ? `Não encontramos itens correspondentes a "${searchQuery}".` : 'Não há itens disponíveis nesta categoria no momento.'}
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => { setSelectedCategory('Todos'); setSearchQuery(''); }}
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition cursor-pointer"
+              >
+                Limpar Filtros
+              </button>
+              <a
+                href={`https://wa.me/${whatsDigits}?text=${encodeURIComponent(`Olá! Estou buscando "${searchQuery || selectedCategory}" na loja ${storeName}, vocês têm em estoque?`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs transition cursor-pointer"
+              >
+                <WhatsAppIcon className="w-3.5 h-3.5" />
+                <span>Consultar no WhatsApp</span>
+              </a>
+            </div>
           </div>
         ) : (
           <div className={viewMode === 'grid' ? "grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6" : "flex flex-col gap-3 sm:gap-4"}>
-            {filteredProducts.map(product => {
+            {sortedProducts.map(product => {
               const isNovo =
                 product.cat.toLowerCase().includes('novo') ||
                 product.cat.toLowerCase().includes('lacrad') ||
@@ -414,6 +477,8 @@ Gostaria de confirmar a disponibilidade!`;
               } else if (isIphoneStore && isNovo) {
                 batteryLabel = 'Bateria 100%';
               }
+
+              const isLowStock = product.quantity !== undefined && product.quantity > 0 && product.quantity <= 2;
 
               return (
                 <div 
@@ -445,16 +510,20 @@ Gostaria de confirmar a disponibilidade!`;
 
                   {/* Info */}
                   <div className={`flex flex-col flex-1 ${viewMode === 'list' ? 'justify-center text-left' : 'text-left mt-2'}`}>
-                    <div className="flex items-center justify-between gap-1 mb-1.5 w-full">
-                      <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 dark:bg-sky-950/80 text-blue-600 dark:text-sky-400 border border-blue-200/60 dark:border-sky-800/60 truncate max-w-[60%]">
+                    <div className="flex items-center justify-between gap-1 mb-1.5 w-full flex-wrap">
+                      <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 dark:bg-sky-950/80 text-blue-600 dark:text-sky-400 border border-blue-200/60 dark:border-sky-800/60 truncate max-w-[65%]">
                         {catLabel}
                       </span>
                       {batteryLabel ? (
-                        <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 truncate max-w-[40%]">
+                        <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 truncate max-w-[35%]">
                           {batteryLabel}
                         </span>
+                      ) : isLowStock ? (
+                        <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60 truncate">
+                          Últimas {product.quantity} un.
+                        </span>
                       ) : (
-                        <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 truncate max-w-[40%]">
+                        <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 truncate max-w-[35%]">
                           {product.badge || 'Disponível'}
                         </span>
                       )}
@@ -475,8 +544,8 @@ Gostaria de confirmar a disponibilidade!`;
                       <div className="text-sm sm:text-lg font-black text-blue-600 dark:text-sky-400 leading-tight">
                         {fmt(product.price)}
                       </div>
-                      <div className="text-[9px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                        à vista ou até 18x no cartão
+                      <div className="text-[9px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
+                        {product.price > 50000 ? 'Consulte opções de financiamento' : 'à vista ou até 18x no cartão'}
                       </div>
                     </div>
 
@@ -574,3 +643,5 @@ Gostaria de confirmar a disponibilidade!`;
     </div>
   );
 }
+
+export default StoreCatalogPage;

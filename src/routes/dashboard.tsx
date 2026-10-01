@@ -36,7 +36,7 @@ function DashboardLayout() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const t = localStorage.getItem('terephones_theme');
+      const t = localStorage.getItem('zapstore_dashboard_theme');
       if (t === 'black-piano' || document.documentElement.classList.contains('theme-black-piano')) {
         setCurrentTheme('black-piano');
       } else {
@@ -48,7 +48,7 @@ function DashboardLayout() {
   const handleToggleTheme = () => {
     const next = currentTheme === 'black-piano' ? 'white' : 'black-piano';
     setCurrentTheme(next);
-    localStorage.setItem('terephones_theme', next);
+    localStorage.setItem('zapstore_dashboard_theme', next);
     const root = document.documentElement;
     root.classList.remove('theme-white', 'theme-black-piano', 'dark');
     if (next === 'black-piano') {

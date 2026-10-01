@@ -22,6 +22,10 @@ import {
   Box,
   CreditCard,
   Sparkles,
+  Car,
+  UtensilsCrossed,
+  Home,
+  GraduationCap,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { optimizeImageFile } from '@/components/ImageUploadField';
@@ -40,6 +44,22 @@ const TEMPLATES = {
     { key: 'Garantia', value: '3 meses' },
     { key: 'Condição', value: 'Seminovo Impecável' },
   ],
+  veiculos: [
+    { key: 'Ano/Modelo', value: '2023 / 2024' },
+    { key: 'Quilometragem', value: '28.000 km' },
+    { key: 'Câmbio', value: 'Automático' },
+    { key: 'Motor', value: '2.0 Turbo Flex' },
+    { key: 'Combustível', value: 'Flex (Álcool/Gasolina)' },
+    { key: 'Laudo Cautelar', value: '100% Aprovado' },
+    { key: 'Garantia', value: '1 Ano de Garantia' },
+  ],
+  gastronomia: [
+    { key: 'Tamanho / Porção', value: 'Individual (350g)' },
+    { key: 'Pão / Base', value: 'Brioche Selado na Manteiga' },
+    { key: 'Blend / Recheio', value: '160g Blend Bovino Especial' },
+    { key: 'Acompanhamento', value: 'Batata Rústica e Molho da Casa' },
+    { key: 'Tempo de Entrega', value: '30 a 45 minutos' },
+  ],
   roupas: [
     { key: 'Tamanho', value: 'M (Veste 38 ao 40)' },
     { key: 'Cor', value: 'Preto' },
@@ -47,6 +67,21 @@ const TEMPLATES = {
     { key: 'Modelagem', value: 'Oversized / Confort' },
     { key: 'Gênero', value: 'Unissex' },
     { key: 'Cuidados', value: 'Lavar à mão ou ciclo delicado' },
+  ],
+  imoveis: [
+    { key: 'Área Útil', value: '120 m²' },
+    { key: 'Quartos & Suítes', value: '3 Quartos (1 Suíte)' },
+    { key: 'Vagas de Garagem', value: '2 Vagas Cobertas' },
+    { key: 'Condomínio', value: 'R$ 850 / mês' },
+    { key: 'IPTU', value: 'R$ 2.400 / ano' },
+    { key: 'Destaques', value: 'Varanda Gourmet com Vista Livre' },
+  ],
+  infoprodutos: [
+    { key: 'Formato', value: 'Aulas 100% Online em Vídeo' },
+    { key: 'Duração', value: '40 Horas de Conteúdo Prático' },
+    { key: 'Acesso', value: 'Vitalício com Suporte a Dúvidas' },
+    { key: 'Certificado', value: 'Certificado Reconhecido Incluso' },
+    { key: 'Bônus', value: 'Comunidade VIP + Ferramentas Prontas' },
   ],
   calcados: [
     { key: 'Numeração', value: '40' },
@@ -809,11 +844,43 @@ function ProductNovo() {
                     </button>
                     <button
                       type="button"
+                      onClick={() => applyTemplate('veiculos')}
+                      className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                    >
+                      <Car size={12} className="text-rose-600" />
+                      <span>Veículos</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => applyTemplate('gastronomia')}
+                      className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                    >
+                      <UtensilsCrossed size={12} className="text-orange-600" />
+                      <span>Delivery</span>
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => applyTemplate('roupas')}
                       className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer"
                     >
                       <Shirt size={12} className="text-indigo-600" />
-                      <span>Roupas</span>
+                      <span>Moda</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => applyTemplate('imoveis')}
+                      className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                    >
+                      <Home size={12} className="text-teal-600" />
+                      <span>Imóveis</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => applyTemplate('infoprodutos')}
+                      className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                    >
+                      <GraduationCap size={12} className="text-violet-600" />
+                      <span>Cursos</span>
                     </button>
                     <button
                       type="button"

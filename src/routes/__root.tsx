@@ -145,7 +145,7 @@ function RootShell({ children }: { children: ReactNode }) {
                 var p = window.location.pathname;
                 var reserved = ['dashboard', 'admin', 'login', 'signup', 'termos-de-uso', 'politica-de-privacidade'];
                 var seg = p.split('/').filter(Boolean)[0] || '';
-                // Only load custom theme on public store routes
+                // Store routes
                 if (seg && reserved.indexOf(seg) === -1) {
                   var t = localStorage.getItem('zapstore_theme_' + seg) || (seg === 'terephones' ? localStorage.getItem('terephones_theme') : null);
                   if (t === 'black-piano') {
@@ -153,6 +153,12 @@ function RootShell({ children }: { children: ReactNode }) {
                   } else if (t === 'white') {
                     document.documentElement.classList.add('theme-white');
                     document.documentElement.classList.remove('dark');
+                  }
+                } else if (!seg) {
+                  // Landing page
+                  var lt = localStorage.getItem('zapstore_landing_theme');
+                  if (lt === 'black-piano') {
+                    document.documentElement.classList.add('theme-black-piano', 'dark');
                   }
                 }
               } catch (e) {}

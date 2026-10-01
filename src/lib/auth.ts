@@ -333,11 +333,21 @@ export async function signup(data: SignupData): Promise<SignupResult> {
 
   const isCelulares = data.niche === 'celulares';
 
+  const defaultTaglines: Record<string, string> = {
+    celulares: 'Especialista em iPhones e Smartphones com garantia total.',
+    moda: 'Moda autêntica, tendências exclusivas e entrega expressa.',
+    gastronomia: 'Sabor irresistível preparado na hora com entrega rápida.',
+    veiculos: 'Veículos selecionados, laudo 100% aprovado e garantia.',
+    imoveis: 'Imóveis exclusivos e consultoria personalizada para seu novo lar.',
+    infoprodutos: 'Aprenda novas habilidades e impulsione sua carreira hoje.',
+    geral: 'Catálogo oficial de produtos com atendimento direto no WhatsApp.',
+  };
+
   // Criar configurações padrão da loja
   db.storeSettings.create({
     profile_id: profile.id,
     store_name: data.store_name,
-    store_tagline: isCelulares ? 'Especialista em iPhones e Smartphones' : '',
+    store_tagline: defaultTaglines[data.niche || 'geral'] || defaultTaglines.geral,
     whatsapp: data.whatsapp,
     custom_domain_verified: false,
     theme_mode: 'white',
@@ -359,6 +369,7 @@ export async function signup(data: SignupData): Promise<SignupResult> {
     gastronomia: ['Mais Pedidos', 'Burgers & Pratos', 'Acompanhamentos', 'Bebidas'],
     veiculos: ['Seminovos Selecionados', 'Novos / 0km', 'Utilitários & SUVs'],
     imoveis: ['Apartamentos', 'Casas em Condomínio', 'Alto Padrão'],
+    infoprodutos: ['Cursos & Formações', 'Mentorias & Workshops', 'E-books & Guias'],
     geral: ['Destaques', 'Novidades', 'Mais Vendidos'],
   };
 

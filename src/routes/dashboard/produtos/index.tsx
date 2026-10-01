@@ -84,11 +84,26 @@ function ProdutosList() {
     ...Array.from(new Set([...userCats.map((c) => c.name), ...products.map((p) => p.category_name).filter(Boolean)])),
   ];
 
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'low_stock' | 'out_of_stock'>('all');
+
   const filteredProducts = products.filter((p) => {
     const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase());
     const matchesCat = selectedCat === 'Todos' || p.category_name === selectedCat;
-    return matchesSearch && matchesCat;
+
+    let matchesStatus = true;
+    if (statusFilter === 'active') {
+      matchesStatus = p.is_available && (p.quantity === undefined || p.quantity > 0);
+    } else if (statusFilter === 'low_stock') {
+      matchesStatus = p.is_available && p.quantity !== undefined && p.quantity > 0 && p.quantity <= 2;
+    } else if (statusFilter === 'out_of_stock') {
+      matchesStatus = !p.is_available || p.quantity === 0;
+    }
+
+    return matchesSearch && matchesCat && matchesStatus;
   });
+
+  const lowStockCount = products.filter((p) => p.is_available && p.quantity !== undefined && p.quantity > 0 && p.quantity <= 2).length;
+  const outOfStockCount = products.filter((p) => !p.is_available || p.quantity === 0).length;
 
   const canAdd = canAddProduct(session.user.plan_slug, products.length);
   const limit = planLimits[session.user.plan_slug].products;
@@ -176,6 +191,58 @@ function ProdutosList() {
             </div>
           )}
         </div>
+
+        {/* Status Quick Filter Tabs */}
+        <div className="flex gap-1.5 overflow-x-auto pt-2 border-t border-slate-100 scrollbar-none">
+          <button
+            type="button"
+            onClick={() => setStatusFilter('all')}
+            className={`px-3 py-1 rounded-xl text-xs font-bold transition cursor-pointer ${
+              statusFilter === 'all'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            Todos ({products.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatusFilter('active')}
+            className={`px-3 py-1 rounded-xl text-xs font-bold transition cursor-pointer ${
+              statusFilter === 'active'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60'
+            }`}
+          >
+            Ativos ({products.filter((p) => p.is_available && (p.quantity === undefined || p.quantity > 0)).length})
+          </button>
+          {lowStockCount > 0 && (
+            <button
+              type="button"
+              onClick={() => setStatusFilter('low_stock')}
+              className={`px-3 py-1 rounded-xl text-xs font-bold transition cursor-pointer ${
+                statusFilter === 'low_stock'
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200/60'
+              }`}
+            >
+              ⚠️ Estoque Baixo ({lowStockCount})
+            </button>
+          )}
+          {outOfStockCount > 0 && (
+            <button
+              type="button"
+              onClick={() => setStatusFilter('out_of_stock')}
+              className={`px-3 py-1 rounded-xl text-xs font-bold transition cursor-pointer ${
+                statusFilter === 'out_of_stock'
+                  ? 'bg-rose-600 text-white shadow-xs'
+                  : 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200/60'
+              }`}
+            >
+              Pausados / Esgotados ({outOfStockCount})
+            </button>
+          )}
+        </div>
       </div>
 
       {!canAdd && (
@@ -239,9 +306,19 @@ function ProdutosList() {
                     </h3>
                     <div className="flex items-baseline justify-between mt-1">
                       <span className="text-sm font-black text-blue-600">{fmt(product.price)}</span>
-                      <span className="text-[10px] font-bold text-slate-500 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200">
-                        {product.quantity > 0 ? `${product.quantity} un.` : 'Esgotado'}
-                      </span>
+                      {product.quantity === 0 || !product.is_available ? (
+                        <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
+                          Esgotado
+                        </span>
+                      ) : product.quantity <= 2 ? (
+                        <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                          ⚠️ Restam {product.quantity} un.
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                          {product.quantity} un.
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -358,13 +435,17 @@ function ProdutosList() {
                       {fmt(product.price)}
                     </td>
                     <td className="p-4">
-                      {product.quantity > 0 ? (
-                        <span className="text-slate-700 font-semibold text-xs bg-slate-100 px-2.5 py-1 rounded-lg">
-                          {product.quantity} un.
+                      {product.quantity === 0 || !product.is_available ? (
+                        <span className="text-rose-600 font-bold text-xs bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">
+                          Esgotado
+                        </span>
+                      ) : product.quantity <= 2 ? (
+                        <span className="text-amber-700 font-bold text-xs bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">
+                          ⚠️ Restam {product.quantity} un.
                         </span>
                       ) : (
-                        <span className="text-rose-600 font-bold text-xs bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
-                          Esgotado
+                        <span className="text-slate-700 font-semibold text-xs bg-slate-100 px-2.5 py-1 rounded-lg">
+                          {product.quantity} un.
                         </span>
                       )}
                     </td>

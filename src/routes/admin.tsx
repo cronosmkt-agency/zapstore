@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, Link, useNavigate } from '@tanstack/react-router';
 import { useAuth } from '@/context/AuthContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   LayoutDashboard,
   Users,
@@ -11,15 +11,27 @@ import {
   Shield,
   Store,
   Settings,
+  ChevronDown,
+  ExternalLink,
 } from 'lucide-react';
 
 export const Route = createFileRoute('/admin')({
   component: AdminLayout,
 });
 
+const DEMO_STORES = [
+  { slug: 'terephones', name: 'TerePhones', niche: 'Apple & Celulares' },
+  { slug: 'prime-motors', name: 'Prime Motors', niche: 'Veículos' },
+  { slug: 'craft-burger', name: 'Craft Burger', niche: 'Gastronomia' },
+  { slug: 'aura-store', name: 'Aura Store', niche: 'Moda & Streetwear' },
+  { slug: 'alpha-imoveis', name: 'Alpha Imóveis', niche: 'Imobiliária' },
+  { slug: 'nexus-digital', name: 'Nexus Digital', niche: 'Cursos & Tech' },
+];
+
 function AdminLayout() {
   const { session, logout } = useAuth();
   const navigate = useNavigate();
+  const [demoStoresOpen, setDemoStoresOpen] = useState(false);
 
   // Strict admin access check
   useEffect(() => {
@@ -131,19 +143,40 @@ function AdminLayout() {
             <p className="text-xs font-bold text-slate-800 truncate">{session.email}</p>
           </div>
 
-          <a
-            href="/terephones"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-between px-3 py-2 rounded-xl text-blue-700 bg-blue-50/70 hover:bg-blue-100/80 transition-all font-bold text-xs w-full border border-blue-200/80 shadow-xs cursor-pointer"
-            title="Visualizar a loja demo oficial TerePhones"
-          >
-            <div className="flex items-center gap-2">
-              <Store size={14} className="text-blue-600" />
-              <span>Ver Loja Demo</span>
-            </div>
-            <span className="text-[10px] font-mono text-blue-500">/terephones</span>
-          </a>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setDemoStoresOpen(!demoStoresOpen)}
+              className="flex items-center justify-between px-3 py-2 rounded-xl text-blue-700 bg-blue-50/70 hover:bg-blue-100/80 transition-all font-bold text-xs w-full border border-blue-200/80 shadow-xs cursor-pointer"
+              title="Visualizar as lojas demo do ecossistema"
+            >
+              <div className="flex items-center gap-2">
+                <Store size={14} className="text-blue-600" />
+                <span>Lojas Demo (6)</span>
+              </div>
+              <ChevronDown size={14} className={`text-blue-500 transition-transform ${demoStoresOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {demoStoresOpen && (
+              <div className="mt-1.5 p-1.5 bg-white rounded-xl border border-slate-200/90 shadow-lg space-y-1">
+                {DEMO_STORES.map((st) => (
+                  <a
+                    key={st.slug}
+                    href={`/${st.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 text-slate-700 hover:text-blue-600 text-xs font-semibold transition"
+                  >
+                    <div className="min-w-0">
+                      <div className="font-bold truncate">{st.name}</div>
+                      <div className="text-[10px] text-slate-400 truncate">{st.niche}</div>
+                    </div>
+                    <ExternalLink size={12} className="text-slate-400 shrink-0 ml-1" />
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
 
           <button
             onClick={handleLogout}
