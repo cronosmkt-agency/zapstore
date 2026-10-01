@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { db, initDb } from '@/lib/mockDb';
 import { Profile, StoreSettings, Product, ProductCategory } from '@/types';
-import { MessageCircle, Search, LayoutGrid, List, Sparkles, Info, X } from 'lucide-react';
+import { MessageCircle, Search, LayoutGrid, List, Sparkles, Info, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ProductDetailModal, type ProductItem } from '@/components/ProductDetailModal';
 import { SiteNavbar } from '@/components/SiteNavbar';
 import { SiteFooter } from '@/components/SiteFooter';
@@ -27,7 +27,7 @@ function toProductItem(p: Product): ProductItem {
   return {
     name: p.name,
     price: p.price,
-    cat: p.category_name || (p.badge?.toLowerCase().includes('lacrado') ? 'Lacrados' : (p.badge?.toLowerCase().includes('seminov') ? 'Seminovos' : 'Geral')),
+    cat: p.category_name || (p.badge?.toLowerCase().includes('lacrado') ? 'Lacrados' : (p.badge?.toLowerCase().includes('seminov') ? 'Seminovos' : '')),
     badge: p.badge || '',
     img: p.primary_image || p.images?.[0] || '',
     images: p.images && p.images.length > 0 ? p.images : (p.primary_image ? [p.primary_image] : []),
@@ -61,6 +61,37 @@ function StoreCatalogPage() {
   const [currentTheme, setCurrentTheme] = useState<ThemeMode>('white');
   const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(null);
 
+  // Mouse Drag-to-Scroll for categories
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
+  const [isDraggingCategory, setIsDraggingCategory] = useState(false);
+  const [categoryStartX, setCategoryStartX] = useState(0);
+  const [categoryScrollLeft, setCategoryScrollLeft] = useState(0);
+
+  const handleCategoryMouseDown = (e: React.MouseEvent) => {
+    if (!categoryScrollRef.current) return;
+    setIsDraggingCategory(true);
+    setCategoryStartX(e.pageX - categoryScrollRef.current.offsetLeft);
+    setCategoryScrollLeft(categoryScrollRef.current.scrollLeft);
+  };
+
+  const handleCategoryMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingCategory || !categoryScrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - categoryScrollRef.current.offsetLeft;
+    const walk = (x - categoryStartX) * 1.5;
+    categoryScrollRef.current.scrollLeft = categoryScrollLeft - walk;
+  };
+
+  const handleCategoryMouseUpOrLeave = () => {
+    setIsDraggingCategory(false);
+  };
+
+  const scrollCategories = (direction: 'left' | 'right') => {
+    if (!categoryScrollRef.current) return;
+    const offset = direction === 'left' ? -220 : 220;
+    categoryScrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+  };
+
   useEffect(() => {
     initDb();
     
@@ -79,7 +110,7 @@ function StoreCatalogPage() {
     
     const cats = db.categories
       .getByProfileId(p.id)
-      .filter((c) => c.name.toLowerCase() !== 'todos' && c.slug.toLowerCase() !== 'todos');
+      .filter((c) => c.name.toLowerCase() !== 'todos' && c.slug.toLowerCase() !== 'todos' && c.slug.toLowerCase() !== 'geral');
     setCategories(cats);
 
     // Theme initialization - scoped per store
@@ -147,7 +178,7 @@ function StoreCatalogPage() {
     const dynamicNames = categories.map((c) => c.name);
     const fromProducts = productListItems.map((p) => p.cat).filter(Boolean) as string[];
     const allUnique = Array.from(new Set([...dynamicNames, ...fromProducts])).filter(
-      (c) => c.toLowerCase() !== 'todos'
+      (c) => c.toLowerCase() !== 'todos' && c.toLowerCase() !== 'geral' && c.toLowerCase() !== 'gerais'
     );
     return ['Todos', ...allUnique];
   }, [categories, productListItems]);
@@ -301,6 +332,12 @@ Gostaria de confirmar a disponibilidade!`;
         storeLogo={settings.logo_url}
         whatsapp={rawWhatsapp}
         showThemeToggle={settings.enable_dark_mode_toggle !== false}
+        header_logo_alignment_desktop={settings.header_logo_alignment_desktop}
+        header_logo_alignment_mobile={settings.header_logo_alignment_mobile}
+        header_show_theme_toggle={settings.header_show_theme_toggle}
+        header_show_hours_badge={settings.header_show_hours_badge}
+        header_hours_text={settings.header_hours_text}
+        header_show_whatsapp_mobile={settings.header_show_whatsapp_mobile}
         header_show_announcement={settings.header_show_announcement}
         header_announcement_text={settings.header_announcement_text}
         header_cta_text={settings.header_cta_text}
@@ -329,22 +366,49 @@ Gostaria de confirmar a disponibilidade!`;
       <div className="container mx-auto max-w-6xl px-4 mb-20 sm:mb-28">
         {/* Controls Bar */}
         <div className="p-3 sm:p-4 rounded-2xl mb-8 flex flex-col md:flex-row gap-3 sm:gap-4 justify-between items-center bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm">
-          {/* Category Tabs */}
-          <div className="flex overflow-x-auto gap-1.5 p-1 w-full md:w-auto hide-scrollbar scrollbar-hide">
-            {categoryTabs.map(cat => (
-              <button 
-                key={cat}
-                type="button"
-                onClick={() => setSelectedCategory(cat)}
-                className={`whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 shrink-0 ${
-                  selectedCategory.toLowerCase() === cat.toLowerCase()
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25'
-                    : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200/80 dark:hover:bg-slate-700/80'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+          {/* Category Tabs with Mouse Drag & Arrow Navigation */}
+          <div className="relative flex items-center w-full md:w-auto max-w-full group/cat">
+            <button
+              type="button"
+              onClick={() => scrollCategories('left')}
+              className="hidden sm:flex absolute left-0 z-10 w-7 h-7 -translate-x-2 rounded-full bg-white/95 dark:bg-slate-800/95 shadow-md border border-slate-200 dark:border-slate-700 items-center justify-center text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-sky-400 transition cursor-pointer"
+              aria-label="Rolar categorias para esquerda"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            <div
+              ref={categoryScrollRef}
+              onMouseDown={handleCategoryMouseDown}
+              onMouseMove={handleCategoryMouseMove}
+              onMouseUp={handleCategoryMouseUpOrLeave}
+              onMouseLeave={handleCategoryMouseUpOrLeave}
+              className="flex overflow-x-auto gap-1.5 p-1 w-full md:w-auto hide-scrollbar scrollbar-hide cursor-grab select-none active:cursor-grabbing scroll-smooth px-1 sm:px-6"
+            >
+              {categoryTabs.map(cat => (
+                <button 
+                  key={cat}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 shrink-0 ${
+                    selectedCategory.toLowerCase() === cat.toLowerCase()
+                      ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25'
+                      : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200/80 dark:hover:bg-slate-700/80'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => scrollCategories('right')}
+              className="hidden sm:flex absolute right-0 z-10 w-7 h-7 translate-x-2 rounded-full bg-white/95 dark:bg-slate-800/95 shadow-md border border-slate-200 dark:border-slate-700 items-center justify-center text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-sky-400 transition cursor-pointer"
+              aria-label="Rolar categorias para direita"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
           
           {/* Search + Sort + Grid / List Toggle */}
@@ -484,7 +548,7 @@ Gostaria de confirmar a disponibilidade!`;
                 <div 
                   key={product.name} 
                   className={`glass-card p-3 sm:p-5 rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative border border-slate-200/80 dark:border-slate-800/80 ${
-                    viewMode === 'list' ? 'flex flex-row gap-4 sm:gap-6 items-center' : 'flex flex-col justify-between'
+                    viewMode === 'list' ? 'flex flex-row gap-4 sm:gap-6 items-center' : 'flex flex-col h-full justify-between'
                   }`}
                 >
                   {/* Uniform Top Badge */}
@@ -497,76 +561,81 @@ Gostaria de confirmar a disponibilidade!`;
                   {/* Image */}
                   <div 
                     className={`relative flex items-center justify-center cursor-pointer shrink-0 ${
-                      viewMode === 'list' ? 'w-24 h-24 sm:w-32 sm:h-32' : 'w-full aspect-square py-2 sm:py-4'
+                      viewMode === 'list' ? 'w-24 h-24 sm:w-32 sm:h-32' : 'w-full h-36 sm:h-44 py-2 sm:py-3'
                     }`}
                     onClick={() => setSelectedProduct(product)}
                   >
                     <img 
                       src={product.img || ''} 
                       alt={product.name} 
-                      className="w-full h-full object-contain transition-transform duration-300 hover:scale-105 select-none" 
+                      className="w-full h-full max-h-full object-contain transition-transform duration-300 hover:scale-105 select-none" 
                     />
                   </div>
 
                   {/* Info */}
-                  <div className={`flex flex-col flex-1 ${viewMode === 'list' ? 'justify-center text-left' : 'text-left mt-2'}`}>
-                    <div className="flex items-center justify-between gap-1 mb-1.5 w-full flex-wrap">
-                      <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 dark:bg-sky-950/80 text-blue-600 dark:text-sky-400 border border-blue-200/60 dark:border-sky-800/60 truncate max-w-[65%]">
-                        {catLabel}
-                      </span>
-                      {batteryLabel ? (
-                        <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 truncate max-w-[35%]">
-                          {batteryLabel}
+                  <div className={`flex flex-col flex-1 ${viewMode === 'list' ? 'justify-center text-left' : 'text-left mt-2 flex flex-col justify-between'}`}>
+                    <div>
+                      {/* Fixed height badge row: no line wrapping to ensure identical heights */}
+                      <div className="flex items-center justify-between gap-1 mb-1.5 w-full h-6 overflow-hidden">
+                        <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 dark:bg-sky-950/80 text-blue-600 dark:text-sky-400 border border-blue-200/60 dark:border-sky-800/60 truncate max-w-[60%]">
+                          {catLabel}
                         </span>
-                      ) : isLowStock ? (
-                        <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60 truncate">
-                          Últimas {product.quantity} un.
-                        </span>
-                      ) : (
-                        <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 truncate max-w-[35%]">
-                          {product.badge || 'Disponível'}
-                        </span>
-                      )}
-                    </div>
-
-                    <h3 
-                      onClick={() => setSelectedProduct(product)}
-                      className="font-black text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-2 leading-snug cursor-pointer hover:text-blue-600 dark:hover:text-sky-400 transition"
-                    >
-                      {product.name}
-                    </h3>
-                    <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
-                      {product.specs || product.storage || 'Pronta entrega'}
-                    </p>
-                    
-                    {/* Price */}
-                    <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
-                      <div className="text-sm sm:text-lg font-black text-blue-600 dark:text-sky-400 leading-tight">
-                        {fmt(product.price)}
+                        {batteryLabel ? (
+                          <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 truncate max-w-[40%]">
+                            {batteryLabel}
+                          </span>
+                        ) : isLowStock ? (
+                          <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60 truncate max-w-[40%]">
+                            Últimas {product.quantity} un.
+                          </span>
+                        ) : (
+                          <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 truncate max-w-[40%]">
+                            {product.badge || 'Disponível'}
+                          </span>
+                        )}
                       </div>
-                      <div className="text-[9px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
-                        {product.price > 50000 ? 'Consulte opções de financiamento' : 'à vista ou até 18x no cartão'}
-                      </div>
-                    </div>
 
-                    {/* Action Buttons */}
-                    <div className={`mt-3 flex gap-1.5 ${viewMode === 'list' ? 'sm:flex-row' : 'flex-col'}`}>
-                      <button 
-                        type="button"
-                        onClick={() => handleOrderWhatsApp(product)}
-                        className="flex-1 py-1.5 sm:py-2 px-2 rounded-xl font-bold text-[11px] sm:text-xs bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-1.5 shadow-xs active:scale-95 transition cursor-pointer"
-                      >
-                        <WhatsAppIcon className="w-3.5 h-3.5 shrink-0" />
-                        <span>Pedir no Zap</span>
-                      </button>
-                      <button 
-                        type="button"
+                      <h3 
                         onClick={() => setSelectedProduct(product)}
-                        className="py-1.5 sm:py-2 px-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-semibold transition text-[11px] sm:text-xs flex items-center justify-center gap-1 cursor-pointer"
+                        className="font-black text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-2 min-h-[2.5rem] leading-snug cursor-pointer hover:text-blue-600 dark:hover:text-sky-400 transition"
                       >
-                        <Info className="w-3.5 h-3.5" />
-                        <span>Detalhes</span>
-                      </button>
+                        {product.name}
+                      </h3>
+                      <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 h-4 sm:h-5 truncate">
+                        {product.specs || product.storage || 'Pronta entrega'}
+                      </p>
+                    </div>
+                    
+                    {/* Price & Actions pinned to bottom */}
+                    <div className="mt-auto">
+                      <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
+                        <div className="text-sm sm:text-lg font-black text-blue-600 dark:text-sky-400 leading-tight">
+                          {fmt(product.price)}
+                        </div>
+                        <div className="text-[9px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
+                          {product.price > 50000 ? 'Consulte opções de financiamento' : 'à vista ou até 18x no cartão'}
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className={`mt-3 flex gap-1.5 ${viewMode === 'list' ? 'sm:flex-row' : 'flex-col'}`}>
+                        <button 
+                          type="button"
+                          onClick={() => handleOrderWhatsApp(product)}
+                          className="flex-1 py-1.5 sm:py-2 px-2 rounded-xl font-bold text-[11px] sm:text-xs bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-1.5 shadow-xs active:scale-95 transition cursor-pointer"
+                        >
+                          <WhatsAppIcon className="w-3.5 h-3.5 shrink-0" />
+                          <span>Pedir no Zap</span>
+                        </button>
+                        <button 
+                          type="button"
+                          onClick={() => setSelectedProduct(product)}
+                          className="py-1.5 sm:py-2 px-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-semibold transition text-[11px] sm:text-xs flex items-center justify-center gap-1 cursor-pointer"
+                        >
+                          <Info className="w-3.5 h-3.5" />
+                          <span>Detalhes</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

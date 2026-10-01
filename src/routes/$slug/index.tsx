@@ -207,7 +207,7 @@ function mapToProductItem(p: Product): ProductItem {
   return {
     name: p.name,
     price: p.price,
-    cat: p.category_name || (p.badge?.toLowerCase().includes("lacrado") ? "Lacrados" : (p.badge?.toLowerCase().includes("seminov") ? "Seminovos" : "Geral")),
+    cat: p.category_name || (p.badge?.toLowerCase().includes("lacrado") ? "Lacrados" : (p.badge?.toLowerCase().includes("seminov") ? "Seminovos" : "")),
     badge: p.badge || "",
     img: p.primary_image || p.images?.[0] || "",
     images: p.images && p.images.length > 0 ? p.images : (p.primary_image ? [p.primary_image] : []),
@@ -506,6 +506,12 @@ function SlugStorePage() {
         storeLogo={settings.logo_url}
         whatsapp={rawWhatsapp}
         showThemeToggle={settings.enable_dark_mode_toggle !== false}
+        header_logo_alignment_desktop={settings.header_logo_alignment_desktop}
+        header_logo_alignment_mobile={settings.header_logo_alignment_mobile}
+        header_show_theme_toggle={settings.header_show_theme_toggle}
+        header_show_hours_badge={settings.header_show_hours_badge}
+        header_hours_text={settings.header_hours_text}
+        header_show_whatsapp_mobile={settings.header_show_whatsapp_mobile}
         header_show_announcement={settings.header_show_announcement}
         header_announcement_text={settings.header_announcement_text}
         header_cta_text={settings.header_cta_text}
@@ -684,76 +690,79 @@ function SlugStorePage() {
                   return (
                     <div
                       key={item.name}
-                      className="glass-card flex flex-col justify-between p-3 sm:p-5 rounded-2xl group transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative"
+                      className="glass-card flex flex-col justify-between h-full p-3 sm:p-5 rounded-2xl group transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative"
                     >
-                      {/* Top Tags */}
-                      <div className="flex items-center justify-between gap-1 mb-2 w-full">
-                        <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 dark:bg-sky-950/80 text-blue-600 dark:text-sky-400 border border-blue-200/60 dark:border-sky-800/60 truncate max-w-[50%]">
-                          {catLabel}
-                        </span>
-                        {tagLabel ? (
-                          <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 truncate max-w-[50%]">
-                            {tagLabel}
+                      <div>
+                        {/* Top Tags - Fixed height row to prevent line wrap jitter */}
+                        <div className="flex items-center justify-between gap-1 mb-2 w-full h-6 overflow-hidden">
+                          <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 dark:bg-sky-950/80 text-blue-600 dark:text-sky-400 border border-blue-200/60 dark:border-sky-800/60 truncate max-w-[60%]">
+                            {catLabel}
                           </span>
-                        ) : null}
-                      </div>
-
-                      {/* Product Photo */}
-                      <div
-                        className="relative py-2 sm:py-4 flex items-center justify-center cursor-pointer"
-                        onClick={() => handleOpenDetail(item)}
-                      >
-                        <img
-                          src={item.img}
-                          alt={item.name}
-                          loading="lazy"
-                          className="w-24 h-24 sm:w-36 sm:h-36 object-contain transition-transform duration-300 group-hover:scale-105 select-none"
-                        />
-                      </div>
-
-                      {/* Product Info */}
-                      <div className="mt-1 sm:mt-2 text-left">
-                        <h3
-                          onClick={() => handleOpenDetail(item)}
-                          className="font-black text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-2 leading-snug cursor-pointer hover:text-blue-600 dark:hover:text-sky-400 transition"
-                          title={item.name}
-                        >
-                          {item.name}
-                        </h3>
-                        <div className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 truncate">
-                          {item.specs || item.storage || "Pronta entrega"}
+                          {tagLabel ? (
+                            <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 truncate max-w-[40%]">
+                              {tagLabel}
+                            </span>
+                          ) : null}
                         </div>
 
-                        {/* Price Display */}
-                        <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
+                        {/* Product Photo */}
+                        <div
+                          className="relative h-28 sm:h-36 py-2 flex items-center justify-center cursor-pointer"
+                          onClick={() => handleOpenDetail(item)}
+                        >
+                          <img
+                            src={item.img}
+                            alt={item.name}
+                            loading="lazy"
+                            className="w-full h-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105 select-none"
+                          />
+                        </div>
+
+                        {/* Product Info */}
+                        <div className="mt-1 sm:mt-2 text-left">
+                          <h3
+                            onClick={() => handleOpenDetail(item)}
+                            className="font-black text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-2 min-h-[2.5rem] leading-snug cursor-pointer hover:text-blue-600 dark:hover:text-sky-400 transition"
+                            title={item.name}
+                          >
+                            {item.name}
+                          </h3>
+                          <div className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 h-4 sm:h-5 truncate">
+                            {item.specs || item.storage || "Pronta entrega"}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Price Display & Actions pinned to bottom */}
+                      <div className="mt-auto">
+                        <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-slate-800/60 text-left">
                           <div className="text-sm sm:text-xl font-black text-blue-600 dark:text-sky-400 leading-tight">
                             {fmt(item.price)}
                           </div>
-                          <div className="text-[9px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium">
+                          <div className="text-[9px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium truncate">
                             à vista ou até 18x no cartão
                           </div>
                         </div>
-                      </div>
 
-                      {/* Actions */}
-                      <div className="mt-3 flex flex-col gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => handleBuyWhatsApp(item)}
-                          className="w-full py-1.5 sm:py-2 px-2 rounded-xl font-bold text-[11px] sm:text-xs bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition cursor-pointer"
-                        >
-                          <WhatsAppIcon className="w-3.5 h-3.5 shrink-0" />
-                          <span>Pedir no Zap</span>
-                        </button>
+                        <div className="mt-3 flex flex-col gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleBuyWhatsApp(item)}
+                            className="w-full py-1.5 sm:py-2 px-2 rounded-xl font-bold text-[11px] sm:text-xs bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition cursor-pointer"
+                          >
+                            <WhatsAppIcon className="w-3.5 h-3.5 shrink-0" />
+                            <span>Pedir no Zap</span>
+                          </button>
 
-                        <button
-                          type="button"
-                          onClick={() => handleOpenDetail(item)}
-                          className="w-full py-1 sm:py-1.5 px-2 rounded-xl text-[10px] sm:text-[11px] font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 transition cursor-pointer flex items-center justify-center gap-1"
-                        >
-                          <Info className="w-3 h-3" />
-                          <span>Ver Detalhes</span>
-                        </button>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenDetail(item)}
+                            className="w-full py-1 sm:py-1.5 px-2 rounded-xl text-[10px] sm:text-[11px] font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 transition cursor-pointer flex items-center justify-center gap-1"
+                          >
+                            <Info className="w-3 h-3" />
+                            <span>Ver Detalhes</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   );

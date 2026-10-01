@@ -288,7 +288,7 @@ function ProductNovo() {
     const newProduct = {
       profile_id: session.userId,
       ...formData,
-      category_name: selectedCategory?.name || 'Geral',
+      category_name: selectedCategory?.name || (categories[0]?.name || 'Destaques'),
       images: formData.gallery,
       primary_image: formData.gallery.length > 0 ? formData.gallery[0] : undefined,
       sort_order: 0,

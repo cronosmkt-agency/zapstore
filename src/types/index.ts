@@ -119,6 +119,12 @@ export interface StoreSettings {
     tiktok?: string;
   };
   // Header Customization
+  header_logo_alignment_desktop?: 'left' | 'center' | 'right';
+  header_logo_alignment_mobile?: 'left' | 'center' | 'right';
+  header_show_theme_toggle?: boolean;
+  header_show_hours_badge?: boolean;
+  header_hours_text?: string;
+  header_show_whatsapp_mobile?: boolean;
   header_show_announcement?: boolean;
   header_announcement_text?: string;
   header_cta_text?: string;

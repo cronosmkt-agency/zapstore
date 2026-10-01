@@ -600,8 +600,8 @@ export const SEED_CATEGORIES: ProductCategory[] = [
   { id: 'cat-imv-3', profile_id: IMOVEIS_ID, name: 'Apartamentos Modernos', slug: 'apartamentos-modernos', sort_order: 3, created_at: '2026-03-20T00:00:00Z' },
   { id: 'cat-imv-4', profile_id: IMOVEIS_ID, name: 'Mansões Exclusivas', slug: 'mansoes-exclusivas', sort_order: 4, created_at: '2026-03-20T00:00:00Z' },
 
-  // Loja Demo Geral
-  { id: 'cat-demo-1', profile_id: DEMO_ID, name: 'Geral', slug: 'geral', sort_order: 1, created_at: '2026-09-01T00:00:00Z' },
+  // Loja Demo
+  { id: 'cat-demo-1', profile_id: DEMO_ID, name: 'Destaques', slug: 'destaques', sort_order: 1, created_at: '2026-09-01T00:00:00Z' },
 ];
 
 const IMG_BASE = '/devices/';

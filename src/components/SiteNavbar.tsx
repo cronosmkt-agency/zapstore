@@ -15,6 +15,12 @@ interface SiteNavbarProps {
   whatsapp?: string;
   showThemeToggle?: boolean;
   // Header Customization Props
+  header_logo_alignment_desktop?: 'left' | 'center' | 'right';
+  header_logo_alignment_mobile?: 'left' | 'center' | 'right';
+  header_show_theme_toggle?: boolean;
+  header_show_hours_badge?: boolean;
+  header_hours_text?: string;
+  header_show_whatsapp_mobile?: boolean;
   header_show_announcement?: boolean;
   header_announcement_text?: string;
   header_cta_text?: string;
@@ -31,6 +37,12 @@ export function SiteNavbar({
   storeLogo,
   whatsapp,
   showThemeToggle = true,
+  header_logo_alignment_desktop = 'left',
+  header_logo_alignment_mobile = 'center',
+  header_show_theme_toggle = true,
+  header_show_hours_badge = true,
+  header_hours_text,
+  header_show_whatsapp_mobile = true,
   header_show_announcement,
   header_announcement_text,
   header_cta_text,
@@ -95,6 +107,38 @@ export function SiteNavbar({
     { label: header_nav_catalog_label || (isIphoneStore ? "Loja" : "Catálogo"), path: lojaPath },
   ];
 
+  const renderLogo = (isMobile = false) => {
+    if (storeLogo) {
+      return (
+        <div className="flex items-center gap-2">
+          <img
+            src={storeLogo}
+            alt={storeName || "Logo"}
+            className={`${isMobile ? 'h-7 sm:h-8' : 'h-9'} w-auto max-w-[130px] object-contain rounded-md`}
+          />
+          {storeName && (
+            <span className={`font-extrabold ${isMobile ? 'text-xs sm:text-sm max-w-[130px]' : 'text-base'} tracking-tight text-slate-900 dark:text-white truncate`}>
+              {storeName}
+            </span>
+          )}
+        </div>
+      );
+    }
+    if (storeName && !storeName.toLowerCase().includes("terephones")) {
+      return (
+        <div className="flex items-center gap-2">
+          <div className={`${isMobile ? 'w-7 h-7 sm:w-8 sm:h-8 text-xs' : 'w-9 h-9 text-sm'} rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-black flex items-center justify-center shadow-xs shrink-0`}>
+            {storeName.charAt(0).toUpperCase()}
+          </div>
+          <span className={`font-extrabold ${isMobile ? 'text-xs sm:text-sm max-w-[130px]' : 'text-base'} tracking-tight text-slate-900 dark:text-white truncate`}>
+            {storeName}
+          </span>
+        </div>
+      );
+    }
+    return <BrandLogo height={isMobile ? 32 : 38} showText={true} dark={isDark} />;
+  };
+
   return (
     <>
       {/* Top Announcement Bar if enabled */}
@@ -111,87 +155,179 @@ export function SiteNavbar({
             scrolled ? "scrolled" : ""
           } flex items-center justify-between px-6 py-2 w-full max-w-5xl xl:max-w-6xl transition-all duration-300`}
         >
-          <Link to={homePath} className="shrink-0 logo-desk flex items-center">
-            {storeLogo ? (
-              <div className="flex items-center gap-2.5">
-                <img
-                  src={storeLogo}
-                  alt={storeName || "Logo"}
-                  className="h-9 w-auto max-w-[140px] object-contain rounded-md"
-                />
-                {storeName && (
-                  <span className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">
-                    {storeName}
-                  </span>
+          {header_logo_alignment_desktop === 'center' ? (
+            <>
+              {/* Left Navigation Links */}
+              <div className="flex items-center gap-1.5 flex-1 justify-start">
+                {navLinks.map((link) => {
+                  const isCurrent = currentPath === link.path;
+                  return (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all inline-flex items-center gap-1.5 ${
+                        isCurrent
+                          ? "btn-primary-glow text-white shadow-xs"
+                          : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/70"
+                      }`}
+                    >
+                      <span>{link.label}</span>
+                      {link.hasDot && (
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_6px_#10b981]" />
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {/* Centered Logo */}
+              <Link to={homePath} className="shrink-0 logo-desk flex items-center mx-4">
+                {renderLogo(false)}
+              </Link>
+
+              {/* Right Action / Widget Elements */}
+              <div className="flex items-center gap-3 justify-end flex-1">
+                {showThemeToggle && header_show_theme_toggle !== false && (
+                  <ThemeToggleSwitch isDark={isDark} toggleTheme={handleToggleTheme} />
+                )}
+
+                {header_show_hours_badge !== false && (
+                  <div className="badge-aberto text-xs py-1 px-3">
+                    {header_hours_text || (afterHours
+                      ? "Fechado — Abre amanhã às 10:00"
+                      : "Aberto até 18:00")}
+                  </div>
+                )}
+
+                {header_show_whatsapp_button !== false && (
+                  <>
+                    <span
+                      className="h-5 border-l"
+                      style={{ borderColor: "rgba(var(--blue-rgb),0.18)" }}
+                    />
+
+                    <a
+                      href={whatsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-pedir-agora text-xs py-2 px-4 rounded-full flex items-center gap-1.5"
+                    >
+                      <WhatsAppIcon className="w-3.5 h-3.5" />
+                      <span>{header_cta_text || (isIphoneStore ? "Pedir no WhatsApp" : "Chamar no Zap")}</span>
+                    </a>
+                  </>
                 )}
               </div>
-            ) : (storeName && !storeName.toLowerCase().includes("terephones")) ? (
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-black text-sm flex items-center justify-center shadow-sm shrink-0">
-                  {storeName.charAt(0).toUpperCase()}
-                </div>
-                <span className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">
-                  {storeName}
-                </span>
+            </>
+          ) : header_logo_alignment_desktop === 'right' ? (
+            <>
+              {/* Right Logo Layout */}
+              <div className="flex items-center gap-3 justify-start flex-1">
+                {showThemeToggle && header_show_theme_toggle !== false && (
+                  <ThemeToggleSwitch isDark={isDark} toggleTheme={handleToggleTheme} />
+                )}
+                {header_show_whatsapp_button !== false && (
+                  <a
+                    href={whatsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-pedir-agora text-xs py-2 px-4 rounded-full flex items-center gap-1.5"
+                  >
+                    <WhatsAppIcon className="w-3.5 h-3.5" />
+                    <span>{header_cta_text || (isIphoneStore ? "Pedir no WhatsApp" : "Chamar no Zap")}</span>
+                  </a>
+                )}
               </div>
-            ) : (
-              <BrandLogo height={38} showText={true} dark={isDark} />
-            )}
-          </Link>
 
-          <div className="flex items-center justify-center gap-1.5">
-            {navLinks.map((link) => {
-              const isCurrent = currentPath === link.path;
-              return (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all inline-flex items-center gap-1.5 ${
-                    isCurrent
-                      ? "btn-primary-glow text-white shadow-xs"
-                      : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/70"
-                  }`}
-                >
-                  <span>{link.label}</span>
-                  {link.hasDot && (
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_6px_#10b981]" />
-                  )}
-                </Link>
-              );
-            })}
-          </div>
+              <div className="flex items-center justify-center gap-1.5">
+                {navLinks.map((link) => {
+                  const isCurrent = currentPath === link.path;
+                  return (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all inline-flex items-center gap-1.5 ${
+                        isCurrent
+                          ? "btn-primary-glow text-white shadow-xs"
+                          : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/70"
+                      }`}
+                    >
+                      <span>{link.label}</span>
+                      {link.hasDot && (
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_6px_#10b981]" />
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
 
-          <div className="flex items-center gap-3 justify-end">
-            {/* Neumorphic Day/Night Sliding Switch */}
-            {showThemeToggle && (
-              <ThemeToggleSwitch isDark={isDark} toggleTheme={handleToggleTheme} />
-            )}
+              <Link to={homePath} className="shrink-0 logo-desk flex items-center justify-end flex-1">
+                {renderLogo(false)}
+              </Link>
+            </>
+          ) : (
+            /* DEFAULT: Logo on Left (formato web perfeito) */
+            <>
+              <Link to={homePath} className="shrink-0 logo-desk flex items-center">
+                {renderLogo(false)}
+              </Link>
 
-            <div className="badge-aberto text-xs py-1 px-3">
-              {afterHours
-                ? "Fechado — Abre amanhã às 10:00"
-                : "Aberto até 18:00"}
-            </div>
+              <div className="flex items-center justify-center gap-1.5">
+                {navLinks.map((link) => {
+                  const isCurrent = currentPath === link.path;
+                  return (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all inline-flex items-center gap-1.5 ${
+                        isCurrent
+                          ? "btn-primary-glow text-white shadow-xs"
+                          : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/70"
+                      }`}
+                    >
+                      <span>{link.label}</span>
+                      {link.hasDot && (
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_6px_#10b981]" />
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
 
-            {header_show_whatsapp_button && (
-              <>
-                <span
-                  className="h-5 border-l"
-                  style={{ borderColor: "rgba(var(--blue-rgb),0.18)" }}
-                />
+              <div className="flex items-center gap-3 justify-end">
+                {showThemeToggle && header_show_theme_toggle !== false && (
+                  <ThemeToggleSwitch isDark={isDark} toggleTheme={handleToggleTheme} />
+                )}
 
-                <a
-                  href={whatsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-pedir-agora text-xs py-2 px-4 rounded-full flex items-center gap-1.5"
-                >
-                  <WhatsAppIcon className="w-3.5 h-3.5" />
-                  <span>{header_cta_text || (isIphoneStore ? "Pedir no WhatsApp" : "Chamar no Zap")}</span>
-                </a>
-              </>
-            )}
-          </div>
+                {header_show_hours_badge !== false && (
+                  <div className="badge-aberto text-xs py-1 px-3">
+                    {header_hours_text || (afterHours
+                      ? "Fechado — Abre amanhã às 10:00"
+                      : "Aberto até 18:00")}
+                  </div>
+                )}
+
+                {header_show_whatsapp_button !== false && (
+                  <>
+                    <span
+                      className="h-5 border-l"
+                      style={{ borderColor: "rgba(var(--blue-rgb),0.18)" }}
+                    />
+
+                    <a
+                      href={whatsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-pedir-agora text-xs py-2 px-4 rounded-full flex items-center gap-1.5"
+                    >
+                      <WhatsAppIcon className="w-3.5 h-3.5" />
+                      <span>{header_cta_text || (isIphoneStore ? "Pedir no WhatsApp" : "Chamar no Zap")}</span>
+                    </a>
+                  </>
+                )}
+              </div>
+            </>
+          )}
         </nav>
 
         {/* Notificação rápida posicionada diretamente abaixo da header (Web) */}
@@ -222,46 +358,103 @@ export function SiteNavbar({
       {/* Mobile pill navbar */}
       <div className={`lg:hidden fixed ${header_show_announcement && header_announcement_text ? 'top-9' : 'top-4'} left-4 right-4 z-50 flex flex-col items-center pointer-events-none transition-all duration-300`}>
         <nav className={`pointer-events-auto w-full nav-pill ${scrolled ? "scrolled" : ""}`}>
-          <div className="flex items-center justify-between h-14 px-4 sm:px-5">
-            <Link
-              to={homePath}
-              className="flex items-center transition-opacity hover:opacity-90 active:scale-95"
-              aria-label={`Página Inicial ${storeName || "Terephones"}`}
-            >
-              {storeLogo ? (
-                <div className="flex items-center gap-2">
-                  <img
-                    src={storeLogo}
-                    alt={storeName || "Logo"}
-                    className="h-8 w-auto max-w-[120px] object-contain rounded-md"
-                  />
-                  {storeName && (
-                    <span className="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white truncate max-w-[120px]">
-                      {storeName}
-                    </span>
-                  )}
-                </div>
-              ) : (storeName && !storeName.toLowerCase().includes("terephones")) ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">
-                    {storeName.charAt(0).toUpperCase()}
-                  </div>
-                  <span className="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white truncate max-w-[130px]">
-                    {storeName}
-                  </span>
-                </div>
-              ) : (
-                <BrandLogo height={34} showText={true} dark={isDark} />
-              )}
-            </Link>
-
-            {/* Neumorphic Day/Night Sliding Switch for mobile */}
-            {showThemeToggle && (
-              <div className="scale-90 origin-right">
-                <ThemeToggleSwitch isDark={isDark} toggleTheme={handleToggleTheme} />
+          {header_logo_alignment_mobile === 'center' ? (
+            /* DEFAULT: Logo + Text Perfectly Centered on Mobile */
+            <div className="relative flex items-center justify-between h-14 px-3 sm:px-4">
+              {/* Left Widget Area */}
+              <div className="flex items-center gap-1.5 z-10 min-w-8">
+                {header_show_whatsapp_mobile && (
+                  <a
+                    href={whatsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition active:scale-95 border border-emerald-500/25"
+                    title="Chamar no WhatsApp"
+                  >
+                    <WhatsAppIcon className="w-4 h-4" />
+                  </a>
+                )}
               </div>
-            )}
-          </div>
+
+              {/* Center: Brand Logo + Store Name */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-12">
+                <Link
+                  to={homePath}
+                  className="pointer-events-auto flex items-center justify-center gap-2 transition-opacity hover:opacity-90 active:scale-95 max-w-full"
+                  aria-label={`Página Inicial ${storeName || "Terephones"}`}
+                >
+                  {renderLogo(true)}
+                </Link>
+              </div>
+
+              {/* Right Widget Area: Theme Toggle */}
+              <div className="flex items-center gap-2 z-10 min-w-8 justify-end">
+                {showThemeToggle && header_show_theme_toggle !== false && (
+                  <div className="scale-85 origin-right">
+                    <ThemeToggleSwitch isDark={isDark} toggleTheme={handleToggleTheme} />
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : header_logo_alignment_mobile === 'right' ? (
+            /* Logo on the Right */
+            <div className="flex flex-row-reverse items-center justify-between h-14 px-4 sm:px-5">
+              <Link
+                to={homePath}
+                className="flex items-center transition-opacity hover:opacity-90 active:scale-95"
+                aria-label={`Página Inicial ${storeName || "Terephones"}`}
+              >
+                {renderLogo(true)}
+              </Link>
+
+              <div className="flex items-center gap-2">
+                {showThemeToggle && header_show_theme_toggle !== false && (
+                  <div className="scale-85 origin-left">
+                    <ThemeToggleSwitch isDark={isDark} toggleTheme={handleToggleTheme} />
+                  </div>
+                )}
+                {header_show_whatsapp_mobile && (
+                  <a
+                    href={whatsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition active:scale-95 border border-emerald-500/25"
+                  >
+                    <WhatsAppIcon className="w-4 h-4" />
+                  </a>
+                )}
+              </div>
+            </div>
+          ) : (
+            /* Logo on the Left */
+            <div className="flex items-center justify-between h-14 px-4 sm:px-5">
+              <Link
+                to={homePath}
+                className="flex items-center transition-opacity hover:opacity-90 active:scale-95"
+                aria-label={`Página Inicial ${storeName || "Terephones"}`}
+              >
+                {renderLogo(true)}
+              </Link>
+
+              <div className="flex items-center gap-2">
+                {header_show_whatsapp_mobile && (
+                  <a
+                    href={whatsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition active:scale-95 border border-emerald-500/25"
+                  >
+                    <WhatsAppIcon className="w-4 h-4" />
+                  </a>
+                )}
+                {showThemeToggle && header_show_theme_toggle !== false && (
+                  <div className="scale-85 origin-right">
+                    <ThemeToggleSwitch isDark={isDark} toggleTheme={handleToggleTheme} />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </nav>
 
         {/* Notificação rápida posicionada diretamente abaixo da header (Mobile) */}
@@ -357,3 +550,5 @@ export function ThemeToggleSwitch({
     </button>
   );
 }
+
+export default SiteNavbar;

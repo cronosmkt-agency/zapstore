@@ -141,6 +141,12 @@ function SettingsPage() {
     enable_dark_mode_toggle: true,
 
     // 12. Header & Rodapé
+    header_logo_alignment_desktop: 'left' as 'left' | 'center' | 'right',
+    header_logo_alignment_mobile: 'center' as 'left' | 'center' | 'right',
+    header_show_theme_toggle: true,
+    header_show_hours_badge: true,
+    header_hours_text: '',
+    header_show_whatsapp_mobile: true,
     header_show_announcement: false,
     header_announcement_text: '',
     header_cta_text: '',
@@ -1366,12 +1372,155 @@ function SettingsPage() {
                 </div>
 
                 {/* 1. SEÇÃO CABEÇALHO */}
-                <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
+                <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-5">
                   <div className="border-b border-slate-200/80 pb-2">
                     <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                       <span>Cabeçalho da Vitrine (Header)</span>
                     </h3>
-                    <p className="text-xs text-slate-500">Controles do topo do site e barra superior de anúncios.</p>
+                    <p className="text-xs text-slate-500">Posicionamento da marca, logo, widgets e barra de comunicados.</p>
+                  </div>
+
+                  {/* Alinhamento Logo Mobile & Web */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Alinhamento Mobile */}
+                    <div className="p-3.5 bg-white border border-slate-200 rounded-xl space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                          Logo & Nome no Mobile (Smartphones)
+                        </label>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200">
+                          Padrão: Centro
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500">
+                        Como a sua marca será exibida no cabeçalho dos celulares:
+                      </p>
+                      <div className="grid grid-cols-3 gap-2 pt-1">
+                        {[
+                          { id: 'left', label: 'Esquerda' },
+                          { id: 'center', label: 'Centro (Padrão)' },
+                          { id: 'right', label: 'Direita' },
+                        ].map((align) => (
+                          <button
+                            key={align.id}
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, header_logo_alignment_mobile: align.id as any }))}
+                            className={`py-2 px-1 text-center rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                              (formData.header_logo_alignment_mobile || 'center') === align.id
+                                ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                            }`}
+                          >
+                            {align.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Alinhamento Web/Desktop */}
+                    <div className="p-3.5 bg-white border border-slate-200 rounded-xl space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                          Logo & Nome na Web (Desktop)
+                        </label>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                          Padrão: Esquerda
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500">
+                        Posição da logo na barra de navegação dos computadores:
+                      </p>
+                      <div className="grid grid-cols-3 gap-2 pt-1">
+                        {[
+                          { id: 'left', label: 'Esquerda (Padrão)' },
+                          { id: 'center', label: 'Centro' },
+                          { id: 'right', label: 'Direita' },
+                        ].map((align) => (
+                          <button
+                            key={align.id}
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, header_logo_alignment_desktop: align.id as any }))}
+                            className={`py-2 px-1 text-center rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                              (formData.header_logo_alignment_desktop || 'left') === align.id
+                                ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                            }`}
+                          >
+                            {align.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Widgets do Cabeçalho */}
+                  <div className="space-y-3 pt-2">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">Widgets & Recursos do Cabeçalho</h4>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* Widget 1: WhatsApp Direto no Mobile */}
+                      <label className="flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+                        <div>
+                          <div className="font-bold text-slate-900 text-xs sm:text-sm mb-0.5">Ícone WhatsApp no Mobile</div>
+                          <div className="text-[11px] text-slate-500">Atalho rápido para o cliente chamar no WhatsApp pelo cabeçalho do celular</div>
+                        </div>
+                        <div className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${formData.header_show_whatsapp_mobile !== false ? 'bg-blue-600' : 'bg-slate-300'}`}>
+                          <input type="checkbox" name="header_show_whatsapp_mobile" checked={formData.header_show_whatsapp_mobile !== false} onChange={handleChange} className="sr-only" />
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-xs ${formData.header_show_whatsapp_mobile !== false ? 'translate-x-6' : 'translate-x-1'}`} />
+                        </div>
+                      </label>
+
+                      {/* Widget 2: Alternador de Tema */}
+                      <label className="flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+                        <div>
+                          <div className="font-bold text-slate-900 text-xs sm:text-sm mb-0.5">Alternador de Modo Escuro / Claro</div>
+                          <div className="text-[11px] text-slate-500">Chave deslizante neumórfica para o visitante trocar o tema no cabeçalho</div>
+                        </div>
+                        <div className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${formData.header_show_theme_toggle !== false ? 'bg-blue-600' : 'bg-slate-300'}`}>
+                          <input type="checkbox" name="header_show_theme_toggle" checked={formData.header_show_theme_toggle !== false} onChange={handleChange} className="sr-only" />
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-xs ${formData.header_show_theme_toggle !== false ? 'translate-x-6' : 'translate-x-1'}`} />
+                        </div>
+                      </label>
+
+                      {/* Widget 3: Badge de Horário / Status */}
+                      <label className="flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+                        <div>
+                          <div className="font-bold text-slate-900 text-xs sm:text-sm mb-0.5">Badge de Horário / Status</div>
+                          <div className="text-[11px] text-slate-500">Exibe badge informando se a loja está aberta ou horário de atendimento</div>
+                        </div>
+                        <div className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${formData.header_show_hours_badge !== false ? 'bg-blue-600' : 'bg-slate-300'}`}>
+                          <input type="checkbox" name="header_show_hours_badge" checked={formData.header_show_hours_badge !== false} onChange={handleChange} className="sr-only" />
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-xs ${formData.header_show_hours_badge !== false ? 'translate-x-6' : 'translate-x-1'}`} />
+                        </div>
+                      </label>
+
+                      {/* Widget 4: Botão de Ação CTA */}
+                      <label className="flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+                        <div>
+                          <div className="font-bold text-slate-900 text-xs sm:text-sm mb-0.5">Botão de Ação (CTA) Web</div>
+                          <div className="text-[11px] text-slate-500">Exibe o botão de contato em destaque no cabeçalho para computadores</div>
+                        </div>
+                        <div className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${formData.header_show_whatsapp_button !== false ? 'bg-blue-600' : 'bg-slate-300'}`}>
+                          <input type="checkbox" name="header_show_whatsapp_button" checked={formData.header_show_whatsapp_button !== false} onChange={handleChange} className="sr-only" />
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-xs ${formData.header_show_whatsapp_button !== false ? 'translate-x-6' : 'translate-x-1'}`} />
+                        </div>
+                      </label>
+                    </div>
+
+                    {formData.header_show_hours_badge !== false && (
+                      <div className="pt-1">
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                          Texto Personalizado do Badge de Horário (Opcional)
+                        </label>
+                        <input
+                          name="header_hours_text"
+                          value={formData.header_hours_text || ''}
+                          onChange={handleChange}
+                          placeholder="Deixe em branco para automático (Ex: Aberto até 18:00)"
+                          className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:border-blue-600 outline-none text-xs sm:text-sm font-medium"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   {/* Toggle Barra de Anúncio */}
@@ -1428,30 +1577,17 @@ function SettingsPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                        Texto do Botão de Ação (CTA)
-                      </label>
-                      <input
-                        name="header_cta_text"
-                        value={formData.header_cta_text || ''}
-                        onChange={handleChange}
-                        placeholder="Ex: Falar no WhatsApp, Ver Estoque, Fazer Pedido"
-                        className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:border-blue-600 outline-none text-xs sm:text-sm font-medium"
-                      />
-                    </div>
-
-                    <label className="flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors self-end">
-                      <div>
-                        <div className="font-bold text-slate-900 text-xs sm:text-sm mb-0.5">Exibir Botão de Ação no Header</div>
-                        <div className="text-[11px] sm:text-xs text-slate-500">Exibe o botão de WhatsApp no cabeçalho</div>
-                      </div>
-                      <div className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${formData.header_show_whatsapp_button !== false ? 'bg-blue-600' : 'bg-slate-300'}`}>
-                        <input type="checkbox" name="header_show_whatsapp_button" checked={formData.header_show_whatsapp_button !== false} onChange={handleChange} className="sr-only" />
-                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-xs ${formData.header_show_whatsapp_button !== false ? 'translate-x-6' : 'translate-x-1'}`} />
-                      </div>
+                  <div className="pt-1">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                      Texto do Botão de Ação (CTA) Web
                     </label>
+                    <input
+                      name="header_cta_text"
+                      value={formData.header_cta_text || ''}
+                      onChange={handleChange}
+                      placeholder="Ex: Falar no WhatsApp, Ver Estoque, Fazer Pedido"
+                      className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:border-blue-600 outline-none text-xs sm:text-sm font-medium"
+                    />
                   </div>
                 </div>
 

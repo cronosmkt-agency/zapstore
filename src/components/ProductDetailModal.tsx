@@ -413,7 +413,7 @@ Gostaria de confirmar a disponibilidade para compra!`;
                     <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />
                     Garantia
                   </div>
-                  <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-blue-600 dark:text-sky-300 truncate">
+                  <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-blue-600 dark:text-sky-300 break-words leading-tight">
                     {product.warranty || (isNovo ? "1 Ano Oficial" : "90 Dias de Garantia")}
                   </div>
                 </div>
@@ -423,7 +423,7 @@ Gostaria de confirmar a disponibilidade para compra!`;
                     <Smartphone className="w-3.5 h-3.5 text-sky-400" />
                     Tela
                   </div>
-                  <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white truncate">
+                  <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white break-words leading-tight">
                     {product.screen || "Super Retina XDR"}
                   </div>
                 </div>
@@ -433,7 +433,7 @@ Gostaria de confirmar a disponibilidade para compra!`;
                     <Camera className="w-3.5 h-3.5 text-sky-400" />
                     Câmeras
                   </div>
-                  <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white truncate">
+                  <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white break-words leading-tight">
                     {product.camera || "Apple Pro / 4K"}
                   </div>
                 </div>
@@ -443,7 +443,7 @@ Gostaria de confirmar a disponibilidade para compra!`;
                     <Cpu className="w-3.5 h-3.5 text-sky-400" />
                     Chip
                   </div>
-                  <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white truncate">
+                  <div className="spec-value text-xs sm:text-sm font-extrabold mt-0.5 text-slate-900 dark:text-white break-words leading-tight">
                     {product.chip || "Apple Bionic / Pro"}
                   </div>
                 </div>
@@ -454,28 +454,45 @@ Gostaria de confirmar a disponibilidade para compra!`;
               <div>
                 <h3 className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-slate-800 dark:text-slate-100 mb-2 sm:mb-3 flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4 text-sky-400" />
-                  Destaques & Ficha Técnica
+                  Destaques & Ficha Técnica Completa
                 </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
-                  {product.specs.split(" • ").map((spec, i) => {
-                    let key = `Item ${i + 1}`;
-                    let val = spec.trim();
-                    if (spec.includes(":")) {
-                      const parts = spec.split(":");
-                      key = parts[0].trim();
-                      val = parts.slice(1).join(":").trim();
-                    }
-                    return (
-                      <div key={i} className="product-modal-box p-2.5 sm:p-3">
-                        <div className="text-[10px] sm:text-[11px] font-bold text-blue-600 dark:text-sky-400 uppercase tracking-wider truncate">
-                          {key}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-2.5">
+                  {(product.specs.includes(" • ")
+                    ? product.specs.split(" • ")
+                    : product.specs.includes(" | ")
+                    ? product.specs.split(" | ")
+                    : product.specs.includes("\n")
+                    ? product.specs.split("\n")
+                    : [product.specs]
+                  )
+                    .map((s) => s.trim())
+                    .filter(Boolean)
+                    .map((spec, i) => {
+                      const hasColon = spec.includes(":");
+                      if (hasColon) {
+                        const parts = spec.split(":");
+                        const key = parts[0].trim();
+                        const val = parts.slice(1).join(":").trim();
+                        return (
+                          <div key={i} className="product-modal-box p-2.5 sm:p-3 flex flex-col justify-center">
+                            <div className="text-[10px] sm:text-[11px] font-bold text-blue-600 dark:text-sky-400 uppercase tracking-wider">
+                              {key}
+                            </div>
+                            <div className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white mt-0.5 break-words leading-snug">
+                              {val}
+                            </div>
+                          </div>
+                        );
+                      }
+                      return (
+                        <div key={i} className="product-modal-box p-2.5 sm:p-3 flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                          <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white break-words leading-snug">
+                            {spec}
+                          </span>
                         </div>
-                        <div className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white mt-0.5 truncate">
-                          {val}
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
                 </div>
               </div>
             ) : null
