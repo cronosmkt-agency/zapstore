@@ -142,15 +142,15 @@ function SettingsPage() {
 
     // 12. Header & Rodapé
     header_logo_alignment_desktop: 'left' as 'left' | 'center' | 'right',
-    header_logo_alignment_mobile: 'center' as 'left' | 'center' | 'right',
+    header_logo_alignment_mobile: 'left' as 'left' | 'center' | 'right',
     header_show_theme_toggle: true,
-    header_show_hours_badge: true,
+    header_show_hours_badge: false,
     header_hours_text: '',
-    header_show_whatsapp_mobile: true,
+    header_show_whatsapp_mobile: false,
     header_show_announcement: false,
     header_announcement_text: '',
     header_cta_text: '',
-    header_show_whatsapp_button: true,
+    header_show_whatsapp_button: false,
     header_nav_home_label: 'Início',
     header_nav_catalog_label: 'Catálogo',
 
@@ -1388,8 +1388,8 @@ function SettingsPage() {
                         <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
                           Logo & Nome no Mobile (Smartphones)
                         </label>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200">
-                          Padrão: Centro
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                          Padrão: Esquerda
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-500">
@@ -1397,8 +1397,8 @@ function SettingsPage() {
                       </p>
                       <div className="grid grid-cols-3 gap-2 pt-1">
                         {[
-                          { id: 'left', label: 'Esquerda' },
-                          { id: 'center', label: 'Centro (Padrão)' },
+                          { id: 'left', label: 'Esquerda (Padrão)' },
+                          { id: 'center', label: 'Centro' },
                           { id: 'right', label: 'Direita' },
                         ].map((align) => (
                           <button
@@ -1406,7 +1406,7 @@ function SettingsPage() {
                             type="button"
                             onClick={() => setFormData(prev => ({ ...prev, header_logo_alignment_mobile: align.id as any }))}
                             className={`py-2 px-1 text-center rounded-lg text-xs font-bold border transition-all cursor-pointer ${
-                              (formData.header_logo_alignment_mobile || 'center') === align.id
+                              (formData.header_logo_alignment_mobile || 'left') === align.id
                                 ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
                                 : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
                             }`}

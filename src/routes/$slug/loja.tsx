@@ -521,8 +521,8 @@ Gostaria de confirmar a disponibilidade!`;
               </a>
             </div>
           </div>
-        ) : (
-          <div className={viewMode === 'grid' ? "grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6" : "flex flex-col gap-3 sm:gap-4"}>
+        ) : viewMode === 'grid' ? (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             {sortedProducts.map(product => {
               const isNovo =
                 product.cat.toLowerCase().includes('novo') ||
@@ -547,57 +547,47 @@ Gostaria de confirmar a disponibilidade!`;
               return (
                 <div 
                   key={product.name} 
-                  className={`glass-card p-3 sm:p-5 rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative border border-slate-200/80 dark:border-slate-800/80 ${
-                    viewMode === 'list' ? 'flex flex-row gap-4 sm:gap-6 items-center' : 'flex flex-col h-full justify-between'
-                  }`}
+                  className="glass-card p-3 sm:p-5 rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative border border-slate-200/80 dark:border-slate-800/80 flex flex-col h-full justify-between group overflow-hidden"
                 >
-                  {/* Uniform Top Badge */}
-                  {product.badge && (
-                    <span className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-blue-600 text-white text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full font-bold shadow-xs z-10 pointer-events-none">
-                      {product.badge}
+                  {/* Top Badges Bar inside Card (no absolute overlap) */}
+                  <div className="flex items-center justify-between gap-1 mb-2 w-full h-6 overflow-hidden">
+                    <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 dark:bg-sky-950/80 text-blue-600 dark:text-sky-400 border border-blue-200/60 dark:border-sky-800/60 truncate max-w-[60%]">
+                      {catLabel}
                     </span>
-                  )}
+                    {batteryLabel ? (
+                      <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 truncate max-w-[40%]">
+                        {batteryLabel}
+                      </span>
+                    ) : isLowStock ? (
+                      <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60 truncate max-w-[40%]">
+                        Últimas {product.quantity} un.
+                      </span>
+                    ) : product.badge ? (
+                      <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 truncate max-w-[40%]">
+                        {product.badge}
+                      </span>
+                    ) : null}
+                  </div>
 
-                  {/* Image */}
+                  {/* Product Image */}
                   <div 
-                    className={`relative flex items-center justify-center cursor-pointer shrink-0 ${
-                      viewMode === 'list' ? 'w-24 h-24 sm:w-32 sm:h-32' : 'w-full h-36 sm:h-44 py-2 sm:py-3'
-                    }`}
+                    className="relative flex items-center justify-center cursor-pointer w-full h-32 sm:h-44 py-1"
                     onClick={() => setSelectedProduct(product)}
                   >
                     <img 
                       src={product.img || ''} 
                       alt={product.name} 
-                      className="w-full h-full max-h-full object-contain transition-transform duration-300 hover:scale-105 select-none" 
+                      className="w-full h-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105 select-none" 
                     />
                   </div>
 
                   {/* Info */}
-                  <div className={`flex flex-col flex-1 ${viewMode === 'list' ? 'justify-center text-left' : 'text-left mt-2 flex flex-col justify-between'}`}>
+                  <div className="flex flex-col flex-1 text-left justify-between mt-1">
                     <div>
-                      {/* Fixed height badge row: no line wrapping to ensure identical heights */}
-                      <div className="flex items-center justify-between gap-1 mb-1.5 w-full h-6 overflow-hidden">
-                        <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 dark:bg-sky-950/80 text-blue-600 dark:text-sky-400 border border-blue-200/60 dark:border-sky-800/60 truncate max-w-[60%]">
-                          {catLabel}
-                        </span>
-                        {batteryLabel ? (
-                          <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 truncate max-w-[40%]">
-                            {batteryLabel}
-                          </span>
-                        ) : isLowStock ? (
-                          <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60 truncate max-w-[40%]">
-                            Últimas {product.quantity} un.
-                          </span>
-                        ) : (
-                          <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 truncate max-w-[40%]">
-                            {product.badge || 'Disponível'}
-                          </span>
-                        )}
-                      </div>
-
                       <h3 
                         onClick={() => setSelectedProduct(product)}
                         className="font-black text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-2 min-h-[2.5rem] leading-snug cursor-pointer hover:text-blue-600 dark:hover:text-sky-400 transition"
+                        title={product.name}
                       >
                         {product.name}
                       </h3>
@@ -618,11 +608,11 @@ Gostaria de confirmar a disponibilidade!`;
                       </div>
 
                       {/* Action Buttons */}
-                      <div className={`mt-3 flex gap-1.5 ${viewMode === 'list' ? 'sm:flex-row' : 'flex-col'}`}>
+                      <div className="mt-3 flex flex-col gap-1.5">
                         <button 
                           type="button"
                           onClick={() => handleOrderWhatsApp(product)}
-                          className="flex-1 py-1.5 sm:py-2 px-2 rounded-xl font-bold text-[11px] sm:text-xs bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-1.5 shadow-xs active:scale-95 transition cursor-pointer"
+                          className="w-full py-1.5 sm:py-2 px-2 rounded-xl font-bold text-[11px] sm:text-xs bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-1.5 shadow-xs active:scale-95 transition cursor-pointer"
                         >
                           <WhatsAppIcon className="w-3.5 h-3.5 shrink-0" />
                           <span>Pedir no Zap</span>
@@ -630,10 +620,212 @@ Gostaria de confirmar a disponibilidade!`;
                         <button 
                           type="button"
                           onClick={() => setSelectedProduct(product)}
-                          className="py-1.5 sm:py-2 px-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-semibold transition text-[11px] sm:text-xs flex items-center justify-center gap-1 cursor-pointer"
+                          className="w-full py-1.5 sm:py-2 px-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-semibold transition text-[11px] sm:text-xs flex items-center justify-center gap-1 cursor-pointer"
                         >
                           <Info className="w-3.5 h-3.5" />
                           <span>Detalhes</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3 sm:gap-4">
+            {sortedProducts.map(product => {
+              const isNovo =
+                product.cat.toLowerCase().includes('novo') ||
+                product.cat.toLowerCase().includes('lacrad') ||
+                product.badge.toLowerCase().includes('lacrad') ||
+                product.badge.toLowerCase().includes('novo') ||
+                product.name.toLowerCase().includes('lacrad');
+              const catLabel = isIphoneStore
+                ? (isNovo ? 'Novo Lacrado' : 'Seminovo Premium')
+                : (product.cat || (isNovo ? 'Novo' : 'Destaque'));
+
+              let batteryLabel = '';
+              if (product.battery) {
+                const match = product.battery.match(/(\d+)\s*%/);
+                batteryLabel = match ? `Bateria ${match[1]}%` : `Bateria ${product.battery.replace(/^bateria\s*/i, '')}`;
+              } else if (isIphoneStore && isNovo) {
+                batteryLabel = 'Bateria 100%';
+              }
+
+              const isLowStock = product.quantity !== undefined && product.quantity > 0 && product.quantity <= 2;
+              const specChips = product.specs
+                ? product.specs.split(/[|•]/).map(s => s.trim()).filter(Boolean)
+                : (product.storage ? [product.storage] : []);
+
+              return (
+                <div key={product.name}>
+                  {/* MOBILE LIST CARD: zero horizontal overflow */}
+                  <div className="sm:hidden glass-card p-3 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 flex flex-col overflow-hidden">
+                    <div className="flex gap-3 items-center min-w-0">
+                      {/* Thumbnail */}
+                      <div 
+                        className="relative w-20 h-20 shrink-0 bg-slate-50/70 dark:bg-slate-900/70 rounded-xl p-1.5 flex items-center justify-center cursor-pointer border border-slate-200/50 dark:border-slate-800/50 overflow-hidden"
+                        onClick={() => setSelectedProduct(product)}
+                      >
+                        <img 
+                          src={product.img || ''} 
+                          alt={product.name} 
+                          className="w-full h-full object-contain select-none" 
+                        />
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0 flex flex-col justify-center">
+                        <div className="flex items-center gap-1.5 mb-1 overflow-hidden">
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-50 dark:bg-sky-950/80 text-blue-600 dark:text-sky-400 border border-blue-200/60 dark:border-sky-800/60 truncate max-w-[55%]">
+                            {catLabel}
+                          </span>
+                          {batteryLabel ? (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 truncate max-w-[45%]">
+                              {batteryLabel}
+                            </span>
+                          ) : isLowStock ? (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60 truncate max-w-[45%]">
+                              Últimas {product.quantity} un.
+                            </span>
+                          ) : product.badge ? (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 truncate max-w-[45%]">
+                              {product.badge}
+                            </span>
+                          ) : null}
+                        </div>
+
+                        <h3 
+                          onClick={() => setSelectedProduct(product)}
+                          className="font-bold text-xs text-slate-900 dark:text-white truncate cursor-pointer hover:text-blue-600 dark:hover:text-sky-400 transition"
+                        >
+                          {product.name}
+                        </h3>
+
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                          {product.specs || product.storage || 'Pronta entrega'}
+                        </p>
+
+                        <div className="mt-1 flex items-baseline gap-1.5">
+                          <span className="text-sm font-black text-blue-600 dark:text-sky-400">
+                            {fmt(product.price)}
+                          </span>
+                          <span className="text-[9px] text-slate-400 dark:text-slate-500 truncate">
+                            {product.price > 50000 ? 'Financiamento' : 'à vista ou 18x'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Actions full width */}
+                    <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/60 flex items-center gap-2">
+                      <button 
+                        type="button"
+                        onClick={() => handleOrderWhatsApp(product)}
+                        className="flex-1 py-1.5 px-2 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-1.5 shadow-xs active:scale-95 transition cursor-pointer"
+                      >
+                        <WhatsAppIcon className="w-3.5 h-3.5 shrink-0" />
+                        <span>Pedir no Zap</span>
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => setSelectedProduct(product)}
+                        className="py-1.5 px-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-semibold transition text-xs flex items-center justify-center gap-1 cursor-pointer shrink-0"
+                      >
+                        <Info className="w-3.5 h-3.5" />
+                        <span>Detalhes</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* DESKTOP & TABLET LIST CARD: 3-zone layout */}
+                  <div className="hidden sm:flex glass-card p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 flex-row gap-5 items-center hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
+                    {/* Left Zone: Image */}
+                    <div 
+                      className="relative w-32 h-32 md:w-36 md:h-36 shrink-0 bg-slate-50/60 dark:bg-slate-900/60 rounded-xl p-2.5 flex items-center justify-center cursor-pointer border border-slate-200/50 dark:border-slate-800/50 overflow-hidden"
+                      onClick={() => setSelectedProduct(product)}
+                    >
+                      <img 
+                        src={product.img || ''} 
+                        alt={product.name} 
+                        className="w-full h-full object-contain transition-transform duration-300 hover:scale-105 select-none" 
+                      />
+                      {product.badge && (
+                        <span className="absolute top-2 left-2 bg-blue-600 text-white text-[9px] px-2 py-0.5 rounded-full font-bold shadow-xs pointer-events-none max-w-[85%] truncate">
+                          {product.badge}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Middle Zone: Details & Spec Chips */}
+                    <div className="flex-1 min-w-0 pr-3">
+                      <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 dark:bg-sky-950/80 text-blue-600 dark:text-sky-400 border border-blue-200/60 dark:border-sky-800/60">
+                          {catLabel}
+                        </span>
+                        {batteryLabel && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60">
+                            {batteryLabel}
+                          </span>
+                        )}
+                        {isLowStock && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60">
+                            Últimas {product.quantity} un.
+                          </span>
+                        )}
+                      </div>
+
+                      <h3 
+                        onClick={() => setSelectedProduct(product)}
+                        className="font-black text-base md:text-lg text-slate-900 dark:text-white line-clamp-1 cursor-pointer hover:text-blue-600 dark:hover:text-sky-400 transition"
+                      >
+                        {product.name}
+                      </h3>
+
+                      {/* Spec chips */}
+                      {specChips.length > 0 ? (
+                        <div className="flex flex-wrap gap-1.5 mt-2.5">
+                          {specChips.slice(0, 4).map((spec, i) => (
+                            <span key={i} className="text-[11px] px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium border border-slate-200/40 dark:border-slate-700/40">
+                              {spec}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                          {product.storage ? `Armazenamento: ${product.storage}` : 'Pronta entrega com garantia'}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Right Zone: Price & Vertical Action Buttons */}
+                    <div className="w-48 md:w-56 shrink-0 flex flex-col justify-between items-end border-l border-slate-200/60 dark:border-slate-800/60 pl-5 self-stretch py-1">
+                      <div className="text-right">
+                        <div className="text-xl md:text-2xl font-black text-blue-600 dark:text-sky-400 leading-tight">
+                          {fmt(product.price)}
+                        </div>
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                          {product.price > 50000 ? 'Consulte financiamento' : 'à vista ou até 18x no cartão'}
+                        </div>
+                      </div>
+
+                      <div className="w-full mt-4 flex flex-col gap-2">
+                        <button 
+                          type="button"
+                          onClick={() => handleOrderWhatsApp(product)}
+                          className="w-full py-2 px-3 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-2 shadow-xs active:scale-95 transition cursor-pointer"
+                        >
+                          <WhatsAppIcon className="w-4 h-4 shrink-0" />
+                          <span>Pedir no Zap</span>
+                        </button>
+                        <button 
+                          type="button"
+                          onClick={() => setSelectedProduct(product)}
+                          className="w-full py-1.5 px-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-semibold transition text-xs flex items-center justify-center gap-1 cursor-pointer"
+                        >
+                          <Info className="w-3.5 h-3.5" />
+                          <span>Ver Detalhes</span>
                         </button>
                       </div>
                     </div>

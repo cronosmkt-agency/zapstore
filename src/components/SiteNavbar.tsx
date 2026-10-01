@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Sun, MoonStar } from "lucide-react";
-import { BrandLogo } from "@/components/BrandLogo";
+import { BrandLogo, TEREPHONES_LOGO_URL } from "@/components/BrandLogo";
 import type { ThemeMode } from "@/components/ThemeSelectorModal";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { WHATSAPP } from "@/data/storeData";
@@ -38,15 +38,15 @@ export function SiteNavbar({
   whatsapp,
   showThemeToggle = true,
   header_logo_alignment_desktop = 'left',
-  header_logo_alignment_mobile = 'center',
+  header_logo_alignment_mobile = 'left',
   header_show_theme_toggle = true,
-  header_show_hours_badge = true,
+  header_show_hours_badge = false,
   header_hours_text,
-  header_show_whatsapp_mobile = true,
+  header_show_whatsapp_mobile = false,
   header_show_announcement,
   header_announcement_text,
   header_cta_text,
-  header_show_whatsapp_button = true,
+  header_show_whatsapp_button = false,
   header_nav_home_label,
   header_nav_catalog_label,
 }: SiteNavbarProps) {
@@ -110,14 +110,14 @@ export function SiteNavbar({
   const renderLogo = (isMobile = false) => {
     if (storeLogo) {
       return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <img
             src={storeLogo}
             alt={storeName || "Logo"}
-            className={`${isMobile ? 'h-7 sm:h-8' : 'h-9'} w-auto max-w-[130px] object-contain rounded-md`}
+            className={`${isMobile ? 'h-9 w-9 sm:h-10 sm:w-10' : 'h-10 w-10 sm:h-11 sm:w-11'} object-contain rounded-full shrink-0 shadow-xs`}
           />
           {storeName && (
-            <span className={`font-extrabold ${isMobile ? 'text-xs sm:text-sm max-w-[130px]' : 'text-base'} tracking-tight text-slate-900 dark:text-white truncate`}>
+            <span className={`font-black ${isMobile ? 'text-base sm:text-lg' : 'text-lg sm:text-xl'} tracking-tight text-slate-900 dark:text-white truncate max-w-[180px]`}>
               {storeName}
             </span>
           )}
@@ -126,17 +126,28 @@ export function SiteNavbar({
     }
     if (storeName && !storeName.toLowerCase().includes("terephones")) {
       return (
-        <div className="flex items-center gap-2">
-          <div className={`${isMobile ? 'w-7 h-7 sm:w-8 sm:h-8 text-xs' : 'w-9 h-9 text-sm'} rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-black flex items-center justify-center shadow-xs shrink-0`}>
+        <div className="flex items-center gap-2.5">
+          <div className={`${isMobile ? 'w-9 h-9 sm:w-10 sm:h-10 text-sm sm:text-base' : 'w-10 h-10 sm:w-11 sm:h-11 text-base'} rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-black flex items-center justify-center shadow-xs shrink-0`}>
             {storeName.charAt(0).toUpperCase()}
           </div>
-          <span className={`font-extrabold ${isMobile ? 'text-xs sm:text-sm max-w-[130px]' : 'text-base'} tracking-tight text-slate-900 dark:text-white truncate`}>
+          <span className={`font-black ${isMobile ? 'text-base sm:text-lg' : 'text-lg sm:text-xl'} tracking-tight text-slate-900 dark:text-white truncate max-w-[180px]`}>
             {storeName}
           </span>
         </div>
       );
     }
-    return <BrandLogo height={isMobile ? 32 : 38} showText={true} dark={isDark} />;
+    return (
+      <div className="flex items-center gap-2.5">
+        <img
+          src={TEREPHONES_LOGO_URL}
+          alt="Terephones"
+          className={`${isMobile ? 'h-9 w-9 sm:h-10 sm:w-10' : 'h-10 w-10 sm:h-11 sm:w-11'} object-contain rounded-full shrink-0 shadow-xs`}
+        />
+        <span className={`font-black ${isMobile ? 'text-base sm:text-lg' : 'text-lg sm:text-xl'} tracking-tight text-slate-900 dark:text-white`}>
+          {storeName || "Terephones"}
+        </span>
+      </div>
+    );
   };
 
   return (
