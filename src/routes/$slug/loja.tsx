@@ -334,14 +334,14 @@ Gostaria de confirmar a disponibilidade!`;
         showThemeToggle={settings.enable_dark_mode_toggle !== false}
         header_logo_alignment_desktop={settings.header_logo_alignment_desktop}
         header_logo_alignment_mobile={settings.header_logo_alignment_mobile}
-        header_show_theme_toggle={settings.header_show_theme_toggle}
-        header_show_hours_badge={settings.header_show_hours_badge}
+        header_show_theme_toggle={settings.header_show_theme_toggle !== false}
+        header_show_hours_badge={settings.header_show_hours_badge !== false}
         header_hours_text={settings.header_hours_text}
-        header_show_whatsapp_mobile={settings.header_show_whatsapp_mobile}
+        header_show_whatsapp_mobile={Boolean(settings.header_show_whatsapp_mobile)}
         header_show_announcement={settings.header_show_announcement}
         header_announcement_text={settings.header_announcement_text}
         header_cta_text={settings.header_cta_text}
-        header_show_whatsapp_button={settings.header_show_whatsapp_button}
+        header_show_whatsapp_button={settings.header_show_whatsapp_button !== false}
         header_nav_home_label={settings.header_nav_home_label}
         header_nav_catalog_label={settings.header_nav_catalog_label}
       />

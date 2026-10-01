@@ -183,6 +183,9 @@ export const SEED_STORE_SETTINGS: StoreSettings[] = [
     header_announcement_text: '⚡ Entrega Express em até 1 hora em Teresópolis/RJ • Pagamento na entrega!',
     header_cta_text: 'Falar no WhatsApp',
     header_show_whatsapp_button: true,
+    header_show_theme_toggle: true,
+    header_show_hours_badge: true,
+    header_show_whatsapp_mobile: false,
     header_nav_home_label: 'Início',
     header_nav_catalog_label: 'Catálogo de iPhones',
     footer_about_text: 'Sua loja de confiança para iPhones novos e seminovos em Teresópolis e Região Serrana. Aparelhos revisados com até 1 ano de garantia Apple e entrega express imediata.',
@@ -1465,7 +1468,7 @@ const KEYS = {
 } as const;
 
 // Versão do banco para forçar migração transparente no navegador do usuário
-const DB_VERSION = 'v19_header_footer_customization';
+const DB_VERSION = 'v20_landing_header_refresh';
 
 // ─── Helpers ──────────────────────────────────────────────────
 function isClient() { return typeof window !== 'undefined'; }
