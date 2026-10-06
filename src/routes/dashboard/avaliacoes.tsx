@@ -14,6 +14,8 @@ import {
   CheckCircle2,
   MapPin,
   HelpCircle,
+  Edit2,
+  X,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -34,6 +36,14 @@ function ReviewsPage() {
     comment: '',
   });
 
+  const [editingReview, setEditingReview] = useState<StoreReview | null>(null);
+  const [editFormData, setEditFormData] = useState({
+    author_name: '',
+    neighborhood: '',
+    rating: 5,
+    comment: '',
+  });
+
   useEffect(() => {
     if (session) {
       loadReviews();
@@ -45,6 +55,34 @@ function ReviewsPage() {
       const data = db.reviews.getByProfileId(session.userId);
       setReviews(data);
     }
+  };
+
+  const handleStartEdit = (review: StoreReview) => {
+    setEditingReview(review);
+    setEditFormData({
+      author_name: review.author_name || '',
+      neighborhood: review.neighborhood || '',
+      rating: review.rating || 5,
+      comment: review.comment || '',
+    });
+  };
+
+  const handleSaveEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingReview) return;
+    if (!editFormData.author_name.trim() || !editFormData.comment.trim()) {
+      toast.error('Preencha o nome do cliente e o comentário.');
+      return;
+    }
+    db.reviews.update(editingReview.id, {
+      author_name: editFormData.author_name.trim(),
+      neighborhood: editFormData.neighborhood.trim() || 'Cliente Satisfeito',
+      rating: editFormData.rating,
+      comment: editFormData.comment.trim(),
+    });
+    setEditingReview(null);
+    loadReviews();
+    toast.success('Avaliação atualizada com sucesso!');
   };
 
   const handleToggleVisible = (id: string, current: boolean) => {
@@ -344,19 +382,135 @@ function ReviewsPage() {
                   <span>{review.is_visible ? 'Visível na Loja' : 'Oculto'}</span>
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => handleDelete(review.id, review.author_name)}
-                  className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer"
-                  title="Excluir avaliação"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => handleStartEdit(review)}
+                    className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition cursor-pointer"
+                    title="Editar avaliação"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(review.id, review.author_name)}
+                    className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer"
+                    title="Excluir avaliação"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           ))
         )}
       </div>
+
+      {/* ─── MODAL DE EDIÇÃO DE AVALIAÇÃO ─────────────────────────── */}
+      {editingReview && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-6 sm:p-7 max-w-lg w-full shadow-2xl border border-slate-200 relative animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                  <Edit2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900">Editar Avaliação</h3>
+                  <p className="text-xs text-slate-400">Modifique o depoimento do cliente</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingReview(null)}
+                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEdit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    Nome do Cliente *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editFormData.author_name}
+                    onChange={(e) => setEditFormData((prev) => ({ ...prev, author_name: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:border-blue-600 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    Bairro / Cidade
+                  </label>
+                  <input
+                    type="text"
+                    value={editFormData.neighborhood}
+                    onChange={(e) => setEditFormData((prev) => ({ ...prev, neighborhood: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:border-blue-600 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  Classificação em Estrelas
+                </label>
+                <div className="flex gap-2 items-center bg-slate-50 p-2.5 rounded-xl border border-slate-200 w-fit">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      type="button"
+                      key={star}
+                      onClick={() => setEditFormData((prev) => ({ ...prev, rating: star }))}
+                      className="p-1 hover:scale-115 transition-transform cursor-pointer"
+                    >
+                      <Star
+                        className={`w-6 h-6 ${
+                          star <= editFormData.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-200'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                  <span className="text-xs font-bold text-slate-700 ml-2">{editFormData.rating} de 5 estrelas</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  Comentário / Depoimento *
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  value={editFormData.comment}
+                  onChange={(e) => setEditFormData((prev) => ({ ...prev, comment: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:border-blue-600 outline-none resize-none"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setEditingReview(null)}
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-100 transition cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-600/20 transition cursor-pointer"
+                >
+                  Salvar Alterações
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

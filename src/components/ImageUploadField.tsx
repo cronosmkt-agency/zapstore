@@ -195,44 +195,48 @@ export function ImageUploadField({
 
       {/* Se já existe uma imagem selecionada */}
       {value ? (
-        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex flex-col sm:flex-row items-center gap-4">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex items-center gap-3 sm:gap-4 overflow-hidden">
           <div
-            className={`relative rounded-xl overflow-hidden bg-slate-200/60 border border-slate-300 flex items-center justify-center shrink-0 shadow-xs ${aspectClass} w-full sm:w-44`}
+            className={`relative rounded-xl overflow-hidden bg-white border border-slate-200/90 flex items-center justify-center shrink-0 shadow-xs ${
+              aspectRatio === 'banner'
+                ? 'w-24 h-14 sm:w-28 sm:h-16'
+                : 'w-16 h-16 sm:w-20 sm:h-20'
+            }`}
           >
             <img
               src={value}
               alt={label}
-              className="w-full h-full object-contain sm:object-cover"
+              className="w-full h-full object-contain p-1"
               onError={(e) => {
                 (e.target as HTMLElement).style.display = 'none';
               }}
             />
           </div>
 
-          <div className="flex-1 w-full space-y-2 text-center sm:text-left">
-            <div className="flex items-center justify-center sm:justify-start gap-1.5 text-xs text-emerald-600 font-bold">
-              <Check size={14} />
+          <div className="flex-1 min-w-0 space-y-1.5">
+            <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-bold truncate">
+              <Check size={14} className="shrink-0" />
               <span>Imagem configurada</span>
             </div>
-            <p className="text-[11px] text-slate-400 truncate max-w-md">
-              {value.startsWith('data:') ? 'Arquivo enviado localmente (Otimizado)' : value}
+            <p className="text-[11px] text-slate-400 truncate">
+              {value.startsWith('data:') ? 'Arquivo otimizado' : value}
             </p>
 
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
+            <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-semibold flex items-center gap-1.5 shadow-xs cursor-pointer"
+                className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-semibold flex items-center gap-1 shadow-xs cursor-pointer"
               >
-                <RefreshCw size={13} />
-                <span>Trocar arquivo</span>
+                <RefreshCw size={12} />
+                <span>Trocar</span>
               </button>
               <button
                 type="button"
                 onClick={handleRemove}
-                className="px-3 py-1.5 rounded-xl bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                className="px-2.5 py-1 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 text-xs font-semibold flex items-center gap-1 cursor-pointer"
               >
-                <Trash2 size={13} />
+                <Trash2 size={12} />
                 <span>Remover</span>
               </button>
             </div>
@@ -247,26 +251,26 @@ export function ImageUploadField({
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onClick={() => fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
+              className={`border-2 border-dashed rounded-2xl p-4 sm:p-5 text-center cursor-pointer transition-all overflow-hidden ${
                 isDragging
                   ? 'border-blue-500 bg-blue-50/80 scale-[1.01]'
                   : 'border-slate-300 hover:border-blue-500 bg-slate-50/60 hover:bg-blue-50/20'
               }`}
             >
-              <div className="w-12 h-12 mx-auto rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-2 shadow-xs">
+              <div className="w-10 h-10 mx-auto rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-1.5 shadow-xs">
                 {isProcessing ? (
-                  <RefreshCw className="w-6 h-6 animate-spin" />
+                  <RefreshCw className="w-5 h-5 animate-spin" />
                 ) : (
-                  <UploadCloud className="w-6 h-6" />
+                  <UploadCloud className="w-5 h-5" />
                 )}
               </div>
-              <p className="text-xs sm:text-sm font-bold text-slate-800">
+              <p className="text-xs sm:text-sm font-bold text-slate-800 truncate">
                 {isProcessing
                   ? 'Otimizando imagem...'
-                  : 'Clique para enviar ou arraste a imagem aqui'}
+                  : 'Clique para enviar ou arraste aqui'}
               </p>
-              <p className="text-[11px] text-slate-400 mt-1">
-                PNG, JPG, WebP ou SVG (redimensionamento automático)
+              <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">
+                PNG, JPG, WebP ou SVG (otimização automática)
               </p>
             </div>
           ) : (
@@ -276,12 +280,12 @@ export function ImageUploadField({
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
                 placeholder={placeholder}
-                className="flex-1 px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 text-xs sm:text-sm focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none shadow-xs"
+                className="flex-1 px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-slate-900 text-xs sm:text-sm focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none shadow-xs min-w-0"
               />
               <button
                 type="button"
                 onClick={handleApplyUrl}
-                className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs cursor-pointer shrink-0"
               >
                 Aplicar
               </button>

@@ -158,6 +158,7 @@ export const SEED_STORE_SETTINGS: StoreSettings[] = [
     store_name: 'Terephones',
     store_tagline: 'iPhones Novos & Seminovos em Teresópolis',
     logo_url: 'https://ik.imagekit.io/zinma/tr:w-300,f-auto,q-85/TerePhones-Logo.png',
+    favicon_url: 'https://ik.imagekit.io/zinma/tr:w-128,f-auto,q-85/TerePhones-Logo.png',
     whatsapp: '5521964639999',
     phone_display: '(21) 96463-9999',
     address: 'Loja Parceira SejaDelta — Centro de Teresópolis',
@@ -1468,7 +1469,7 @@ const KEYS = {
 } as const;
 
 // Versão do banco para forçar migração transparente no navegador do usuário
-const DB_VERSION = 'v20_landing_header_refresh';
+const DB_VERSION = 'v21_audit_and_fixes';
 
 // ─── Helpers ──────────────────────────────────────────────────
 function isClient() { return typeof window !== 'undefined'; }
@@ -1539,18 +1540,65 @@ export function initDb(): void {
     syncFromSupabase();
   }
 
-  if (localStorage.getItem(KEYS.initialized) === DB_VERSION) return;
-  
-  write(KEYS.profiles,       SEED_PROFILES);
-  write(KEYS.store_settings, SEED_STORE_SETTINGS);
-  write(KEYS.categories,     SEED_CATEGORIES);
-  write(KEYS.products,       SEED_PRODUCTS);
-  write(KEYS.reviews,        SEED_REVIEWS);
-  write(KEYS.plans,          SEED_PLANS);
-  write(KEYS.subscriptions,  []);
-  write(KEYS.activity_logs,  []);
-  localStorage.setItem(KEYS.passwords, JSON.stringify(SEED_PASSWORDS));
-  localStorage.setItem(KEYS.initialized, DB_VERSION);
+  const isCurrentVersion = localStorage.getItem(KEYS.initialized) === DB_VERSION;
+  if (!isCurrentVersion) {
+    write(KEYS.profiles,       SEED_PROFILES);
+    write(KEYS.store_settings, SEED_STORE_SETTINGS);
+    write(KEYS.categories,     SEED_CATEGORIES);
+    write(KEYS.products,       SEED_PRODUCTS);
+    write(KEYS.reviews,        SEED_REVIEWS);
+    write(KEYS.plans,          SEED_PLANS);
+    write(KEYS.subscriptions,  []);
+    write(KEYS.activity_logs,  []);
+    localStorage.setItem(KEYS.passwords, JSON.stringify(SEED_PASSWORDS));
+    localStorage.setItem(KEYS.initialized, DB_VERSION);
+    return;
+  }
+
+  // Auto-reparo de produtos legados no localStorage
+  const existingProds = read<Product>(KEYS.products, []);
+  if (existingProds.length > 0) {
+    let changed = false;
+    const repaired = existingProds.map(p => {
+      let pImg = p.primary_image || (p.images && p.images[0]) || '';
+      let pCat = p.category_name;
+      
+      if (!pImg || pImg.trim() === '') {
+        const match = SEED_PRODUCTS.find(sp => sp.name.toLowerCase() === p.name.toLowerCase());
+        if (match?.primary_image) {
+          pImg = match.primary_image;
+          changed = true;
+        }
+      }
+      
+      if (!pCat || pCat === 'Geral') {
+        const match = SEED_PRODUCTS.find(sp => sp.name.toLowerCase() === p.name.toLowerCase());
+        if (match?.category_name) {
+          pCat = match.category_name;
+          changed = true;
+        } else if (p.badge?.toLowerCase().includes('lacrado')) {
+          pCat = 'Lacrados';
+          changed = true;
+        } else if (p.badge?.toLowerCase().includes('seminov')) {
+          pCat = 'Seminovos';
+          changed = true;
+        }
+      }
+      
+      if (changed) {
+        return {
+          ...p,
+          primary_image: pImg,
+          images: p.images && p.images.length > 0 ? p.images : (pImg ? [pImg] : []),
+          category_name: pCat || 'Destaques',
+        };
+      }
+      return p;
+    });
+    if (changed) {
+      write(KEYS.products, repaired);
+    }
+  }
 }
 
 export function resetDb(): void {

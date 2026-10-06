@@ -7,34 +7,18 @@ export type ThemeMode = "white" | "black-piano";
 interface ThemeSelectorModalProps {
   currentTheme?: ThemeMode;
   onThemeChange?: (theme: ThemeMode) => void;
+  storeSlug?: string;
 }
 
 export function ThemeSelectorModal({
   currentTheme: propTheme,
   onThemeChange,
+  storeSlug,
 }: ThemeSelectorModalProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedTheme, setSelectedTheme] = useState<ThemeMode>("white");
+  const [selectedTheme, setSelectedTheme] = useState<ThemeMode>(propTheme || "white");
 
-  // Initialize theme on mount
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const saved = localStorage.getItem("terephones_theme") as ThemeMode | null;
-    const seenModal = localStorage.getItem("terephones_theme_modal_seen");
-
-    if (saved === "black-piano" || saved === "white") {
-      setSelectedTheme(saved);
-      applyTheme(saved);
-    }
-
-    if (!seenModal && !saved) {
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, []);
+  const storageKey = storeSlug ? `zapstore_theme_${storeSlug}` : "terephones_theme";
 
   // Sync prop changes if any
   useEffect(() => {
@@ -42,6 +26,25 @@ export function ThemeSelectorModal({
       setSelectedTheme(propTheme);
     }
   }, [propTheme]);
+
+  // Check if first-time visitor modal should be shown (without overriding theme on mount)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const seenModal = localStorage.getItem(`${storageKey}_modal_seen`);
+    const saved = localStorage.getItem(storageKey) as ThemeMode | null;
+
+    if (saved === "black-piano" || saved === "white") {
+      setSelectedTheme(saved);
+    }
+
+    if (!seenModal && !saved) {
+      const timer = setTimeout(() => {
+        setIsOpen(true);
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [storageKey]);
 
   // Listen to global open event
   useEffect(() => {
@@ -58,7 +61,10 @@ export function ThemeSelectorModal({
     } else {
       root.classList.add("theme-white");
     }
-    localStorage.setItem("terephones_theme", theme);
+    localStorage.setItem(storageKey, theme);
+    if (storeSlug === "terephones") {
+      localStorage.setItem("terephones_theme", theme);
+    }
     if (onThemeChange) {
       onThemeChange(theme);
     }
@@ -71,7 +77,7 @@ export function ThemeSelectorModal({
   };
 
   const handleClose = () => {
-    localStorage.setItem("terephones_theme_modal_seen", "true");
+    localStorage.setItem(`${storageKey}_modal_seen`, "true");
     setIsOpen(false);
   };
 

@@ -25,6 +25,47 @@ export const Route = createFileRoute('/dashboard/produtos/')({
   component: ProdutosList,
 });
 
+function getProductThumbnail(product: Product): string {
+  if (product.primary_image && product.primary_image.trim()) return product.primary_image.trim();
+  if (product.images && product.images.length > 0 && product.images[0]) return product.images[0].trim();
+  if ((product as any).gallery && (product as any).gallery.length > 0) return (product as any).gallery[0].trim();
+  if ((product as any).image) return (product as any).image.trim();
+
+  // Fallback inteligente para celulares e nichos por nome
+  const n = (product.name || '').toLowerCase();
+  if (n.includes('17 pro max')) {
+    if (n.includes('prata') || n.includes('silver')) return '/devices/iphone-17-pro-max-silver.webp';
+    if (n.includes('laranja') || n.includes('orange')) return '/devices/iphone-17-pro-max-orange.webp';
+    return '/devices/iphone-17-pro-max-blue.webp';
+  }
+  if (n.includes('17 pro')) {
+    if (n.includes('prata') || n.includes('silver')) return '/devices/iphone-17-pro-silver.webp';
+    return '/devices/iphone-17-pro-blue.webp';
+  }
+  if (n.includes('17') && !n.includes('16')) {
+    if (n.includes('branco') || n.includes('white')) return '/devices/iphone-17-white.webp';
+    if (n.includes('preto') || n.includes('black')) return '/devices/iphone-17-black.webp';
+    if (n.includes('verde') || n.includes('green')) return '/devices/iphone-17-green.webp';
+    return '/devices/iphone-17-blue.webp';
+  }
+  if (n.includes('16 pro max')) {
+    if (n.includes('desert')) return '/devices/iphone-16-pro-max-desert.webp';
+    return '/devices/iphone-16-pro-max-natural.webp';
+  }
+  if (n.includes('16 pro')) {
+    if (n.includes('branco')) return '/devices/iphone-16-pro-white.webp';
+    return '/devices/iphone-16-pro-desert.webp';
+  }
+  if (n.includes('15 pro')) return '/devices/iphone-15-pro-blue.webp';
+  if (n.includes('13 pro max')) {
+    if (n.includes('branco')) return '/devices/iphone-13-pro-max-white.webp';
+    return '/devices/iphone-13-pro-max-graphite.webp';
+  }
+  if (n.includes('12 pro max')) return '/devices/iphone-12-pro-max-blue.webp';
+
+  return '';
+}
+
 function ProdutosList() {
   const { session } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
@@ -283,17 +324,26 @@ function ProdutosList() {
                 {/* Top: Image + Info + Price */}
                 <div className="flex gap-3 items-center">
                   <div className="w-16 h-16 rounded-xl bg-slate-50 border border-slate-200 p-1 flex shrink-0 items-center justify-center overflow-hidden">
-                    {product.primary_image ? (
-                      <img src={product.primary_image} alt={product.name} className="w-full h-full object-contain" />
-                    ) : (
+                    {getProductThumbnail(product) ? (
+                      <img
+                        src={getProductThumbnail(product)}
+                        alt={product.name}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLElement).style.display = 'none';
+                          (e.currentTarget.parentElement?.querySelector('.fallback-icon') as HTMLElement)?.classList.remove('hidden');
+                        }}
+                      />
+                    ) : null}
+                    <div className={`fallback-icon flex items-center justify-center ${getProductThumbnail(product) ? 'hidden' : ''}`}>
                       <ImageIcon className="w-6 h-6 text-slate-300" />
-                    )}
+                    </div>
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600">
-                        {product.category_name || 'Geral'}
+                        {product.category_name || (product.badge?.toLowerCase().includes('lacrado') ? 'Lacrados' : product.badge?.toLowerCase().includes('seminov') ? 'Seminovos' : 'Catálogo')}
                       </span>
                       {product.badge && (
                         <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-100">
@@ -406,23 +456,26 @@ function ProdutosList() {
                 filteredProducts.map((product) => (
                   <tr key={product.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="p-4">
-                      {product.primary_image ? (
+                      {getProductThumbnail(product) ? (
                         <img
-                          src={product.primary_image}
+                          src={getProductThumbnail(product)}
                           alt={product.name}
                           className="w-12 h-12 rounded-xl object-contain bg-slate-50 border border-slate-200/80 p-0.5"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLElement).style.display = 'none';
+                            (e.currentTarget.parentElement?.querySelector('.fallback-icon') as HTMLElement)?.classList.remove('hidden');
+                          }}
                         />
-                      ) : (
-                        <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 border border-slate-200">
-                          <ImageIcon className="w-5 h-5" />
-                        </div>
-                      )}
+                      ) : null}
+                      <div className={`fallback-icon w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 border border-slate-200 ${getProductThumbnail(product) ? 'hidden' : ''}`}>
+                        <ImageIcon className="w-5 h-5" />
+                      </div>
                     </td>
                     <td className="p-4">
                       <div className="font-bold text-slate-900 text-sm">{product.name}</div>
                       <div className="flex items-center gap-1.5 mt-1">
                         <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
-                          {product.category_name || 'Geral'}
+                          {product.category_name || (product.badge?.toLowerCase().includes('lacrado') ? 'Lacrados' : product.badge?.toLowerCase().includes('seminov') ? 'Seminovos' : 'Catálogo')}
                         </span>
                         {product.badge && (
                           <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200/60">
