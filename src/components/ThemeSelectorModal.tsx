@@ -8,12 +8,16 @@ interface ThemeSelectorModalProps {
   currentTheme?: ThemeMode;
   onThemeChange?: (theme: ThemeMode) => void;
   storeSlug?: string;
+  storeName?: string;
+  storeLogo?: string;
 }
 
 export function ThemeSelectorModal({
   currentTheme: propTheme,
   onThemeChange,
   storeSlug,
+  storeName,
+  storeLogo,
 }: ThemeSelectorModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState<ThemeMode>(propTheme || "white");
@@ -117,7 +121,26 @@ export function ThemeSelectorModal({
         {/* Clean Header */}
         <div className="text-center pt-1">
           <div className="inline-flex items-center justify-center mb-2">
-            <BrandLogo height={32} showText={true} dark={true} />
+            {storeSlug === "terephones" || (!storeName && !storeLogo) ? (
+              <BrandLogo height={32} showText={true} dark={true} />
+            ) : storeLogo ? (
+              <div className="flex items-center gap-2">
+                <img
+                  src={storeLogo}
+                  alt={storeName || "Logo"}
+                  className="h-8 max-w-[130px] object-contain rounded-lg"
+                />
+                {storeName && (
+                  <span className="font-extrabold text-base text-white tracking-tight">
+                    {storeName}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <span className="font-black text-lg text-white tracking-tight">
+                {storeName}
+              </span>
+            )}
           </div>
 
           <h2

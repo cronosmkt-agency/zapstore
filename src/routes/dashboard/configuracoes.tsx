@@ -48,7 +48,23 @@ const DEFAULT_DIFFERENTIALS: Differential[] = [
 
 function SettingsPage() {
   const { session } = useAuth();
-  const [activeTab, setActiveTab] = useState('identidade');
+  const [activeTab, setActiveTabState] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab) return tab;
+    }
+    return 'identidade';
+  });
+
+  const setActiveTab = (tabId: string) => {
+    setActiveTabState(tabId);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('tab', tabId);
+      window.history.replaceState({}, '', url.toString());
+    }
+  };
 
   const [formData, setFormData] = useState({
     // 1. Identidade
@@ -142,7 +158,7 @@ function SettingsPage() {
 
     // 12. Header & Rodapé
     header_logo_alignment_desktop: 'left' as 'left' | 'center' | 'right',
-    header_logo_alignment_mobile: 'left' as 'left' | 'center' | 'right',
+    header_logo_alignment_mobile: 'center' as 'left' | 'center' | 'right',
     header_show_theme_toggle: true,
     header_show_hours_badge: true,
     header_hours_text: '',
@@ -339,7 +355,7 @@ function SettingsPage() {
 
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         {/* Navigation Sidebar Tabs */}
-        <aside className="w-full lg:w-64 shrink-0 space-y-1 bg-white p-2 rounded-2xl border border-slate-200/90 shadow-xs overflow-x-auto lg:overflow-visible flex lg:flex-col gap-1 lg:gap-1 scrollbar-none">
+        <aside className="w-full lg:w-64 shrink-0 space-y-0 lg:space-y-1 bg-white p-2 rounded-2xl border border-slate-200/90 shadow-xs overflow-x-auto lg:overflow-visible flex lg:flex-col gap-1.5 lg:gap-1 scrollbar-none">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -1389,7 +1405,7 @@ function SettingsPage() {
                           Logo & Nome no Mobile (Smartphones)
                         </label>
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                          Padrão: Esquerda
+                          Padrão: Centro
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-500">
@@ -1397,8 +1413,8 @@ function SettingsPage() {
                       </p>
                       <div className="grid grid-cols-3 gap-2 pt-1">
                         {[
-                          { id: 'left', label: 'Esquerda (Padrão)' },
-                          { id: 'center', label: 'Centro' },
+                          { id: 'left', label: 'Esquerda' },
+                          { id: 'center', label: 'Centro (Padrão)' },
                           { id: 'right', label: 'Direita' },
                         ].map((align) => (
                           <button
@@ -1406,7 +1422,7 @@ function SettingsPage() {
                             type="button"
                             onClick={() => setFormData(prev => ({ ...prev, header_logo_alignment_mobile: align.id as any }))}
                             className={`py-2 px-1 text-center rounded-lg text-xs font-bold border transition-all cursor-pointer ${
-                              (formData.header_logo_alignment_mobile || 'left') === align.id
+                              (formData.header_logo_alignment_mobile || 'center') === align.id
                                 ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
                                 : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
                             }`}

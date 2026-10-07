@@ -200,7 +200,7 @@ function LandingPage() {
 
   return (
     <div
-      className={`min-h-screen font-sans transition-colors duration-300 selection:bg-blue-600 selection:text-white ${
+      className={`min-h-screen font-sans overflow-x-hidden pb-20 md:pb-0 transition-colors duration-300 selection:bg-blue-600 selection:text-white ${
         isDark ? "bg-[#06080d] text-zinc-100" : "bg-slate-50 text-slate-900"
       }`}
     >
@@ -297,10 +297,10 @@ function LandingPage() {
               <ThemeToggleSwitch isDark={isDark} toggleTheme={toggleTheme} />
             </div>
 
-            {/* Login button */}
+            {/* Login button (desktop and tablet) */}
             <Link
               to="/login"
-              className={`px-3 sm:px-3.5 py-1.5 text-xs sm:text-sm font-bold rounded-xl border transition whitespace-nowrap shadow-2xs cursor-pointer ${
+              className={`hidden sm:inline-flex px-3 sm:px-3.5 py-1.5 text-xs sm:text-sm font-bold rounded-xl border transition whitespace-nowrap shadow-2xs cursor-pointer ${
                 isDark
                   ? "bg-zinc-900/80 border-zinc-800 text-zinc-200 hover:text-white hover:bg-zinc-800 hover:border-zinc-700"
                   : "bg-white border-slate-200 text-slate-700 hover:text-slate-900 hover:bg-slate-100/90"
@@ -309,10 +309,10 @@ function LandingPage() {
               Entrar
             </Link>
 
-            {/* Signup CTA button */}
+            {/* Signup CTA button (desktop and tablet) */}
             <Link
               to="/signup"
-              className="px-3.5 sm:px-4.5 py-1.5 text-xs sm:text-sm font-extrabold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 bg-[length:200%_auto] hover:bg-[right_center] rounded-xl shadow-md shadow-blue-600/30 hover:shadow-blue-600/50 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center gap-1 sm:gap-1.5 whitespace-nowrap cursor-pointer"
+              className="hidden sm:inline-flex px-3.5 sm:px-4.5 py-1.5 text-xs sm:text-sm font-extrabold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 bg-[length:200%_auto] hover:bg-[right_center] rounded-xl shadow-md shadow-blue-600/30 hover:shadow-blue-600/50 transition-all hover:scale-[1.02] active:scale-[0.98] items-center gap-1 sm:gap-1.5 whitespace-nowrap cursor-pointer"
             >
               <span>Criar Loja</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -322,7 +322,7 @@ function LandingPage() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`md:hidden p-2 rounded-xl border transition-colors cursor-pointer ${
+              className={`md:hidden p-2 rounded-xl border transition-colors cursor-pointer shrink-0 ${
                 isDark
                   ? "bg-zinc-900 border-zinc-800 text-zinc-200"
                   : "bg-white border-slate-200 text-slate-700"
@@ -377,6 +377,28 @@ function LandingPage() {
             >
               Dúvidas Frequentes
             </a>
+
+            {/* Quick Action Buttons in Mobile Drawer */}
+            <div className="pt-2 border-t border-slate-200/60 dark:border-zinc-800/60 grid grid-cols-2 gap-2">
+              <Link
+                to="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center justify-center py-2.5 px-3 text-xs font-bold rounded-xl border text-center transition ${
+                  isDark
+                    ? "border-zinc-800 bg-zinc-900 text-white hover:bg-zinc-800"
+                    : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
+                }`}
+              >
+                Entrar
+              </Link>
+              <Link
+                to="/signup"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-center py-2.5 px-3 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-center shadow-xs transition"
+              >
+                Criar Loja &rarr;
+              </Link>
+            </div>
           </div>
         )}
       </header>
@@ -1316,6 +1338,61 @@ function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* ─── Mobile Bottom Navigation (Landing Page) ────────────── */}
+      <nav
+        aria-label="Navegação rápida mobile"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#06080d]/95 backdrop-blur-xl border-t border-slate-200/90 dark:border-zinc-800/90 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.7)] px-2 py-1.5 pb-[max(0.6rem,env(safe-area-inset-bottom))]"
+      >
+        <div className="grid grid-cols-5 w-full max-w-md mx-auto items-center">
+          {/* 1. Início */}
+          <a
+            href="#inicio"
+            className="flex flex-col items-center justify-center gap-0.5 py-1 text-slate-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-cyan-400 transition"
+          >
+            <Store className="w-4 h-4 shrink-0" />
+            <span className="text-[10px] font-semibold leading-tight">Início</span>
+          </a>
+
+          {/* 2. Demos */}
+          <a
+            href="#lojas-demo"
+            className="flex flex-col items-center justify-center gap-0.5 py-1 text-slate-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-cyan-400 transition"
+          >
+            <Eye className="w-4 h-4 shrink-0" />
+            <span className="text-[10px] font-semibold leading-tight">Demos</span>
+          </a>
+
+          {/* 3. Planos */}
+          <a
+            href="#planos"
+            className="flex flex-col items-center justify-center gap-0.5 py-1 text-slate-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-cyan-400 transition"
+          >
+            <CreditCard className="w-4 h-4 shrink-0" />
+            <span className="text-[10px] font-semibold leading-tight">Planos</span>
+          </a>
+
+          {/* 4. Entrar */}
+          <Link
+            to="/login"
+            className="flex flex-col items-center justify-center gap-0.5 py-1 text-slate-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-cyan-400 transition"
+          >
+            <LayoutDashboard className="w-4 h-4 shrink-0" />
+            <span className="text-[10px] font-semibold leading-tight">Entrar</span>
+          </Link>
+
+          {/* 5. Criar Loja CTA */}
+          <Link
+            to="/signup"
+            className="flex flex-col items-center justify-center gap-0.5 py-1 text-blue-600 dark:text-sky-400 font-extrabold transition group"
+          >
+            <div className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
+              <Rocket className="w-3.5 h-3.5" />
+            </div>
+            <span className="text-[10px] leading-tight">Criar Loja</span>
+          </Link>
+        </div>
+      </nav>
     </div>
   );
 }

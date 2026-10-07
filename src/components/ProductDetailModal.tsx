@@ -45,6 +45,7 @@ interface ProductDetailModalProps {
   onClose: () => void;
   whatsappNumber?: string;
   storeName?: string;
+  storeSlug?: string;
 }
 
 const fmt = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -53,8 +54,9 @@ export function ProductDetailModal({
   product,
   isOpen,
   onClose,
-  whatsappNumber = "5521964639999",
-  storeName = "Terephones",
+  whatsappNumber = "",
+  storeName = "Loja",
+  storeSlug,
 }: ProductDetailModalProps) {
   const [selectedImg, setSelectedImg] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
@@ -106,11 +108,14 @@ export function ProductDetailModal({
     (product.condition || "").toLowerCase().includes("lacrad") ||
     (product.condition || "").toLowerCase().includes("novo");
 
+  const isTerephonesDemo =
+    storeSlug === "terephones" ||
+    storeName.toLowerCase().includes("terephones");
+
   const isIphoneStore =
-    storeName.toLowerCase().includes("terephones") ||
-    storeName.toLowerCase().includes("apple") ||
-    storeName.toLowerCase().includes("phone") ||
-    product.name.toLowerCase().includes("iphone");
+    isTerephonesDemo ||
+    product.name.toLowerCase().includes("iphone") ||
+    product.name.toLowerCase().includes("apple");
 
   const storageDisplay =
     product.storage || product.name.match(/\d+(gb|tb)/i)?.[0]?.toUpperCase() || "";
@@ -133,6 +138,14 @@ export function ProductDetailModal({
     : `ou até 12x de ${fmt(totalPrice / 12)} (consulte opções no cartão)`;
 
   const handleWhatsApp = () => {
+    const rawNumber = whatsappNumber || (isTerephonesDemo ? "5521964639999" : "");
+    const cleanNumber = rawNumber.replace(/\D/g, "");
+
+    if (!cleanNumber) {
+      alert(`O WhatsApp da loja ${storeName} está sendo configurado pelo lojista. Por favor, tente novamente em instantes.`);
+      return;
+    }
+
     const condText = isNovo
       ? "Novo Lacrado de Fábrica Apple"
       : `Seminovo Grade A+${product.battery ? ` (Saúde da Bateria: ${product.battery})` : ""}`;
@@ -159,11 +172,11 @@ Gostaria de confirmar a disponibilidade para entrega hoje!`;
 Gostaria de confirmar a disponibilidade para compra!`;
     }
 
-    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`;
+    const url = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
     window.open(url, "_blank");
   };
 
-  const defaultBoxItems = isIphoneStore
+  const defaultBoxItems = isTerephonesDemo && isIphoneStore
     ? (isNovo
       ? [
           "Aparelho iPhone Novo Lacrado de Fábrica",

@@ -92,11 +92,11 @@ function DashboardLayout() {
   }
 
   const navItems = [
-    { label: 'Início', icon: Home, to: '/dashboard' },
-    { label: 'Produtos', icon: Package, to: '/dashboard/produtos' },
-    { label: 'Configurações', icon: Settings, to: '/dashboard/configuracoes' },
-    { label: 'Avaliações', icon: Star, to: '/dashboard/avaliacoes' },
-    { label: 'Planos', icon: CreditCard, to: '/dashboard/planos' },
+    { label: 'Início', mobileLabel: 'Início', icon: Home, to: '/dashboard' },
+    { label: 'Produtos', mobileLabel: 'Produtos', icon: Package, to: '/dashboard/produtos' },
+    { label: 'Configurações', mobileLabel: 'Ajustes', icon: Settings, to: '/dashboard/configuracoes' },
+    { label: 'Avaliações', mobileLabel: 'Reviews', icon: Star, to: '/dashboard/avaliacoes' },
+    { label: 'Planos', mobileLabel: 'Planos', icon: CreditCard, to: '/dashboard/planos' },
   ];
 
   const storeName = storeSettings?.store_name || session.user.display_name || 'Loja';
@@ -155,8 +155,8 @@ function DashboardLayout() {
             )}
 
             <div className="flex flex-col min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="font-black text-xs sm:text-sm text-slate-900 dark:text-white truncate max-w-[120px] sm:max-w-[170px]">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="font-black text-xs sm:text-sm text-slate-900 dark:text-white truncate max-w-[135px] sm:max-w-[190px]">
                   {storeName}
                 </span>
                 <span
@@ -174,11 +174,11 @@ function DashboardLayout() {
           </div>
 
           {/* Quick Actions (Theme + Ver Loja + Menu) */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
             <button
               type="button"
               onClick={handleToggleTheme}
-              className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-slate-200 dark:border-slate-800 shadow-xs"
+              className="p-1.5 sm:p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-slate-200 dark:border-slate-800 shadow-xs cursor-pointer"
               title={currentTheme === 'black-piano' ? 'Mudar para Modo White' : 'Mudar para Modo Black Piano'}
             >
               {currentTheme === 'black-piano' ? (
@@ -192,7 +192,7 @@ function DashboardLayout() {
               href={`/${storeSlug}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors flex items-center gap-1 border border-slate-200 dark:border-slate-800 text-xs font-bold shadow-xs"
+              className="p-1.5 sm:p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors flex items-center gap-1 border border-slate-200 dark:border-slate-800 text-xs font-bold shadow-xs"
               title="Abrir vitrine em nova aba"
             >
               <Eye className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -202,7 +202,7 @@ function DashboardLayout() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-transparent"
+              className="p-1.5 sm:p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-transparent cursor-pointer"
               aria-label="Abrir menu da conta"
             >
               <Menu className="w-5 h-5" />
@@ -479,19 +479,23 @@ function DashboardLayout() {
         </main>
       </div>
 
-      {/* ─── Mobile Bottom Nav ───────────────────────────────────── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-[#0b0e17]/95 border-t border-slate-200/90 dark:border-slate-800/80 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] px-1 z-20 flex justify-around backdrop-blur-md shadow-[0_-4px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.5)]">
-        {navItems.map((item) => (
-          <Link
-            key={item.to}
-            to={item.to}
-            className="flex flex-col items-center gap-0.5 py-1 px-2.5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 [&.active]:text-blue-600 dark:[&.active]:text-blue-400 [&.active]:font-bold transition-colors"
-            activeOptions={{ exact: item.to === '/dashboard' }}
-          >
-            <item.icon className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-            <span className="text-[10px] tracking-tight">{item.label}</span>
-          </Link>
-        ))}
+      {/* ─── Mobile Bottom Nav (Fix Overflow on Small Screens) ──────── */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-[#0b0e17]/95 border-t border-slate-200/90 dark:border-slate-800/80 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] px-1 z-30 backdrop-blur-md shadow-[0_-4px_16px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.5)]">
+        <div className="grid grid-cols-5 w-full max-w-md mx-auto items-center">
+          {navItems.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="flex flex-col items-center justify-center gap-0.5 py-1 px-0.5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 [&.active]:text-blue-600 dark:[&.active]:text-blue-400 [&.active]:font-bold transition-colors min-w-0"
+              activeOptions={{ exact: item.to === '/dashboard' }}
+            >
+              <item.icon className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+              <span className="text-[9.5px] sm:text-[10px] tracking-tight truncate max-w-full leading-tight">
+                {item.mobileLabel || item.label}
+              </span>
+            </Link>
+          ))}
+        </div>
       </nav>
     </div>
   );

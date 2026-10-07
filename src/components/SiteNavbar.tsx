@@ -38,7 +38,7 @@ export function SiteNavbar({
   whatsapp,
   showThemeToggle = true,
   header_logo_alignment_desktop = 'left',
-  header_logo_alignment_mobile = 'left',
+  header_logo_alignment_mobile = 'center',
   header_show_theme_toggle = true,
   header_show_hours_badge = true,
   header_hours_text,
@@ -252,6 +252,76 @@ export function SiteNavbar({
                 )}
               </div>
             </>
+          ) : header_logo_alignment_desktop === 'right' ? (
+            /* Logo on Right */
+            <>
+              {/* Left: Navigation Links */}
+              <div className="flex items-center gap-1.5 flex-1 justify-start">
+                <nav
+                  className={`flex items-center gap-1 text-xs font-semibold p-1 rounded-full border backdrop-blur-md transition-all ${
+                    isDark
+                      ? "bg-zinc-900/60 border-zinc-800 text-zinc-300"
+                      : "bg-slate-100/80 border-slate-200/80 text-slate-600"
+                  }`}
+                >
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      className={`px-3.5 sm:px-4 py-1.5 rounded-full text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer ${
+                        link.active
+                          ? "bg-blue-600 text-white shadow-xs"
+                          : isDark
+                            ? "hover:text-white hover:bg-zinc-800/80"
+                            : "hover:text-slate-900 hover:bg-white/80"
+                      }`}
+                    >
+                      <span>{link.label}</span>
+                      {link.hasDot && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_6px_#10b981]" />
+                      )}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+
+              {/* Center: Actions */}
+              <div className="flex items-center gap-2.5 sm:gap-3 justify-center shrink-0 mx-4">
+                {header_show_theme_toggle !== false && (
+                  <div className="scale-75 sm:scale-85 origin-center">
+                    <ThemeToggleSwitch isDark={isDark} toggleTheme={handleToggleTheme} />
+                  </div>
+                )}
+
+                {header_show_hours_badge !== false && (
+                  <div className={`hidden lg:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl border transition whitespace-nowrap shadow-2xs ${
+                    isDark
+                      ? "bg-zinc-900/80 border-zinc-800 text-emerald-400"
+                      : "bg-emerald-50/80 border-emerald-200/80 text-emerald-700"
+                  }`}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>{header_hours_text || (afterHours ? "Fechado • Abre às 10h" : "Aberto até 18:00")}</span>
+                  </div>
+                )}
+
+                {header_show_whatsapp_button !== false && (
+                  <a
+                    href={whatsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3.5 sm:px-4.5 py-1.5 text-xs sm:text-sm font-extrabold text-white bg-emerald-600 hover:bg-emerald-500 active:scale-95 rounded-xl shadow-md shadow-emerald-600/25 transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
+                  >
+                    <WhatsAppIcon className="w-4 h-4 shrink-0" />
+                    <span>{header_cta_text || (isIphoneStore ? "Pedir no Zap" : "Chamar no Zap")}</span>
+                  </a>
+                )}
+              </div>
+
+              {/* Right: Brand Logo */}
+              <Link to={homePath} className="shrink-0 logo-desk flex items-center gap-2 group flex-1 justify-end">
+                {renderLogo(false)}
+              </Link>
+            </>
           ) : (
             /* DEFAULT: Logo on Left (Padrão Landing Page) */
             <>
@@ -359,36 +429,109 @@ export function SiteNavbar({
       {/* Mobile pill navbar (< 768px: Smartphones) */}
       <div className={`md:hidden fixed ${header_show_announcement && header_announcement_text ? 'top-9' : 'top-3 sm:top-4'} left-3 right-3 sm:left-4 sm:right-4 z-50 flex flex-col items-center pointer-events-none transition-all duration-300`}>
         <nav className={`pointer-events-auto w-full nav-pill ${scrolled ? "scrolled" : ""}`}>
-          <div className="flex items-center justify-between h-14 px-3 sm:px-4">
-            {/* Left: Brand Logo + Store Name */}
-            <Link
-              to={homePath}
-              className="flex items-center gap-2 transition-opacity hover:opacity-90 active:scale-95 min-w-0"
-              aria-label={`Página Inicial ${storeName || "Terephones"}`}
-            >
-              {renderLogo(true)}
-            </Link>
+          {header_logo_alignment_mobile === 'center' ? (
+            /* CENTER ALIGNMENT (PADRÃO MOBILE SOLICITADO): Balanced 3-column layout */
+            <div className="grid grid-cols-3 items-center h-14 px-3 sm:px-4 w-full">
+              {/* Left Column: WhatsApp Mobile Shortcut or Spacer */}
+              <div className="flex items-center justify-start min-w-0">
+                {header_show_whatsapp_mobile ? (
+                  <a
+                    href={whatsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition active:scale-95 border border-emerald-500/25 shrink-0 shadow-xs"
+                    title="Chamar no WhatsApp"
+                  >
+                    <WhatsAppIcon className="w-4 h-4" />
+                  </a>
+                ) : (
+                  <div className="w-8 h-8" aria-hidden="true" />
+                )}
+              </div>
 
-            {/* Right: Theme Toggle Switch (Always Active & On Right) */}
-            <div className="flex items-center gap-2 shrink-0">
-              {header_show_theme_toggle !== false && (
-                <div className="scale-80 sm:scale-85 origin-right">
-                  <ThemeToggleSwitch isDark={isDark} toggleTheme={handleToggleTheme} />
-                </div>
-              )}
-              {header_show_whatsapp_mobile && (
-                <a
-                  href={whatsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition active:scale-95 border border-emerald-500/25"
-                  title="Chamar no WhatsApp"
-                >
-                  <WhatsAppIcon className="w-4 h-4" />
-                </a>
-              )}
+              {/* Center Column: Rigorously Centered Brand Logo + Store Name */}
+              <Link
+                to={homePath}
+                className="flex items-center justify-center gap-1.5 transition-opacity hover:opacity-90 active:scale-95 min-w-0 text-center mx-auto"
+                aria-label={`Página Inicial ${storeName || "Terephones"}`}
+              >
+                {renderLogo(true)}
+              </Link>
+
+              {/* Right Column: Theme Toggle Switch */}
+              <div className="flex items-center justify-end gap-1.5 shrink-0">
+                {header_show_theme_toggle !== false && (
+                  <div className="scale-80 sm:scale-85 origin-right">
+                    <ThemeToggleSwitch isDark={isDark} toggleTheme={handleToggleTheme} />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          ) : header_logo_alignment_mobile === 'right' ? (
+            /* RIGHT ALIGNMENT ON MOBILE */
+            <div className="flex items-center justify-between h-14 px-3 sm:px-4 flex-row-reverse">
+              {/* Right: Brand Logo + Store Name */}
+              <Link
+                to={homePath}
+                className="flex items-center gap-2 transition-opacity hover:opacity-90 active:scale-95 min-w-0"
+                aria-label={`Página Inicial ${storeName || "Terephones"}`}
+              >
+                {renderLogo(true)}
+              </Link>
+
+              {/* Left: Theme Switch + WhatsApp */}
+              <div className="flex items-center gap-2 shrink-0">
+                {header_show_theme_toggle !== false && (
+                  <div className="scale-80 sm:scale-85 origin-left">
+                    <ThemeToggleSwitch isDark={isDark} toggleTheme={handleToggleTheme} />
+                  </div>
+                )}
+                {header_show_whatsapp_mobile && (
+                  <a
+                    href={whatsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition active:scale-95 border border-emerald-500/25"
+                    title="Chamar no WhatsApp"
+                  >
+                    <WhatsAppIcon className="w-4 h-4" />
+                  </a>
+                )}
+              </div>
+            </div>
+          ) : (
+            /* LEFT ALIGNMENT ON MOBILE */
+            <div className="flex items-center justify-between h-14 px-3 sm:px-4">
+              {/* Left: Brand Logo + Store Name */}
+              <Link
+                to={homePath}
+                className="flex items-center gap-2 transition-opacity hover:opacity-90 active:scale-95 min-w-0"
+                aria-label={`Página Inicial ${storeName || "Terephones"}`}
+              >
+                {renderLogo(true)}
+              </Link>
+
+              {/* Right: Theme Toggle Switch + WhatsApp */}
+              <div className="flex items-center gap-2 shrink-0">
+                {header_show_theme_toggle !== false && (
+                  <div className="scale-80 sm:scale-85 origin-right">
+                    <ThemeToggleSwitch isDark={isDark} toggleTheme={handleToggleTheme} />
+                  </div>
+                )}
+                {header_show_whatsapp_mobile && (
+                  <a
+                    href={whatsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition active:scale-95 border border-emerald-500/25"
+                    title="Chamar no WhatsApp"
+                  >
+                    <WhatsAppIcon className="w-4 h-4" />
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
         </nav>
 
         {/* Notificação rápida de tema (Mobile) */}

@@ -170,11 +170,11 @@ function ProdutosList() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
             <Link
               to="/dashboard/configuracoes"
               search={{ tab: 'categorias' } as any}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3.5 py-2.5 rounded-xl text-xs sm:text-sm border border-slate-200/80 transition shadow-xs cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-2.5 rounded-xl text-xs sm:text-sm border border-slate-200/80 transition shadow-xs cursor-pointer"
             >
               <Layers className="w-4 h-4 text-blue-600" />
               <span>Categorias</span>
@@ -183,7 +183,7 @@ function ProdutosList() {
             {canAdd ? (
               <Link
                 to="/dashboard/produtos/novo"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs sm:text-sm shadow-md shadow-blue-600/20 transition-all hover:scale-102 active:scale-98 cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-2.5 rounded-xl text-xs sm:text-sm shadow-md shadow-blue-600/20 transition-all hover:scale-102 active:scale-98 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Novo Produto</span>
@@ -191,7 +191,7 @@ function ProdutosList() {
             ) : (
               <button
                 disabled
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-200 text-slate-400 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold cursor-not-allowed"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-slate-200 text-slate-400 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold cursor-not-allowed"
               >
                 <AlertCircle className="w-4 h-4" />
                 <span>Limite Atingido</span>

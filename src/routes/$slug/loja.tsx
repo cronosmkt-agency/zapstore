@@ -12,6 +12,7 @@ import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { ThemeSelectorModal, type ThemeMode } from '@/components/ThemeSelectorModal';
 import { TawkFloatingWidget } from '@/components/TawkFloatingWidget';
 import { defaultProducts, fmt, WHATSAPP } from '@/data/storeData';
+import { updateFavicon, restoreDefaultFavicon } from '@/lib/favicon';
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/$slug/loja')({
@@ -58,7 +59,23 @@ function StoreCatalogPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc' | 'name-asc'>('featured');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [currentTheme, setCurrentTheme] = useState<ThemeMode>('white');
+  const [currentTheme, setCurrentTheme] = useState<ThemeMode>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = (localStorage.getItem(`zapstore_theme_${slug}`) ||
+        (slug === 'terephones' ? localStorage.getItem('terephones_theme') : null)) as ThemeMode | null;
+      if (saved === 'black-piano' || saved === 'white') {
+        const root = document.documentElement;
+        root.classList.remove('theme-white', 'theme-black-piano', 'dark');
+        if (saved === 'black-piano') {
+          root.classList.add('theme-black-piano', 'dark');
+        } else {
+          root.classList.add('theme-white');
+        }
+        return saved;
+      }
+    }
+    return 'white';
+  });
   const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(null);
 
   // Mouse Drag-to-Scroll for categories
@@ -113,27 +130,35 @@ function StoreCatalogPage() {
       .filter((c) => c.name.toLowerCase() !== 'todos' && c.slug.toLowerCase() !== 'todos' && c.slug.toLowerCase() !== 'geral');
     setCategories(cats);
 
+    // Dynamic Favicon per store
+    const icon = s?.favicon_url || s?.logo_url;
+    if (icon) {
+      updateFavicon(icon);
+    }
+
     // Theme initialization - scoped per store
     const themeKey = `zapstore_theme_${slug}`;
-    const saved = localStorage.getItem(themeKey) as ThemeMode | null;
-    const initialTheme: ThemeMode =
-      saved === 'black-piano' || saved === 'white'
-        ? saved
-        : s?.theme_mode === 'black-piano'
-        ? 'black-piano'
-        : 'white';
-
-    setCurrentTheme(initialTheme);
-    const root = document.documentElement;
-    root.classList.remove('theme-white', 'theme-black-piano', 'dark');
-    if (initialTheme === 'black-piano') {
-      root.classList.add('theme-black-piano', 'dark');
-    } else {
-      root.classList.add('theme-white');
+    const saved = (localStorage.getItem(themeKey) || (slug === 'terephones' ? localStorage.getItem('terephones_theme') : null)) as ThemeMode | null;
+    if (!saved && (s?.theme_mode === 'black-piano' || s?.theme_mode === 'white')) {
+      setCurrentTheme(s.theme_mode);
+      const root = document.documentElement;
+      root.classList.remove('theme-white', 'theme-black-piano', 'dark');
+      if (s.theme_mode === 'black-piano') {
+        root.classList.add('theme-black-piano', 'dark');
+      } else {
+        root.classList.add('theme-white');
+      }
     }
 
     setLoading(false);
   }, [slug]);
+
+  // Clean up favicon on unmount
+  useEffect(() => {
+    return () => {
+      restoreDefaultFavicon();
+    };
+  }, []);
 
   // Track store visit
   useEffect(() => {
@@ -153,6 +178,9 @@ function StoreCatalogPage() {
       root.classList.add('theme-white');
     }
     localStorage.setItem(`zapstore_theme_${slug}`, next);
+    if (slug === 'terephones') {
+      localStorage.setItem('terephones_theme', next);
+    }
     window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: next } }));
     toast.success(next === 'black-piano' ? 'Modo Black ativado' : 'Modo Branco ativado', {
       id: 'theme-toggle',
@@ -259,9 +287,10 @@ function StoreCatalogPage() {
     );
   }
 
-  const rawWhatsapp = settings.whatsapp || '5521964639999';
+  const isTerephones = slug === 'terephones';
+  const rawWhatsapp = settings.whatsapp || profile?.whatsapp || (isTerephones ? '5521964639999' : '');
   const whatsDigits = rawWhatsapp.replace(/\D/g, '');
-  const phoneDisplay = settings.phone_display || '(21) 96463-9999';
+  const phoneDisplay = settings.phone_display || (isTerephones ? '(21) 96463-9999' : '');
 
   const handleOrderWhatsApp = (prod: ProductItem) => {
     if (profile?.id) {
@@ -284,7 +313,7 @@ function StoreCatalogPage() {
 
     let text = settings.whatsapp_message_template;
     if (!text) {
-      if (isIphoneStore) {
+      if (isIphoneStore || prod.name.toLowerCase().includes('iphone')) {
         text = `Olá, equipe ${storeName}! Gostaria de pedir este item que vi na Loja:
 
 📱 *Aparelho:* ${prod.name}
@@ -310,7 +339,14 @@ Gostaria de confirmar a disponibilidade!`;
         .replace(/{condition}/g, condText);
     }
 
-    window.open(`https://wa.me/${whatsDigits}?text=${encodeURIComponent(text)}`, '_blank');
+    const rawNumber = settings.whatsapp || profile?.whatsapp || (isTerephones ? '5521964639999' : '');
+    const targetDigits = rawNumber.replace(/\D/g, '');
+    if (!targetDigits) {
+      alert(`O WhatsApp da loja ${storeName} está sendo configurado pelo lojista. Por favor, tente novamente em instantes.`);
+      return;
+    }
+
+    window.open(`https://wa.me/${targetDigits}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   return (
@@ -321,7 +357,13 @@ Gostaria de confirmar a disponibilidade!`;
         '--accent': settings.accent_color || '#0ea5e9',
       } as React.CSSProperties}
     >
-      <ThemeSelectorModal currentTheme={currentTheme} onThemeChange={setCurrentTheme} />
+      <ThemeSelectorModal
+        currentTheme={currentTheme}
+        onThemeChange={setCurrentTheme}
+        storeSlug={slug}
+        storeName={storeName}
+        storeLogo={settings.logo_url}
+      />
 
       {/* Navbar with dynamic store props */}
       <SiteNavbar
@@ -332,8 +374,8 @@ Gostaria de confirmar a disponibilidade!`;
         storeLogo={settings.logo_url}
         whatsapp={rawWhatsapp}
         showThemeToggle={settings.enable_dark_mode_toggle !== false}
-        header_logo_alignment_desktop={settings.header_logo_alignment_desktop}
-        header_logo_alignment_mobile={settings.header_logo_alignment_mobile}
+        header_logo_alignment_desktop={settings.header_logo_alignment_desktop || 'left'}
+        header_logo_alignment_mobile={settings.header_logo_alignment_mobile || 'center'}
         header_show_theme_toggle={settings.header_show_theme_toggle !== false}
         header_show_hours_badge={settings.header_show_hours_badge !== false}
         header_hours_text={settings.header_hours_text}
@@ -844,6 +886,7 @@ Gostaria de confirmar a disponibilidade!`;
         onClose={() => setSelectedProduct(null)} 
         whatsappNumber={whatsDigits}
         storeName={storeName}
+        storeSlug={slug}
       />
 
       {/* Footer */}

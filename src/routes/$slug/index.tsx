@@ -18,6 +18,7 @@ import {
 import { ThemeSelectorModal, type ThemeMode } from "@/components/ThemeSelectorModal";
 import { ProductDetailModal, type ProductItem } from "@/components/ProductDetailModal";
 import { defaultProducts, fmt, WHATSAPP, PHONE_DISPLAY, reviews as defaultReviews } from "@/data/storeData";
+import { updateFavicon, restoreDefaultFavicon } from "@/lib/favicon";
 import { SiteNavbar } from "@/components/SiteNavbar";
 import { SiteFooter } from "@/components/SiteFooter";
 import { WhatsFloat } from "@/components/WhatsFloat";
@@ -46,7 +47,17 @@ function BackgroundOrbs() {
 }
 
 /* ---------- 3D Floating Tilt Phone / Hero Image (Desktop Only) ---------- */
-function TiltPhone({ image, storeName }: { image?: string; storeName?: string }) {
+function TiltPhone({
+  image,
+  storeName,
+  storeLogo,
+  isTerephones,
+}: {
+  image?: string;
+  storeName?: string;
+  storeLogo?: string;
+  isTerephones?: boolean;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number | undefined>(undefined);
@@ -140,22 +151,77 @@ function TiltPhone({ image, storeName }: { image?: string; storeName?: string })
           zIndex: 0,
         }}
       />
-      <img
-        src={image || heroIphone}
-        alt={storeName ? `Destaque ${storeName}` : "Produto em destaque"}
-        fetchPriority="high"
-        decoding="async"
-        width={500}
-        height={500}
-        className="relative z-10 w-[300px] lg:w-[460px] max-h-[420px] object-contain h-auto float-slow"
-        style={{
-          filter: "drop-shadow(0 35px 50px rgba(13,27,62,0.22))",
-          transformStyle: "preserve-3d",
-          userSelect: "none",
-          pointerEvents: "none",
-        }}
-        draggable={false}
-      />
+      {image ? (
+        <img
+          src={image}
+          alt={storeName ? `Destaque ${storeName}` : "Produto em destaque"}
+          fetchPriority="high"
+          decoding="async"
+          width={500}
+          height={500}
+          className="relative z-10 w-[300px] lg:w-[460px] max-h-[420px] object-contain h-auto float-slow"
+          style={{
+            filter: "drop-shadow(0 35px 50px rgba(13,27,62,0.22))",
+            transformStyle: "preserve-3d",
+            userSelect: "none",
+            pointerEvents: "none",
+          }}
+          draggable={false}
+        />
+      ) : isTerephones ? (
+        <img
+          src={heroIphone}
+          alt={storeName ? `Destaque ${storeName}` : "Produto em destaque"}
+          fetchPriority="high"
+          decoding="async"
+          width={500}
+          height={500}
+          className="relative z-10 w-[300px] lg:w-[460px] max-h-[420px] object-contain h-auto float-slow"
+          style={{
+            filter: "drop-shadow(0 35px 50px rgba(13,27,62,0.22))",
+            transformStyle: "preserve-3d",
+            userSelect: "none",
+            pointerEvents: "none",
+          }}
+          draggable={false}
+        />
+      ) : storeLogo ? (
+        <div
+          className="relative z-10 w-[280px] lg:w-[380px] h-[320px] rounded-3xl p-8 flex flex-col items-center justify-center text-center float-slow"
+          style={{
+            background: "linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04))",
+            backdropFilter: "blur(20px)",
+            border: "1px solid rgba(255, 255, 255, 0.18)",
+            boxShadow: "0 35px 50px rgba(13,27,62,0.25)",
+            transformStyle: "preserve-3d",
+          }}
+        >
+          <img
+            src={storeLogo}
+            alt={storeName || "Logo"}
+            className="max-h-24 max-w-[200px] object-contain mb-4 filter drop-shadow-md"
+          />
+          <h3 className="text-xl font-black text-slate-900 dark:text-white">{storeName}</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Produtos Selecionados & Pronta Entrega</p>
+        </div>
+      ) : (
+        <div
+          className="relative z-10 w-[280px] lg:w-[380px] h-[320px] rounded-3xl p-8 flex flex-col items-center justify-center text-center float-slow"
+          style={{
+            background: "linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04))",
+            backdropFilter: "blur(20px)",
+            border: "1px solid rgba(255, 255, 255, 0.18)",
+            boxShadow: "0 35px 50px rgba(13,27,62,0.25)",
+            transformStyle: "preserve-3d",
+          }}
+        >
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-sky-400 flex items-center justify-center text-white mb-4 shadow-lg shadow-blue-500/30">
+            <ShoppingBag className="w-8 h-8" />
+          </div>
+          <h3 className="text-xl font-black text-slate-900 dark:text-white">{storeName || "Vitrine Online"}</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Peça direto pelo WhatsApp</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -237,9 +303,36 @@ function SlugStorePage() {
   const [productList, setProductList] = useState<ProductItem[]>([]);
   const [reviewsList, setReviewsList] = useState<any[]>([]);
 
-  const [currentTheme, setCurrentTheme] = useState<ThemeMode>("white");
+  const [currentTheme, setCurrentTheme] = useState<ThemeMode>(() => {
+    if (typeof window !== "undefined") {
+      const saved = (localStorage.getItem(`zapstore_theme_${slug}`) ||
+        (slug === "terephones" ? localStorage.getItem("terephones_theme") : null)) as ThemeMode | null;
+      if (saved === "black-piano" || saved === "white") {
+        const root = document.documentElement;
+        root.classList.remove("theme-white", "theme-black-piano", "dark");
+        if (saved === "black-piano") {
+          root.classList.add("theme-black-piano", "dark");
+        } else {
+          root.classList.add("theme-white");
+        }
+        return saved;
+      }
+    }
+    return "white";
+  });
   const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  // Dynamic Favicon per store
+  useEffect(() => {
+    const icon = settings?.favicon_url || settings?.logo_url;
+    if (icon) {
+      updateFavicon(icon);
+    }
+    return () => {
+      restoreDefaultFavicon();
+    };
+  }, [settings?.favicon_url, settings?.logo_url]);
 
   // Load store data on mount
   useEffect(() => {
@@ -286,23 +379,18 @@ function SlugStorePage() {
       db.analytics.trackVisit(p.id);
     }
 
-    // Set initial theme based on store settings or scoped localStorage
+    // Set initial theme based on store settings if not already customized by visitor
     const themeKey = `zapstore_theme_${slug}`;
     const saved = (localStorage.getItem(themeKey) || (isTerephones ? localStorage.getItem("terephones_theme") : null)) as ThemeMode | null;
-    const initialTheme: ThemeMode =
-      saved === "black-piano" || saved === "white"
-        ? saved
-        : s?.theme_mode === "black-piano"
-        ? "black-piano"
-        : "white";
-
-    setCurrentTheme(initialTheme);
-    const root = document.documentElement;
-    root.classList.remove("theme-white", "theme-black-piano", "dark");
-    if (initialTheme === "black-piano") {
-      root.classList.add("theme-black-piano", "dark");
-    } else {
-      root.classList.add("theme-white");
+    if (!saved && (s?.theme_mode === "black-piano" || s?.theme_mode === "white")) {
+      setCurrentTheme(s.theme_mode);
+      const root = document.documentElement;
+      root.classList.remove("theme-white", "theme-black-piano", "dark");
+      if (s.theme_mode === "black-piano") {
+        root.classList.add("theme-black-piano", "dark");
+      } else {
+        root.classList.add("theme-white");
+      }
     }
 
     setLoading(false);
@@ -401,8 +489,12 @@ function SlugStorePage() {
       .replace(/{storage}/g, storageDisplay || "Padrão")
       .replace(/{condition}/g, condText);
 
-    const rawWhatsapp = settings?.whatsapp || "5521964639999";
-    const digits = rawWhatsapp.replace(/\D/g, "");
+    const rawPhone = settings?.whatsapp || profile?.whatsapp || (isTerephones ? "5521964639999" : "");
+    const digits = rawPhone.replace(/\D/g, "");
+    if (!digits) {
+      alert(`O WhatsApp da loja ${storeName} está sendo configurado pelo lojista. Por favor, tente novamente em instantes.`);
+      return;
+    }
     window.open(`https://wa.me/${digits}?text=${encodeURIComponent(text)}`, "_blank");
   };
 
@@ -410,11 +502,16 @@ function SlugStorePage() {
     if (profile?.id) {
       db.analytics.trackLead(profile.id);
     }
-    const storeName = settings?.store_name || "Terephones";
+    const isTerephones = slug === "terephones" || (settings?.store_name || "").toLowerCase().includes("terephones");
+    const storeName = settings?.store_name || (isTerephones ? "Terephones" : "Loja");
     let text = settings?.tradein_whatsapp_message || `Olá, equipe {store_name}! Gostaria de fazer uma simulação de Troca com Troco (Trade-in) do meu aparelho usado por um novo.`;
     text = text.replace(/{store_name}/g, storeName);
-    const rawWhatsapp = settings?.whatsapp || "5521964639999";
-    const digits = rawWhatsapp.replace(/\D/g, "");
+    const rawPhone = settings?.whatsapp || profile?.whatsapp || (isTerephones ? "5521964639999" : "");
+    const digits = rawPhone.replace(/\D/g, "");
+    if (!digits) {
+      alert(`O WhatsApp da loja ${storeName} está sendo configurado pelo lojista. Por favor, tente novamente em instantes.`);
+      return;
+    }
     window.open(`https://wa.me/${digits}?text=${encodeURIComponent(text)}`, "_blank");
   };
 
@@ -477,14 +574,18 @@ function SlugStorePage() {
     );
   }
 
-  const rawWhatsapp = settings.whatsapp || "5521964639999";
+  const isTerephones = slug === "terephones";
+  const rawWhatsapp = settings.whatsapp || profile?.whatsapp || (isTerephones ? "5521964639999" : "");
   const whatsDigits = rawWhatsapp.replace(/\D/g, "");
-  const whatsLink = `https://wa.me/${whatsDigits}`;
-  const storeName = settings.store_name || "Terephones";
-  const storeTagline = settings.store_tagline || "iPhones Novos & Seminovos em Teresópolis";
-  const phoneDisplay = settings.phone_display || "(21) 96463-9999";
+  const whatsLink = whatsDigits ? `https://wa.me/${whatsDigits}` : "";
+  const storeName = settings.store_name || (isTerephones ? "Terephones" : "Loja");
+  const storeTagline = settings.store_tagline || (isTerephones ? "iPhones Novos & Seminovos em Teresópolis" : "Catálogo & Pedidos Online");
+  const phoneDisplay = settings.phone_display || (isTerephones ? "(21) 96463-9999" : "");
 
-  const doubledReviews = [...reviewsList, ...reviewsList];
+  const marqueeReviews = reviewsList.length > 0
+    ? Array.from({ length: Math.max(2, Math.ceil(8 / reviewsList.length)) })
+        .flatMap(() => reviewsList)
+    : [];
 
   return (
     <div
@@ -494,7 +595,13 @@ function SlugStorePage() {
         "--accent": settings.accent_color || "#0ea5e9",
       } as React.CSSProperties}
     >
-      <ThemeSelectorModal currentTheme={currentTheme} onThemeChange={setCurrentTheme} />
+      <ThemeSelectorModal
+        currentTheme={currentTheme}
+        onThemeChange={setCurrentTheme}
+        storeSlug={slug}
+        storeName={storeName}
+        storeLogo={settings.logo_url}
+      />
       <BackgroundOrbs />
 
       {/* Navbar with dynamic store props */}
@@ -506,8 +613,8 @@ function SlugStorePage() {
         storeLogo={settings.logo_url}
         whatsapp={rawWhatsapp}
         showThemeToggle={settings.enable_dark_mode_toggle !== false}
-        header_logo_alignment_desktop={settings.header_logo_alignment_desktop}
-        header_logo_alignment_mobile={settings.header_logo_alignment_mobile}
+        header_logo_alignment_desktop={settings.header_logo_alignment_desktop || 'left'}
+        header_logo_alignment_mobile={settings.header_logo_alignment_mobile || 'center'}
         header_show_theme_toggle={settings.header_show_theme_toggle !== false}
         header_show_hours_badge={settings.header_show_hours_badge !== false}
         header_hours_text={settings.header_hours_text}
@@ -591,19 +698,29 @@ function SlugStorePage() {
                   <span>{settings.cta_button_text || "Ver Catálogo na Loja"}</span>
                 </Link>
 
-                <a
-                  href={whatsLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 py-3 sm:py-3.5 px-6 rounded-full font-bold text-sm bg-emerald-600 hover:bg-emerald-500 text-white shadow-md active:scale-95 transition"
-                >
-                  <WhatsAppIcon className="w-4 h-4 fill-white" />
-                  <span>Pedir no WhatsApp</span>
-                </a>
+                {whatsLink ? (
+                  <a
+                    href={whatsLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 py-3 sm:py-3.5 px-6 rounded-full font-bold text-sm bg-emerald-600 hover:bg-emerald-500 text-white shadow-md active:scale-95 transition"
+                  >
+                    <WhatsAppIcon className="w-4 h-4 fill-white" />
+                    <span>Pedir no WhatsApp</span>
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => alert(`O WhatsApp da loja ${storeName} está sendo configurado pelo lojista.`)}
+                    className="inline-flex items-center justify-center gap-2 py-3 sm:py-3.5 px-6 rounded-full font-bold text-sm bg-emerald-600 hover:bg-emerald-500 text-white shadow-md active:scale-95 transition cursor-pointer"
+                  >
+                    <WhatsAppIcon className="w-4 h-4 fill-white" />
+                    <span>Pedir no WhatsApp</span>
+                  </button>
+                )}
               </div>
 
               {/* Micro Trust Indicators */}
-              <div className="mt-5 sm:mt-8 grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center lg:justify-start gap-2 sm:gap-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
+              <div className="mt-5 sm:mt-8 mb-6 sm:mb-0 grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center lg:justify-start gap-2 sm:gap-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
                 <div className="flex items-center justify-center sm:justify-start gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60">
                   <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
                   <span>{settings.trust_badge_rating || (slug === "terephones" ? "4,9 no Google" : "Nota 5.0")}</span>
@@ -626,8 +743,10 @@ function SlugStorePage() {
             {/* Right Column: 3D Tilt Phone on Desktop */}
             <div className="hidden lg:flex lg:col-span-5 justify-center items-center">
               <TiltPhone
-                image={settings.hero_image_url || featured[0]?.img || (slug === "terephones" ? heroIphone : undefined)}
+                image={settings.hero_image_url || featured[0]?.img}
                 storeName={storeName}
+                storeLogo={settings.logo_url}
+                isTerephones={slug === "terephones"}
               />
             </div>
           </div>
@@ -919,9 +1038,9 @@ function SlugStorePage() {
           </section>
         )}
 
-        {/* 5. REVIEWS & LOCATION (Apenas quando houver depoimentos) */}
+        {/* 5. REVIEWS (Apenas quando houver depoimentos) */}
         {reviewsList.length > 0 && (
-          <section id="sobre" className="py-10 sm:py-16 px-4 sm:px-6 overflow-hidden scroll-mt-24">
+          <section id="avaliacoes" className="py-10 sm:py-16 px-4 sm:px-6 overflow-hidden scroll-mt-24">
             <div className="max-w-6xl mx-auto">
               <SectionTitle
                 badge={settings.reviews_badge || "Avaliação 5 ★"}
@@ -930,9 +1049,9 @@ function SlugStorePage() {
                 subtitle={settings.reviews_subtitle || (slug === "terephones" ? "Mais de 500 clientes atendidos com nota máxima em procedência e rapidez." : "Depoimentos de quem já comprou e comprova a nossa qualidade e atendimento.")}
               />
 
-              <div className="relative mt-4 mb-12 sm:mb-16 overflow-hidden py-2">
+              <div className="relative mt-4 overflow-hidden py-2">
                 <div className="marquee">
-                  {doubledReviews.map((r, i) => (
+                  {marqueeReviews.map((r, i) => (
                     <div
                       key={i}
                       className="glass-card p-4 sm:p-5 w-[280px] sm:w-[320px] rounded-2xl shrink-0 text-left border border-slate-200/70 dark:border-slate-800/70"
@@ -960,56 +1079,64 @@ function SlugStorePage() {
                   ))}
                 </div>
               </div>
+            </div>
+          </section>
+        )}
 
-              {/* Physical Location Card (Apenas se habilitado) */}
-              {(settings.enable_physical_location === true || (slug === "terephones" && settings.enable_physical_location !== false)) && (
-                <div className="glass-card p-6 sm:p-10 rounded-3xl border border-blue-500/20 max-w-4xl mx-auto">
-                  <div className="grid md:grid-cols-12 gap-6 items-center">
-                    <div className="md:col-span-8 text-center md:text-left">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/80 dark:border-indigo-800/80 mb-3">
-                        <Building2 className="w-3.5 h-3.5" />
-                        <span>{settings.location_badge || "Ponto de Atendimento"}</span>
-                      </span>
+        {/* 6. PHYSICAL LOCATION & SOBRE (Renderiza se habilitado, independente de reviews) */}
+        {(settings.enable_physical_location === true || (slug === "terephones" && settings.enable_physical_location !== false)) && (
+          <section id="sobre" className="py-10 sm:py-16 px-4 sm:px-6 scroll-mt-24">
+            <div className="max-w-4xl mx-auto">
+              <div className="glass-card p-6 sm:p-10 rounded-3xl border border-blue-500/20">
+                <div className="grid md:grid-cols-12 gap-6 items-center">
+                  <div className="md:col-span-8 text-center md:text-left">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/80 dark:border-indigo-800/80 mb-3">
+                      <Building2 className="w-3.5 h-3.5" />
+                      <span>{settings.location_badge || "Ponto de Atendimento"}</span>
+                    </span>
 
-                      <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                        {settings.location_title || (slug === "terephones" ? "Loja Parceira SejaDelta em Teresópolis" : "Atendimento Presencial")}
-                      </h3>
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                      {settings.location_title || (slug === "terephones" ? "Loja Parceira SejaDelta em Teresópolis" : "Atendimento Presencial")}
+                    </h3>
 
-                      <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                        {settings.location_desc || (slug === "terephones" ? "Você conta com o suporte e a segurança de um endereço presencial no centro da cidade para retirar aparelhos, aplicar películas ou tirar dúvidas pessoalmente." : "Venha conhecer nosso espaço ou agendar a retirada presencial do seu pedido com total comodidade.")}
-                      </p>
+                    <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                      {settings.location_desc || (slug === "terephones" ? "Você conta com o suporte e a segurança de um endereço presencial no centro da cidade para retirar aparelhos, aplicar películas ou tirar dúvidas pessoalmente." : "Venha conhecer nosso espaço ou agendar a retirada presencial do seu pedido com total comodidade.")}
+                    </p>
 
-                      <div className="mt-4 space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-                        {settings.address && (
-                          <div className="flex items-center justify-center md:justify-start gap-2">
-                            <MapPin className="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0" />
-                            <span>{settings.address}</span>
-                          </div>
-                        )}
+                    <div className="mt-4 space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                      {settings.address && (
                         <div className="flex items-center justify-center md:justify-start gap-2">
-                          <Clock className="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0" />
-                          <span>{settings.business_hours || "Segunda a Sábado — Horário Comercial"}</span>
+                          <MapPin className="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0" />
+                          <span>{settings.address}</span>
                         </div>
+                      )}
+                      <div className="flex items-center justify-center md:justify-start gap-2">
+                        <Clock className="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0" />
+                        <span>{settings.business_hours || "Segunda a Sábado — Horário Comercial"}</span>
+                      </div>
+                      {phoneDisplay && (
                         <div className="flex items-center justify-center md:justify-start gap-2">
                           <Phone className="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0" />
                           <span>WhatsApp de Suporte: {phoneDisplay}</span>
                         </div>
-                      </div>
-                    </div>
-
-                    <div className="md:col-span-4 flex flex-col items-center justify-center gap-3">
-                      {settings.address && (
-                        <a
-                          href={settings.google_maps_url || `https://maps.google.com/?q=${encodeURIComponent(settings.address)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn-primary-glow w-full py-3 px-5 rounded-full text-xs font-bold text-white flex items-center justify-center gap-2 shadow-md active:scale-95 transition"
-                        >
-                          <ExternalLink className="w-4 h-4 shrink-0" />
-                          <span>Abrir no Google Maps</span>
-                        </a>
                       )}
+                    </div>
+                  </div>
 
+                  <div className="md:col-span-4 flex flex-col items-center justify-center gap-3">
+                    {settings.address && (
+                      <a
+                        href={settings.google_maps_url || `https://maps.google.com/?q=${encodeURIComponent(settings.address)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-primary-glow w-full py-3 px-5 rounded-full text-xs font-bold text-white flex items-center justify-center gap-2 shadow-md active:scale-95 transition"
+                      >
+                        <ExternalLink className="w-4 h-4 shrink-0" />
+                        <span>Abrir no Google Maps</span>
+                      </a>
+                    )}
+
+                    {whatsLink ? (
                       <a
                         href={`${whatsLink}?text=${encodeURIComponent(`Olá! Gostaria de mais informações sobre atendimento presencial ou agendar uma retirada.`)}`}
                         target="_blank"
@@ -1018,10 +1145,17 @@ function SlugStorePage() {
                       >
                         Agendar Atendimento
                       </a>
-                    </div>
+                    ) : (
+                      <button
+                        onClick={() => alert(`O WhatsApp da loja ${storeName} está sendo configurado pelo lojista.`)}
+                        className="w-full py-2.5 px-4 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition text-center cursor-pointer"
+                      >
+                        Agendar Atendimento
+                      </button>
+                    )}
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           </section>
         )}
@@ -1037,6 +1171,7 @@ function SlugStorePage() {
         }}
         whatsappNumber={whatsDigits}
         storeName={storeName}
+        storeSlug={slug}
       />
 
       {/* Footer */}

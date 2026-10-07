@@ -148,51 +148,54 @@ function DashboardOverview() {
       </div>
 
       {/* ─── Share Store Link Card ───────────────────────────────── */}
-      <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl shadow-sm border border-blue-800/40 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5 w-full md:w-auto">
-          <div className="w-11 h-11 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-sky-400 shrink-0 border border-white/10">
+      <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl shadow-sm border border-blue-800/40 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 w-full md:w-auto">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-sky-400 shrink-0 border border-white/10">
             <Share2 className="w-5 h-5" />
           </div>
-          <div>
-            <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
-              <span>Link da Sua Loja Online</span>
-              <span className="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30">Pronta para Vender</span>
-            </h3>
-            <p className="text-xs text-slate-300 font-mono mt-0.5 truncate max-w-xs sm:max-w-md">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <span className="text-sm sm:text-base font-black text-white">Link da Sua Loja Online</span>
+              <span className="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30 shrink-0">
+                Pronta para Vender
+              </span>
+            </div>
+            <p className="text-xs text-slate-300 font-mono mt-1 truncate max-w-full">
               {storeUrl}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full md:w-auto shrink-0">
           <button
             type="button"
             onClick={handleCopyLink}
-            className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition cursor-pointer backdrop-blur-md"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition cursor-pointer backdrop-blur-md active:scale-95"
           >
             {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-sky-300" />}
             <span>{copiedLink ? 'Copiado!' : 'Copiar Link'}</span>
           </button>
 
           <a
-            href={`/${session.user.slug}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition cursor-pointer backdrop-blur-md"
-            title="Abrir vitrine em nova aba"
-          >
-            <ExternalLink className="w-3.5 h-3.5 text-sky-300" />
-            <span className="hidden sm:inline">Abrir</span>
-          </a>
-
-          <a
             href={`https://wa.me/?text=${encodeURIComponent(`Olá! Conheça o catálogo online da loja ${storeName} e faça seu pedido direto comigo: ${storeUrl}`)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition cursor-pointer shadow-sm"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition cursor-pointer shadow-sm active:scale-95"
           >
             <WhatsAppIcon className="w-3.5 h-3.5" />
             <span>Divulgar no Zap</span>
+          </a>
+
+          <a
+            href={`/${session.user.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="col-span-2 sm:col-span-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition cursor-pointer backdrop-blur-md"
+            title="Abrir vitrine em nova aba"
+          >
+            <ExternalLink className="w-3.5 h-3.5 text-sky-300" />
+            <span className="sm:hidden">Abrir Loja</span>
+            <span className="hidden sm:inline">Abrir</span>
           </a>
         </div>
       </div>

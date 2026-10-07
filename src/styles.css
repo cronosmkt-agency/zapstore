@@ -76,6 +76,8 @@ html.theme-black-piano {
 }
 
 html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
   background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 40%, var(--bg-tertiary) 100%);
   background-attachment: fixed;
   color: var(--text-primary);

@@ -213,18 +213,22 @@ function AdminLayout() {
       </main>
 
       {/* ─── Mobile Bottom Navigation Bar (Fixed) ───────────────── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 border-t border-slate-200/90 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] px-1.5 z-30 flex justify-around backdrop-blur-md shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
-        {navItems.map((item) => (
-          <Link
-            key={item.to}
-            to={item.to}
-            className="flex flex-col items-center gap-0.5 py-1 px-2 text-slate-500 [&.active]:text-blue-600 [&.active]:font-bold transition-colors"
-            activeOptions={{ exact: item.to === '/admin' }}
-          >
-            <item.icon className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="text-[10px] tracking-tight">{item.mobileLabel}</span>
-          </Link>
-        ))}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 border-t border-slate-200/90 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] px-1 z-30 backdrop-blur-md shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+        <div className="grid grid-cols-5 w-full max-w-md mx-auto items-center">
+          {navItems.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="flex flex-col items-center justify-center gap-0.5 py-1 px-0.5 text-slate-500 [&.active]:text-blue-600 [&.active]:font-bold transition-colors min-w-0"
+              activeOptions={{ exact: item.to === '/admin' }}
+            >
+              <item.icon className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+              <span className="text-[9.5px] sm:text-[10px] tracking-tight truncate max-w-full leading-tight">
+                {item.mobileLabel}
+              </span>
+            </Link>
+          ))}
+        </div>
       </nav>
     </div>
   );

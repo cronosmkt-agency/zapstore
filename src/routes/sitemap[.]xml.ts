@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 
-const BASE_URL = process.env.VITE_APP_URL || "https://zapstore-mu.vercel.app";
+const BASE_URL = process.env.VITE_APP_URL || "https://zapstore.cronosmkt-agency.workers.dev";
 
 interface SitemapEntry {
   path: string;

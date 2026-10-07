@@ -14,7 +14,7 @@ export function MobileBottomNav({ basePath }: { basePath?: string } = {}) {
   return (
     <nav
       aria-label="Navegação rápida mobile"
-      className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/92 dark:bg-slate-950/92 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800/80 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.5)] px-6 py-2 pb-[max(0.65rem,env(safe-area-inset-bottom))]"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/92 dark:bg-slate-950/92 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800/80 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.5)] px-6 py-2 pb-[max(0.65rem,env(safe-area-inset-bottom))]"
     >
       <div className="grid grid-cols-2 max-w-xs mx-auto items-center gap-4">
         {/* Início */}
